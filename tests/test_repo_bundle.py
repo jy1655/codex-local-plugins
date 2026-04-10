@@ -14,6 +14,8 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("jy-autoplan", text)
         self.assertIn("jy-framing", text)
         self.assertIn("jy-plan-review", text)
+        self.assertIn("jy-writing-plans", text)
+        self.assertIn("jy-worktrees", text)
         self.assertIn("jy-document-release", text)
         self.assertIn("jy-ship", text)
         self.assertIn("Shift+Tab", text)
@@ -44,7 +46,11 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("### Maintenance", text)
         self.assertIn("### Authoring", text)
         self.assertIn("`jy-autoplan`", text)
+        self.assertIn("`jy-writing-plans`", text)
+        self.assertIn("`jy-worktrees`", text)
         self.assertIn("`jy-test-driven`", text)
+        self.assertIn("`jy-executing-plans`", text)
+        self.assertIn("`jy-receiving-review`", text)
         self.assertIn("`jy-intent-gate`", text)
         self.assertIn("`jy-ship`", text)
         self.assertIn("`jy-env-sync-admin`", text)
@@ -89,6 +95,10 @@ class RepoBundleTests(unittest.TestCase):
         self.assertTrue((skill_root / "jy-plan-review" / "agents" / "openai.yaml").exists())
         self.assertTrue((skill_root / "jy-autoplan" / "SKILL.md").exists())
         self.assertTrue((skill_root / "jy-autoplan" / "agents" / "openai.yaml").exists())
+        self.assertTrue((skill_root / "jy-writing-plans" / "SKILL.md").exists())
+        self.assertTrue((skill_root / "jy-writing-plans" / "agents" / "openai.yaml").exists())
+        self.assertTrue((skill_root / "jy-worktrees" / "SKILL.md").exists())
+        self.assertTrue((skill_root / "jy-worktrees" / "agents" / "openai.yaml").exists())
         self.assertTrue((skill_root / "_shared" / "jy-planning-pack.md").exists())
 
     def test_codex_env_core_bundle_includes_codex_checkpoint(self) -> None:
@@ -119,6 +129,8 @@ class RepoBundleTests(unittest.TestCase):
         for skill_name in [
             "jy-debugging",
             "jy-test-driven",
+            "jy-executing-plans",
+            "jy-receiving-review",
             "jy-verification-before-completion",
         ]:
             with self.subTest(skill=skill_name):
@@ -135,6 +147,8 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("jy-slop-remover", text)
         self.assertIn("jy-debugging", text)
         self.assertIn("jy-test-driven", text)
+        self.assertIn("jy-executing-plans", text)
+        self.assertIn("jy-receiving-review", text)
         self.assertIn("jy-ship", text)
         self.assertIn("jy-verification-before-completion", text)
 

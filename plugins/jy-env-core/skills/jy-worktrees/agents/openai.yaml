@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Worktrees"
+  short_description: "Set up an isolated feature worktree with ignore checks and a light baseline validation pass"
+  default_prompt: "Use $jy-worktrees to create a safe isolated worktree for this feature before implementation."

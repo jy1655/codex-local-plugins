@@ -1,6 +1,6 @@
 # First-Party Skill Verification Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use `jy-executing-plans` to implement this plan task-by-task in the current session. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add a repo-local verification package for first-party Codex skills so maintainers can run consistent baseline and pressure-scenario reviews.
 

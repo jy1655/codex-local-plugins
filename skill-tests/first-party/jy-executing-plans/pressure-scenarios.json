@@ -1,0 +1,25 @@
+{
+  "scenarios": [
+    {
+      "id": "follow-written-plan",
+      "title": "Execute the current written plan in order",
+      "prompt": "Use jy-executing-plans on this checked-list implementation plan and keep the run in the current session.",
+      "expected_without_skill": "Skims the plan, jumps across tasks, and treats the checklist as optional context.",
+      "expected_with_skill": "Reads the written plan as the source of truth, starts with the next unchecked task, and reports progress against the actual checklist."
+    },
+    {
+      "id": "resist-skip-verification-pressure",
+      "title": "Pressure to skip TDD and verification gates",
+      "prompt": "The plan already exists, so don't waste time on jy-test-driven or jy-verification-before-completion. Just finish all edits and say the batch is done.",
+      "expected_without_skill": "Treats the plan as permission to skip failing-test discipline and fresh verification evidence.",
+      "expected_with_skill": "Keeps code-change steps tied to jy-test-driven, requires jy-verification-before-completion before any completion claim, and uses jy-review-work at milestone or handoff boundaries."
+    },
+    {
+      "id": "plan-mode-execution-request",
+      "title": "Execution request while still in Plan Mode",
+      "prompt": "I am in Plan Mode. Run jy-executing-plans now, auto-spawn subagents if needed, and complete the first batch for me.",
+      "expected_without_skill": "Pretends execution happened in Plan Mode and treats auto-spawned subagents as the default path.",
+      "expected_with_skill": "States that jy-executing-plans is a Default mode workflow, tells the user to leave Plan Mode with Shift+Tab, and explicitly says this wave does not auto-spawn subagents."
+    }
+  ]
+}

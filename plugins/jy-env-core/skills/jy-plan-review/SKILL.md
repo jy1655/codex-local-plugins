@@ -8,7 +8,8 @@ description: Use when a plan exists and needs to be made decision-complete acros
 ## Overview
 
 이미 존재하는 계획을 읽고, 구현자가 추가 결정을 하지 않아도 되도록 빈칸을 메우는 first-party
-plan review skill. 제품 범위, 기술 구조, UX/DX 영향, 검증 기준을 한 번에 점검한다.
+plan review skill. 제품 범위, 기술 구조, UX/DX 영향, 검증 기준을 한 번에 점검하고,
+필요하면 다음 handoff를 `jy-writing-plans`로 연결한다.
 
 이 skill은 Codex의 collaboration mode를 인식해야 한다. decision-complete plan을 완성하려면
 대개 Plan Mode가 더 적합하지만, skill 자체가 모드를 바꾸지는 못한다.
@@ -46,6 +47,7 @@ plan review skill. 제품 범위, 기술 구조, UX/DX 영향, 검증 기준을 
 - 계획에 추가되어야 할 결정 목록
 - 결정이 반영된 revised plan
 - 구현 시작 전 acceptance criteria
+- 다음 handoff (`jy-writing-plans` 또는 바로 구현)
 
 ## Review Dimensions
 
@@ -64,6 +66,7 @@ plan review skill. 제품 범위, 기술 구조, UX/DX 영향, 검증 기준을 
 - 공백이 많아서 질문 왕복이 필요하면 이렇게 유도한다:
   - "이건 Plan Mode로 잠그는 게 맞습니다. `Shift+Tab`으로 Plan Mode로 바꾼 뒤 `/jy-plan-review`를 다시 실행하세요."
 - 동시에 현재 보이는 핵심 finding 3-5개와 간단한 draft revised plan은 남긴다.
+- plan은 승인 가능한데 implementer용 task breakdown이 없으면 `jy-writing-plans`를 다음 단계로 명시한다.
 - Default mode에서는 `<proposed_plan>`이나 Plan 전용 질문 흐름을 전제로 하지 않는다.
 
 ### If current collaboration mode is Plan
@@ -71,6 +74,7 @@ plan review skill. 제품 범위, 기술 구조, UX/DX 영향, 검증 기준을 
 - 빠진 결정을 질문으로 잠근다.
 - 결과를 implementer가 그대로 집을 수 있는 수준까지 채운다.
 - 최종 계획은 `<proposed_plan>` 블록으로 정리한다.
+- taskized implementation plan이 아직 아니면 `jy-writing-plans` handoff를 명시한다.
 
 ## Workflow
 
@@ -80,6 +84,7 @@ plan review skill. 제품 범위, 기술 구조, UX/DX 영향, 검증 기준을 
 4. finding을 severity 순으로 정리한다.
 5. 누락된 결정을 메운 revised plan 형태로 다시 쓴다.
 6. 구현 시작 조건과 검증 기준을 명시한다.
+7. taskized plan이 아직 아니면 다음 단계로 `jy-writing-plans`를 남긴다.
 
 ## Boundaries
 
@@ -94,4 +99,5 @@ plan review skill. 제품 범위, 기술 구조, UX/DX 영향, 검증 기준을 
 - 좋은 아이디어인지 평가만 하고 구현 결정을 잠그지 않는 것
 - architecture만 보고 UX, migration, 검증 기준을 빼먹는 것
 - finding은 적었지만 revised plan으로 다시 써주지 않는 것
+- reviewed plan은 만들었지만 implementer가 그대로 실행할 task breakdown이 필요하다는 점을 명시하지 않는 것
 - implementer가 다시 질문해야 하는 상태로 끝내는 것

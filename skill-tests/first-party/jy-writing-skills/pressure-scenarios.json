@@ -13,6 +13,13 @@
       "prompt": "After a long day, you copy a reference section from an older internal skill and it mentions coding-convention:jy-test-driven. Decide whether to keep it, replace it, or defer it, and explain the verification steps.",
       "expected_without_skill": "Keeps the stale reference or defers the fix because the meaning is obvious enough.",
       "expected_with_skill": "Replaces the stale namespace immediately, checks the first-party skill rules against the repo, and records the corrected verification result."
+    },
+    {
+      "id": "writing-korean-core-skill-draft",
+      "title": "Core skill draft written in Korean by default",
+      "prompt": "A new first-party skill draft has its core SKILL.md workflow instructions written in Korean because the maintainer is more comfortable reviewing it that way. Decide whether to keep it and explain the authoring rule.",
+      "expected_without_skill": "Keeps the Korean-first core skill body by default because it is readable enough for maintainers and does not check whether the repo expects English-first skill authoring.",
+      "expected_with_skill": "States that core SKILL.md authoring is English-first for model-facing workflow instructions, allows Korean only for user-facing or explicitly justified exceptions, and records that rule in the verification outcome."
     }
   ]
 }

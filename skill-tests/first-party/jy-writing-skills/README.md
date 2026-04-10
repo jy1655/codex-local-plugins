@@ -14,4 +14,5 @@ Passing behavior:
 
 - The operator insists on a baseline failure before claiming the skill is good.
 - The operator keeps the frontmatter and section structure aligned with the documented rules.
+- The operator treats core `SKILL.md` authoring as English-first unless there is a clear exception.
 - The operator avoids stale skill namespace references and records the result explicitly.
