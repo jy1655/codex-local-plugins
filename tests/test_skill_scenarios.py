@@ -96,6 +96,19 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
         self.assertIn("jy-document-release", text)
         self.assertIn("docs", text)
 
+    def test_output_template_skill_packs_track_response_language(self) -> None:
+        for skill_name in [
+            "jy-ship",
+            "jy-checkpoint",
+            "jy-document-release",
+            "jy-env-sync-admin",
+        ]:
+            with self.subTest(skill=skill_name):
+                readme = (SCENARIO_ROOT / skill_name / "README.md").read_text(encoding="utf-8")
+                result_template = (SCENARIO_ROOT / skill_name / "result-template.md").read_text(encoding="utf-8")
+                self.assertIn("user's language", readme)
+                self.assertIn("Observed response language", result_template)
+
 
 
 

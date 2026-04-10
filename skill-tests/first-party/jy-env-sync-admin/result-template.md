@@ -4,6 +4,7 @@
 - Scenario ID:
 - Date:
 - Tester:
+- Observed response language:
 
 ## Without Skill
 

@@ -106,6 +106,9 @@ Do not use it when:
 
 ## Output Template
 
+- Render the headings and short status phrases in the user's language unless the user explicitly asks for English.
+- Keep the structure stable even when the labels are localized.
+
 - `Base Branch:` detected target branch
 - `Review Gate:` PASS/FAIL with evidence
 - `Verification Gate:` command run plus result

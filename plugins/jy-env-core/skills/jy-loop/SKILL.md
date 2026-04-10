@@ -7,90 +7,91 @@ description: Use when a task needs iterative execution until verified completion
 
 ## Overview
 
-작업을 한 번에 끝내지 않고, 완료 선언 후 검증까지 반복하는 자기 참조 실행 루프.
-"끝났다"고 생각한 시점이 아니라 검증을 통과한 시점이 진짜 완료다.
+Use a self-referential execution loop when work must continue until verified completion,
+not merely until it "seems done." Completion is real only after verification passes.
 
-이 skill은 실행 지향적이다. 실제 코드 작성, 테스트, 검증을 반복하므로 Default mode에서만 정상 동작한다.
+This skill is execution-oriented and belongs in Default mode because it iterates through
+real code changes, tests, and verification.
 
 ## When to Use
 
-- "끝날 때까지 계속해", "다 될 때까지 반복해" 요청
-- 대규모 작업이 여러 단계를 거쳐야 완료되는 경우
-- 단일 시도로 끝나지 않을 것이 분명한 작업
-- "ultrawork", "계속 돌려" 같은 키워드
+- "Keep going until it is done"
+- A large task clearly requires multiple passes
+- A single attempt will not be enough
+- The user asks for continuous execution such as "keep iterating"
 
-사용하지 않을 때: 한 번에 끝나는 간단한 작업, 리서치/분석 요청
+Do not use it when the task is simple enough for one pass or is purely research/analysis.
 
 ## Quick Reference
 
-| 단계 | 행동 |
-|------|------|
-| 0. 모드 확인 | Default mode인지 먼저 판단 |
-| 1. 목표 파악 | 완료 기준을 명확하게 정의 |
-| 2. 반복 실행 | 매 반복마다 의미 있는 진전 |
-| 3. 완료 선언 | 완료 기준 충족 시 선언 |
-| 4. 검증 | 선언 후 실제 검증 (테스트, 빌드, 실행) |
-| 5. 판정 | 검증 통과 시 종료, 실패 시 루프 계속 |
+| Step | Action |
+|------|--------|
+| 0. Mode check | Confirm Default mode |
+| 1. Define done | Make the completion criteria explicit |
+| 2. Iterate | Make meaningful progress each pass |
+| 3. Declare done | Only when the criteria appear satisfied |
+| 4. Verify | Run tests, builds, or runtime checks |
+| 5. Decide | Exit on verified success, continue on failure |
 
 ## Loop Protocol
 
-### 1. 완료 기준 정의
+### 1. Define completion criteria
 
-작업 시작 전 완료 기준을 명시:
+Before starting, state the criteria explicitly:
 
 ```
-완료 기준:
-- [ ] 모든 테스트 통과
-- [ ] 빌드 성공
-- [ ] 요청된 기능 동작 확인
+Completion criteria:
+- [ ] all tests pass
+- [ ] build succeeds
+- [ ] requested behavior works
 ```
 
-사용자가 기준을 안 주면 작업 성격에서 추론하되, 추론한 기준을 명시한다.
+If the user did not provide criteria, infer them from the task and say what you inferred.
 
-### 2. 반복 실행 규칙
+### 2. Iteration rules
 
-- 매 반복마다 이전 시도에서 배운 것을 반영
-- 같은 접근을 2회 이상 반복하지 않음 — 실패하면 다른 전략
-- 진행 상태를 주기적으로 요약
-- 막히면 근본 원인을 먼저 파악한 뒤 다음 시도
+- Apply what was learned from the prior pass
+- Do not repeat the same failed approach more than twice
+- Summarize progress periodically
+- If blocked, find the root cause before starting the next pass
 
-### 3. 완료 선언과 검증
+### 3. Completion and verification
 
-완료했다고 판단하면:
+Once the work seems done:
 
-1. 완료 기준 체크리스트를 하나씩 확인
-2. 실행 가능한 검증 수행 (테스트, 빌드, lint)
-3. 검증 통과 → 루프 종료
-4. 검증 실패 → 실패 원인 파악 후 루프 계속
+1. Check the completion criteria one by one
+2. Run executable verification such as tests, builds, or lint
+3. Exit only if verification passes
+4. Continue the loop if verification fails
 
-**"끝난 것 같다"는 완료가 아니다. 검증을 통과해야 완료다.**
+`Looks done` is not done. Verified completion is done.
 
-### 4. 탈출 조건
+### 4. Exit conditions
 
-- 검증 통과 (정상 완료)
-- 사용자가 명시적으로 중단
-- 동일 실패가 3회 반복되면 사용자에게 보고하고 방향 전환 요청
+- verification passes
+- the user explicitly stops the work
+- the same failure repeats three times and requires a direction change
 
 ## Mode-Aware Behavior
 
 ### If current collaboration mode is Default
 
-- 이 skill의 정상 실행 모드다.
-- 실제 코드 작성, 테스트, 빌드, 검증을 반복 수행한다.
+- This is the normal execution mode
+- Iterate through code changes, testing, build checks, and verification for real
 
 ### If current collaboration mode is Plan
 
-- 실제 반복 실행은 시작하지 않는다.
-- 이렇게 유도한다:
-  - "이건 반복 실행형 workflow라 Default mode가 맞습니다. `Shift+Tab`으로 Plan Mode에서 나온 뒤 다시 실행하세요."
-- 대신 루프 전략과 완료 기준 초안을 compact하게 남긴다.
-- Plan Mode 안에서 "지금 반복 실행을 시작하겠다"라고 가장하지 않는다.
+- Do not start the real execution loop
+- Route like this:
+  - "This is an iterative execution workflow. Leave Plan Mode with `Shift+Tab`, then run it again in Default mode."
+- Still leave a compact loop strategy and draft completion criteria
+- Do not pretend the loop has started inside Plan Mode
 
 ## Common Mistakes
 
-- Plan Mode에서 실제 반복 실행이 가능한 것처럼 행동하는 것
-- 완료 기준을 정의하지 않고 "다 된 것 같다"로 끝내는 것
-- 검증 없이 완료 선언하는 것
-- 같은 실패를 반복하면서 다른 접근을 시도하지 않는 것
-- 매 반복의 진전을 기록하지 않아 컨텍스트가 유실되는 것
-- 루프를 돌리면서 원래 목표에서 벗어나는 것
+- Acting as if Plan Mode can run the real loop
+- Declaring completion before defining completion criteria
+- Declaring completion without verification
+- Repeating the same failed approach instead of changing strategy
+- Losing context by failing to record progress between passes
+- Drifting away from the original goal while iterating

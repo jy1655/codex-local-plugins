@@ -4,6 +4,7 @@
 - Date:
 - Repo:
 - Scenario ID:
+- Observed response language:
 - Review Gate:
 - Verification Gate:
 - Docs:

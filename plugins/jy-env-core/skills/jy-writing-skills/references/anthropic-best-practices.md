@@ -6,15 +6,15 @@ Good Skills are concise, well-structured, and tested with real usage. This guide
 
 For conceptual background on how Skills work, see the [Skills overview](/en/docs/agents-and-tools/agent-skills/overview).
 
-## 목차
+## Table of Contents
 
-- [Core principles](#core-principles) — 간결성, 컨텍스트 효율, Progressive Disclosure (L9–143)
-- [Skill structure](#skill-structure) — 디렉토리 구조, frontmatter, description 작성법 (L144–276)
-- 예시 스킬 모음 — PDF Processing (L277), BigQuery Data Analysis (L312), DOCX Processing (L337)
-- API Reference 패턴 (L390–418)
+- [Core principles](#core-principles) — concision, context efficiency, Progressive Disclosure (L9–143)
+- [Skill structure](#skill-structure) — directory layout, frontmatter, and description writing (L144–276)
+- Example skills — PDF Processing (L277), BigQuery Data Analysis (L312), DOCX Processing (L337)
+- API Reference pattern (L390–418)
 - Workflows and feedback loops (L410) — Research synthesis (L419), PDF form filling (L461)
 - Content review process (L512–561)
-- Common patterns (L598) — Report structure 예시 (L607–654)
+- Common patterns (L598) — report structure example (L607–654)
 - [Commit message format](#commit-message-format) (L656)
 - [Document modification workflow](#document-modification-workflow) (L698)
 - [Evaluation and iteration](#evaluation-and-iteration) (L721–822)

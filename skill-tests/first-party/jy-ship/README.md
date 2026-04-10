@@ -18,4 +18,5 @@ Passing behavior:
 - Does not invent `VERSION`, `CHANGELOG`, or hidden runtime files when the repo does not have them.
 - Pushes with normal `git push` behavior and never force-pushes.
 - Uses `jy-document-release` as the documentation sync path when shipped changes require doc updates and does not skip that decision when docs are affected.
+- Renders the final ship summary in the user's language by default instead of leaking English-first authoring language into the response.
 - If the user is in Plan Mode, the skill routes them back to Default mode with `Shift+Tab` instead of pretending to push or create a PR.
