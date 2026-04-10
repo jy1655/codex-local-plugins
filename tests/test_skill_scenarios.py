@@ -19,6 +19,7 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
         for skill_name in [
             "jy-debugging",
             "jy-test-driven",
+            "jy-ship",
             "jy-verification-before-completion",
         ]:
             with self.subTest(skill=skill_name):
@@ -69,6 +70,7 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
             "jy-loop",
             "jy-debugging",
             "jy-test-driven",
+            "jy-ship",
             "jy-verification-before-completion",
         ]
         for skill_name in mode_aware_skills:

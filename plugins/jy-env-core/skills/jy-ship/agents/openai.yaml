@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Ship"
+  short_description: "Verified push + PR/MR workflow for a ready branch"
+  default_prompt: "Use $jy-ship to ship the current branch with base-branch checks, fresh verification, push, PR/MR creation, and docs sync."

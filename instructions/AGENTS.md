@@ -25,6 +25,7 @@ This machine is managed by the portable Codex environment sync repo.
 - If the user already has a plan and wants decision gaps closed before implementation, prefer `jy-plan-review`.
 - If the correct planning path is not obvious, route through `jy-autoplan` instead of choosing ad hoc.
 - If the user shipped changes and now needs docs, instructions, or skill verification artifacts synced, prefer `jy-document-release`.
+- If the user wants to ship a ready branch, push verified changes, or create/update a PR/MR, prefer `jy-ship`.
 - Planning skills are mode-aware, but they cannot switch Codex collaboration mode themselves.
 - If a planning skill says the task belongs in Plan Mode, tell the user to press `Shift+Tab` and re-run the named skill.
 - If the user wants to park work, resume later, or hand off current context across sessions or branches, prefer `jy-checkpoint`.
@@ -38,6 +39,7 @@ This machine is managed by the portable Codex environment sync repo.
 - If the user completed implementation and wants multi-angle review, prefer `jy-review-work`.
 - If the user needs iterative work until verified completion, prefer `jy-loop`.
 - If the user wants to clean AI-generated code smells from files, prefer `jy-slop-remover`.
+- If the user wants the current branch pushed and a PR/MR created after fresh gates pass, prefer `jy-ship`.
 - Execution skills are mode-aware: if the user is in Plan Mode, tell them to press `Shift+Tab` and re-run in Default mode.
 
 ## Advisory and Research Skill Routing

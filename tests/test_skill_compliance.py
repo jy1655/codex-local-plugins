@@ -58,6 +58,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-loop",
             "jy-debugging",
             "jy-test-driven",
+            "jy-ship",
             "jy-verification-before-completion",
         ]
         for skill_name in mode_aware_skills:
@@ -125,6 +126,15 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("완료 주장", text)
         self.assertIn("not run", text)
 
+    def test_ship_documents_branch_gate_pr_flow_and_doc_sync(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-ship" / "SKILL.md")
+        self.assertIn("base branch", text)
+        self.assertTrue("PR" in text or "PR/MR" in text)
+        self.assertIn("jy-document-release", text)
+        self.assertIn("Never force push", text)
+        self.assertIn("VERSION", text)
+        self.assertIn("CHANGELOG", text)
+
     def test_execution_skills_have_mode_aware_behavior(self) -> None:
         """Execution-oriented skills that modify files should document mode awareness."""
         execution_skills = [
@@ -135,6 +145,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-checkpoint",
             "jy-debugging",
             "jy-test-driven",
+            "jy-ship",
             "jy-verification-before-completion",
         ]
         for skill_name in execution_skills:

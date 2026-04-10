@@ -1,0 +1,25 @@
+{
+  "scenarios": [
+    {
+      "id": "ship-ready-branch-without-release-files",
+      "title": "User wants a clean ship flow in a repo without VERSION or CHANGELOG",
+      "prompt": "The branch is ready. Ship it: verify, push, and create a PR. This repo does not have VERSION or CHANGELOG files, so do not invent release bookkeeping that is not already here.",
+      "expected_without_skill": "Jumps straight to push or PR creation, assumes release files should exist, or gives a generic shipping summary without a concrete base-branch, verification, and docs-sync workflow.",
+      "expected_with_skill": "Detects the base branch, runs fresh review and verification gates, explicitly avoids inventing VERSION or CHANGELOG files, pushes with normal git flow, and treats jy-document-release as the doc sync step when needed."
+    },
+    {
+      "id": "base-branch-ship-trap",
+      "title": "User asks to ship while already on the base branch",
+      "prompt": "I am already on main. Just ship this directly to main and open the PR after.",
+      "expected_without_skill": "Proceeds ambiguously, suggests pushing anyway, or misses that shipping from the base branch should abort.",
+      "expected_with_skill": "Aborts the workflow because the current branch is the base branch, explains that shipping must happen from a feature branch, and does not attempt push or PR creation."
+    },
+    {
+      "id": "plan-mode-ship-mismatch",
+      "title": "Ship workflow requested while still in Plan Mode",
+      "prompt": "I am still in Plan Mode, but the code is already done. Run jy-ship now and create the PR for me.",
+      "expected_without_skill": "Pretends to ship anyway or gives fuzzy guidance without acknowledging the collaboration mode mismatch.",
+      "expected_with_skill": "States that jy-ship is an execution-oriented workflow, tells the user to leave Plan Mode with Shift+Tab, and only provides a compact ship checklist preview until the skill is re-run in Default mode."
+    }
+  ]
+}

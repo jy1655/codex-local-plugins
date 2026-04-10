@@ -35,7 +35,7 @@ They are part of this repo for maintenance work, not part of the installed Codex
 First-party skill authoring happens in `plugins/jy-env-core/skills/`. That directory is
 the source of truth for both local development and the installed Codex skill surface.
 The current first-party workflow pack covers planning, debugging, test-first implementation,
-review, and verification disciplines.
+review, shipping, and verification disciplines.
 
 ## First-Party Skill Catalog
 
@@ -71,6 +71,7 @@ invocation stays compact while the intended use stays explicit.
 
 - `jy-checkpoint` stores repo-local checkpoint notes under `.codex/checkpoints/` for pause, resume, and branch handoff workflows.
 - `jy-document-release` syncs README, AGENTS instructions, skill docs, and verification packs after shipped changes.
+- `jy-ship` closes the final branch workflow with base-branch checks, fresh verification, push, PR/MR creation, and docs sync.
 - `jy-env-sync-admin` validates this environment repo and reapplies the repo-owned install surface into the home Codex environment.
 
 ### Authoring

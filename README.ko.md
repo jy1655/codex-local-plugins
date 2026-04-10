@@ -35,7 +35,7 @@ first-party `jy-checkpoint` skill이 사용합니다.
 first-party skill authoring은 `plugins/jy-env-core/skills/`에서 이뤄집니다. 이 디렉터리는
 로컬 개발과 설치된 Codex skill 표면 모두의 source of truth입니다.
 현재 first-party workflow pack은 planning, debugging, test-first implementation,
-review, verification discipline을 다룹니다.
+review, shipping, verification discipline을 다룹니다.
 
 ## First-Party Skill Catalog
 
@@ -71,6 +71,7 @@ review, verification discipline을 다룹니다.
 
 - `jy-checkpoint`는 pause, resume, branch handoff workflow를 위해 repo-local checkpoint note를 `.codex/checkpoints/` 아래에 저장합니다.
 - `jy-document-release`는 shipped change 이후 README, AGENTS instruction, skill doc, verification pack을 동기화합니다.
+- `jy-ship`은 base branch check, fresh verification, push, PR/MR 생성, docs sync까지 현재 branch의 마지막 ship workflow를 닫습니다.
 - `jy-env-sync-admin`은 이 환경 repo를 검증하고 repo-owned install surface를 home Codex 환경에 다시 적용합니다.
 
 ### Authoring

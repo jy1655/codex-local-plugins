@@ -15,6 +15,7 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("jy-framing", text)
         self.assertIn("jy-plan-review", text)
         self.assertIn("jy-document-release", text)
+        self.assertIn("jy-ship", text)
         self.assertIn("Shift+Tab", text)
 
     def test_global_agents_instructions_include_checkpoint_routing(self) -> None:
@@ -45,6 +46,7 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("`jy-autoplan`", text)
         self.assertIn("`jy-test-driven`", text)
         self.assertIn("`jy-intent-gate`", text)
+        self.assertIn("`jy-ship`", text)
         self.assertIn("`jy-env-sync-admin`", text)
         self.assertIn("`jy-writing-skills`", text)
 
@@ -103,6 +105,13 @@ class RepoBundleTests(unittest.TestCase):
         self.assertTrue((skill_root / "SKILL.md").exists())
         self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
 
+    def test_codex_env_core_bundle_includes_ship_workflow(self) -> None:
+        repo_root = Path(__file__).resolve().parents[1]
+        skill_root = repo_root / "plugins" / "jy-env-core" / "skills" / "jy-ship"
+
+        self.assertTrue((skill_root / "SKILL.md").exists())
+        self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
+
     def test_codex_env_core_bundle_includes_debugging_and_verification_workflow_skills(self) -> None:
         repo_root = Path(__file__).resolve().parents[1]
         skill_root = repo_root / "plugins" / "jy-env-core" / "skills"
@@ -126,6 +135,7 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("jy-slop-remover", text)
         self.assertIn("jy-debugging", text)
         self.assertIn("jy-test-driven", text)
+        self.assertIn("jy-ship", text)
         self.assertIn("jy-verification-before-completion", text)
 
     def test_global_agents_instructions_include_advisory_skill_routing(self) -> None:
