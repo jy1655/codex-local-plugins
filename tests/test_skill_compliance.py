@@ -142,6 +142,9 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("Never force push", text)
         self.assertIn("VERSION", text)
         self.assertIn("CHANGELOG", text)
+        self.assertIn("old CI run", text)
+        self.assertIn("If docs sync creates a new commit, push the same branch again", text)
+        self.assertIn("Do not skip the `jy-document-release` decision", text)
 
     def test_writing_plans_documents_plan_doc_contract_and_placeholder_bans(self) -> None:
         text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-writing-plans" / "SKILL.md")

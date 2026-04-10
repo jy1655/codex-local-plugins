@@ -7,112 +7,118 @@ description: Use when the user wants to "ship", "deploy", "push to main", or cre
 
 ## Overview
 
-현재 브랜치를 안전하게 밀고 PR/MR까지 닫는 repo-native ship workflow다. 핵심은
-`base branch safety -> review -> fresh verification -> push -> PR/MR -> docs sync` 순서를
-건너뛰지 않는 것이다.
+This is the repo-native workflow for taking the current branch through a safe push and
+PR/MR closeout. The core rule is simple: do not skip
+`base branch safety -> review -> fresh verification -> push -> PR/MR -> docs sync`.
 
-이 skill은 gstack의 hidden runtime, telemetry, self-update, local sidecar state를 들이지 않는다.
-이 repo에 실제로 있는 git surface와 first-party skills만 사용한다.
+This skill does not depend on gstack hidden runtime, telemetry, self-update flows, or
+local sidecar state. It uses only the real git surface and first-party skills that exist
+in this repo.
 
 ## When to Use
 
-- "ship it", "push this branch", "PR 만들어", "merge 준비해" 요청
-- 구현이 끝났고 원격 브랜치와 PR/MR 생성까지 이어서 닫아야 할 때
-- handoff 전에 review, verification, docs sync까지 한 번에 마무리해야 할 때
+- "ship it", "push this branch", "make the PR", "prepare this for merge"
+- Implementation is complete and the work needs to be pushed and closed out through a PR/MR
+- Review, verification, and docs sync all need to happen before handoff
 
-사용하지 않을 때:
+Do not use it when:
 
-- 구현이나 디버깅이 아직 끝나지 않았을 때
-- 계획만 남기고 실제 git 작업은 하지 않을 때
-- 단순 문서 동기화만 필요할 때 (`jy-document-release` 사용)
+- Implementation or debugging is still incomplete
+- The user only wants planning, not actual git work
+- The task is only documentation sync (`jy-document-release`)
 
 ## Quick Reference
 
-| 단계 | 행동 | 중단 조건 |
-|------|------|-----------|
-| 0. 모드 확인 | Default면 실행, Plan이면 preview만 | Plan Mode면 `Shift+Tab` 안내 |
-| 1. base branch 탐지 | remote와 CLI 메타데이터로 target branch 확인 | 현재 branch가 base branch면 중단 |
-| 2. ship surface 수집 | `git status`, diff, commit log 확인 | 변경 범위를 설명할 수 없으면 중단 |
-| 3. review + verify | `jy-review-work`, `jy-verification-before-completion` 기준으로 fresh gate 수행 | review FAIL, verification FAIL이면 중단 |
-| 4. commit + push | 필요한 변경을 커밋하고 일반 `git push` | `Never force push` |
-| 5. PR/MR | `gh`/`glab`가 있으면 create or update, 없으면 수동 next step | URL 없으면 생성 완료 주장 금지 |
-| 6. docs sync | 필요 시 `jy-document-release` 흐름으로 문서 동기화 | docs drift 남기지 않기 |
+| Step | Action | Stop Condition |
+|------|--------|----------------|
+| 0. Mode check | Execute in Default, preview only in Plan | If in Plan Mode, route with `Shift+Tab` |
+| 1. Detect base branch | Use remote and CLI metadata to find the target branch | Stop if the current branch is the base branch |
+| 2. Gather ship surface | Check `git status`, diff, and commit log | Stop if the change surface cannot be explained |
+| 3. Review + verify | Use `jy-review-work` and `jy-verification-before-completion` for fresh gates | Stop on review FAIL or verification FAIL |
+| 4. Commit + push | Commit the required changes and use normal `git push` | `Never force push` |
+| 5. PR/MR | Create or update the PR/MR with `gh`/`glab` when available | Do not claim creation without a URL |
+| 6. Docs sync | Use `jy-document-release` when docs are affected | Do not leave docs drift unresolved |
 
 ## Base Branch Gate
 
-- 먼저 현재 branch와 base branch를 찾는다.
-- base branch 탐지는 다음 순서로 시도한다:
-  - GitHub면 `gh pr view` 또는 `gh repo view`
-  - GitLab이면 `glab mr view` 또는 project default branch 조회
-  - 공통 fallback은 `origin/HEAD`
-- 현재 branch가 base branch면 ship workflow를 중단한다.
-- "main에서 바로 ship" 요청을 받아도 feature branch 없이 진행하지 않는다.
+- Find the current branch and the base branch first
+- Detect the base branch in this order:
+  - GitHub: `gh pr view` or `gh repo view`
+  - GitLab: `glab mr view` or the project default branch lookup
+  - Common fallback: `origin/HEAD`
+- If the current branch is the base branch, abort the ship workflow
+- Even if the user says "ship directly from main", do not do it without a feature branch
 
 ## Review And Verification Gate
 
-- multi-file 구현이면 `jy-review-work` 기준으로 review gate를 먼저 닫는다.
-- 완료 주장, 테스트 통과, ship readiness 평가는 `jy-verification-before-completion` 기준으로
-  fresh verification evidence가 있어야 한다.
-- earlier test memory, old CI run, agent success report만으로 push 또는 PR/MR 생성에 들어가지 않는다.
-- review 또는 verification이 FAIL이면 ship을 멈추고 그 결과를 그대로 보고한다.
+- Multi-file implementation should close a review gate through `jy-review-work` first
+- Completion claims, passing tests, and ship readiness must be backed by fresh verification
+  evidence using `jy-verification-before-completion`
+- Do not rely on earlier test memory, an `old CI run`, or an agent success report to justify
+  push or PR/MR creation
+- If review or verification fails, stop the workflow and report that state directly
 
 ## Release File Rules
 
-- `VERSION`, `CHANGELOG`, `TODOS.md` 같은 release bookkeeping 파일은 repo에 이미 있을 때만 다룬다.
-- repo에 없는 `VERSION` 또는 `CHANGELOG`를 invent하지 않는다.
-- 이 repo처럼 해당 파일이 없으면 shipping summary, verification 결과, PR/MR body로 충분하다.
+- Only handle release bookkeeping files such as `VERSION`, `CHANGELOG`, or `TODOS.md` if
+  they already exist in the repo
+- Do not invent `VERSION` or `CHANGELOG` files that the repo does not have
+- In repos like this one, a shipping summary plus verification results and PR/MR body is enough
 
 ## Push And PR/MR Rules
 
-- worktree가 dirty면 현재 ship surface에 포함할 변경만 stage하고 커밋한다.
-- commit message는 diff와 목표에서 안전하게 추론 가능한 범위로만 작성한다.
-- 제목을 책임 있게 정할 수 없으면 임의 문구를 만들지 말고 사용자에게 commit summary를 한 번 요청한다.
-- push는 일반 `git push` 또는 `git push -u origin <branch>`만 사용한다.
-- `Never force push`.
-- `gh` 또는 `glab`가 있으면 existing PR/MR을 update하거나 새로 만든다.
-- CLI가 없으면 branch name, remote, compare URL 또는 수동 PR 생성 next step을 남긴다.
-- URL이 없으면 "PR created" 같은 완료 주장을 하지 않는다.
+- If the worktree is dirty, stage and commit only the current ship surface
+- Keep the commit message within what can be safely inferred from the diff and user goal
+- If you cannot responsibly name the change, ask the user for a commit summary instead of
+  inventing one
+- Push with normal `git push` or `git push -u origin <branch>`
+- `Never force push`
+- If `gh` or `glab` exists, update an existing PR/MR or create a new one
+- If no CLI exists, leave the branch name, remote, compare URL, or manual PR next step
+- If there is no URL, do not claim that the PR was created
 
 ## Documentation Sync
 
-- shipped changes가 README, instructions, skill docs, verification assets와 연결되면
-  `jy-document-release`를 follow-up으로 실행한다.
-- docs sync가 새 commit을 만들었다면 같은 branch로 다시 push하고 PR/MR body도 최신 상태로 맞춘다.
-- docs 변경이 필요 없으면 그 사실을 명시하고 끝낸다.
+- If the shipped changes touch README, instructions, skill docs, or verification assets,
+  run `jy-document-release` as the follow-up docs path
+- Do not skip the `jy-document-release` decision when the diff clearly affects docs
+- If docs state is still unclear, do not report ship complete; leave `Docs: blocked`
+- If docs sync creates a new commit, push the same branch again and update the PR/MR body
+- If docs changes are not needed, state that explicitly and end there
 
 ## Mode-Aware Behavior
 
 ### If current collaboration mode is Default
 
-- 이 skill의 정상 실행 모드다.
-- base branch 탐지, fresh verification, commit, push, PR/MR 생성, docs sync를 실제로 수행한다.
+- This is the normal execution mode for the skill
+- Perform base branch detection, fresh verification, commit, push, PR/MR creation, and docs sync for real
 
 ### If current collaboration mode is Plan
 
-- 실제 git write, push, PR/MR 생성은 하지 않는다.
-- 이렇게 유도한다:
-  - "이건 실행형 ship workflow라 Default mode가 맞습니다. `Shift+Tab`으로 Plan Mode에서 나온 뒤 `/jy-ship`을 다시 실행하세요."
-- 대신 compact ship checklist preview만 남긴다.
-  - base branch 확인 방법
-  - 필요한 review/verification 명령
-  - PR/MR 생성 전까지의 중단 조건
-- Plan Mode 안에서 이미 push나 PR/MR 생성을 한 것처럼 가장하지 않는다.
+- Do not perform real git writes, pushes, or PR/MR creation
+- Route like this:
+  - "This is an execution-oriented ship workflow. Leave Plan Mode with `Shift+Tab`, then run `/jy-ship` again."
+- Still leave a compact ship checklist preview:
+  - how to confirm the base branch
+  - which review and verification commands are required
+  - which stop conditions block PR/MR creation
+- Do not pretend that a push or PR/MR was already done while still in Plan Mode
 
 ## Output Template
 
-- `Base Branch:` 탐지된 target branch
-- `Review Gate:` PASS/FAIL와 근거
-- `Verification Gate:` 실행한 명령과 결과
+- `Base Branch:` detected target branch
+- `Review Gate:` PASS/FAIL with evidence
+- `Verification Gate:` command run plus result
 - `Push:` pushed / already up to date / blocked
 - `PR/MR:` created / updated / manual action required
 - `Docs:` synced / no changes needed / blocked
 
 ## Common Mistakes
 
-- base branch 확인 없이 바로 `git push`부터 하는 것
-- review나 fresh verification 없이 "ship ready"라고 말하는 것
-- 이 repo에 없는 `VERSION`이나 `CHANGELOG`를 자동으로 만드는 것
-- force push로 문제를 덮는 것
-- PR/MR URL이 없는데도 생성 완료처럼 보고하는 것
-- `jy-document-release`가 필요한 변경인데 docs sync를 생략하는 것
-- Plan Mode에서 실제 ship을 수행한 것처럼 말하는 것
+- Pushing before confirming the base branch
+- Claiming ship readiness without review or fresh verification
+- Auto-creating `VERSION` or `CHANGELOG` in a repo that does not use them
+- Using force push to hide process problems
+- Claiming PR/MR creation without a real URL
+- Skipping `jy-document-release` when docs are affected
+- Acting as if Plan Mode can perform the real ship workflow

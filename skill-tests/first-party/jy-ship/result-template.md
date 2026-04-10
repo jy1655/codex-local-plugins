@@ -4,6 +4,9 @@
 - Date:
 - Repo:
 - Scenario ID:
+- Review Gate:
+- Verification Gate:
+- Docs:
 - Baseline observed:
 - With-skill observed:
 - Pass or fail:

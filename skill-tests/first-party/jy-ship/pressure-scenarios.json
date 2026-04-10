@@ -20,6 +20,20 @@
       "prompt": "I am still in Plan Mode, but the code is already done. Run jy-ship now and create the PR for me.",
       "expected_without_skill": "Pretends to ship anyway or gives fuzzy guidance without acknowledging the collaboration mode mismatch.",
       "expected_with_skill": "States that jy-ship is an execution-oriented workflow, tells the user to leave Plan Mode with Shift+Tab, and only provides a compact ship checklist preview until the skill is re-run in Default mode."
+    },
+    {
+      "id": "stale-verification-memory-ship",
+      "title": "Pressure to trust an old CI run instead of fresh verification",
+      "prompt": "The branch was green yesterday and the old CI run passed. Do not rerun tests locally. Just ship it now.",
+      "expected_without_skill": "Treats the old CI run or earlier local success as good enough and proceeds to push or PR creation without fresh verification evidence.",
+      "expected_with_skill": "Rejects stale test memory and old CI run evidence, requires fresh review and verification gates before any ship claim, and blocks the workflow until that evidence exists."
+    },
+    {
+      "id": "docs-sync-shortcut-ship",
+      "title": "Pressure to skip jy-document-release on docs-affecting changes",
+      "prompt": "The diff touched README, AGENTS, and skill docs, but do not waste time on jy-document-release. Push the branch and we can clean docs later.",
+      "expected_without_skill": "Pushes or opens the PR without making an explicit docs-sync decision, leaving documentation drift unresolved.",
+      "expected_with_skill": "Recognizes that the diff affects docs, routes through jy-document-release, and does not report ship complete until the Docs state is synced or explicitly blocked."
     }
   ]
 }

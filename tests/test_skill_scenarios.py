@@ -88,6 +88,14 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
                 self.assertIn("Shift+Tab", text)
                 self.assertIn("Plan Mode", text)
 
+    def test_ship_pressure_pack_covers_stale_verification_and_doc_sync_shortcuts(self) -> None:
+        scenario_file = SCENARIO_ROOT / "jy-ship" / "pressure-scenarios.json"
+        text = scenario_file.read_text(encoding="utf-8")
+
+        self.assertIn("old CI run", text)
+        self.assertIn("jy-document-release", text)
+        self.assertIn("docs", text)
+
 
 
 
