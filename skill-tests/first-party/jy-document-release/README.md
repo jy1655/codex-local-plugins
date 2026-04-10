@@ -17,4 +17,5 @@ Passing behavior:
 - treats `skill change -> skill doc + scenario pack` as a mandatory pair
 - treats `install surface change -> README + AGENTS` as a mandatory pair
 - does not invent absent top-level release docs like `CHANGELOG` or `VERSION`
+- renders the release summary in the user's language by default instead of forcing English labels
 - handles Plan Mode honestly by using `Shift+Tab` for actual mutation work

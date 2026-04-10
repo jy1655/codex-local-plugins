@@ -34,6 +34,14 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("~/.agents/skills/", text)
         self.assertIn("source-owned install surface", text)
 
+    def test_global_agents_instructions_include_user_language_response_rule(self) -> None:
+        agents_path = Path(__file__).resolve().parents[1] / "instructions" / "AGENTS.md"
+        text = agents_path.read_text(encoding="utf-8")
+
+        self.assertIn("## Response Language", text)
+        self.assertIn("user's language", text)
+        self.assertIn("output-language rule", text)
+
     def test_readme_groups_short_skill_names_by_role(self) -> None:
         readme_path = Path(__file__).resolve().parents[1] / "README.md"
         text = readme_path.read_text(encoding="utf-8")

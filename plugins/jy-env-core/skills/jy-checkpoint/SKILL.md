@@ -7,43 +7,43 @@ description: Use when the user wants to save, list, or resume repo-local working
 
 ## Overview
 
-현재 작업 상태를 repo-local checkpoint 문서로 남기고, 나중 세션이나 다른 branch에서 다시
-이어붙이기 위한 skill.
+Create repo-local checkpoint notes that make it easy to resume work in a later session or
+from another branch.
 
-핵심 원칙은 두 가지다.
+Two rules matter most:
 
-- checkpoint는 hidden home-directory state가 아니라 repo 안의 `.codex/checkpoints/`에 둔다.
-- checkpoint는 append-only Markdown 문서로 남기고, 기존 파일을 조용히 덮어쓰지 않는다.
+- checkpoints live in `.codex/checkpoints/`, not hidden home-directory state
+- checkpoints are append-only Markdown files and must never silently overwrite an older note
 
 ## When to Use
 
-- "이 상태 저장해둬", "나중에 이어서 하자", "checkpoint 남겨줘"
-- "내가 뭘 하고 있었지?", "마지막 상태 복구해줘", "resume"
-- branch를 바꾸거나 세션을 끝내기 전에 현재 결정과 남은 일을 남기고 싶을 때
-- 다른 사람이 바로 이어받을 수 있는 compact handoff가 필요할 때
+- "Save this state", "let's continue later", "leave a checkpoint"
+- "What was I working on?", "restore the last state", "resume"
+- You want to preserve decisions and remaining work before switching branches or ending the session
+- Another person needs a compact handoff they can resume immediately
 
-사용하지 않을 때:
+Do not use it when:
 
-- 단순 진행 요약만 대화에 한 번 남기면 충분한 경우
-- 장기 보관용 공식 문서를 커밋해야 하는 경우
+- a one-line chat summary is enough
+- an official long-lived document should be committed instead
 
 ## Quick Reference
 
-| 동작 | 해야 할 일 | 기본값 |
-|------|-------------|--------|
-| Save | 현재 branch, 변경 파일, 결정, 남은 일을 새 checkpoint로 저장 | 새 Markdown 파일 생성 |
-| List | 현재 branch 기준 recent checkpoint를 보여줌 | 최신순 |
-| Resume | 특정 checkpoint 또는 최신 checkpoint를 읽고 재개 요약 제공 | 최신 checkpoint |
+| Action | Required Behavior | Default |
+|--------|-------------------|---------|
+| Save | store branch, modified files, decisions, and remaining work | new Markdown file |
+| List | show recent checkpoints for the current branch | newest first |
+| Resume | read a specific or latest checkpoint and summarize how to continue | latest checkpoint |
 
 ## Storage Contract
 
-- 저장 위치: `.codex/checkpoints/`
-- 커밋 정책: gitignored, repo-local only
-- 파일 형식: Markdown + YAML frontmatter
-- 쓰기 정책: append-only
-- 파일명 규칙: `YYYYMMDD-HHMMSS-title-slug.md`
+- location: `.codex/checkpoints/`
+- commit policy: gitignored, repo-local only
+- format: Markdown plus YAML frontmatter
+- write policy: append-only
+- filename: `YYYYMMDD-HHMMSS-title-slug.md`
 
-필수 frontmatter:
+Required frontmatter:
 
 ```yaml
 status: in_progress
@@ -53,7 +53,7 @@ files_modified:
   - plugins/jy-env-core/skills/jy-checkpoint/SKILL.md
 ```
 
-본문 기본 섹션:
+Required body sections:
 
 - `Summary`
 - `Decisions Made`
@@ -62,79 +62,82 @@ files_modified:
 
 ## Output Template
 
+- Render headings and short status phrases in the user's language unless the user explicitly asks for English.
+- Keep the template structure stable even when the labels are localized.
+
 ### Save
 
-- `Checkpoint:` 생성한 파일 경로
-- `Status:` 현재 상태
-- `Branch:` 기록한 branch
-- `Next:` resume 시 가장 먼저 할 일 한 줄
+- `Checkpoint:` created file path
+- `Status:` current status
+- `Branch:` recorded branch
+- `Next:` first action to take when resuming
 
 ### List
 
-- 현재 branch 기준 recent checkpoint 목록
-- 각 항목의 날짜, 제목, 상태
-- 필요하면 branch mismatch 항목은 별도로 구분
+- recent checkpoints for the current branch
+- each entry's date, title, and status
+- separate branch mismatch items when needed
 
 ### Resume
 
-- `Checkpoint:` 선택된 파일
-- `What You Were Doing:` 한 단락
-- `Remaining Work:` 바로 이어서 할 일
-- `Warnings:` branch mismatch나 오래된 상태가 있으면 명시
+- `Checkpoint:` selected file
+- `What You Were Doing:` one short paragraph
+- `Remaining Work:` the immediate next work
+- `Warnings:` branch mismatch or stale-state warnings
 
 ## Mode-Aware Behavior
 
 ### If current collaboration mode is Default
 
-- `Save`, `List`, `Resume` 모두 정상 동작 모드다.
-- `Save`는 `.codex/checkpoints/` 아래 새 파일을 만든다.
-- `List`와 `Resume`는 repo-local checkpoint를 읽고 compact summary를 제공한다.
+- `Save`, `List`, and `Resume` all run for real
+- `Save` creates a new file under `.codex/checkpoints/`
+- `List` and `Resume` read repo-local checkpoint state and produce a compact summary
 
 ### If current collaboration mode is Plan
 
-- `List`와 `Resume`는 읽기 전용이므로 계속 진행할 수 있다.
-- `Save`는 실제 파일 쓰기를 가장하지 않는다.
-- 이렇게 유도한다:
-  - "현재는 Plan Mode라 checkpoint 파일을 실제로 쓰지 않습니다. `Shift+Tab`으로 Default mode로 나온 뒤 `/jy-checkpoint save`를 다시 실행하세요."
-- 대신 바로 쓸 수 있는 checkpoint 초안은 대화 안에 compact하게 남긴다.
+- `List` and `Resume` can continue because they are read-only
+- `Save` must not pretend to write the file
+- Route like this:
+  - "Checkpoint save needs Default mode. Leave Plan Mode with `Shift+Tab`, then run `/jy-checkpoint save` again."
+- Still leave a compact checkpoint draft in the conversation
 
 ## Workflow
 
-1. 사용자의 의도가 `Save`, `List`, `Resume` 중 무엇인지 먼저 판정한다.
-2. repo 문맥을 수집한다.
+1. Classify the user's intent as `Save`, `List`, or `Resume`
+2. Gather repo context:
    - `git branch --show-current`
    - `git status --short`
-   - 필요하면 최근 checkpoint 목록
-3. `Save`면 title, status, modified files를 현재 문맥에서 추론한다.
-4. `.codex/checkpoints/`에 새 append-only Markdown 파일을 만든다.
-5. `List`면 현재 branch 항목을 최신순으로 먼저 보여준다.
-6. `Resume`면 사용자가 지정한 항목을 찾고, 없으면 최신 checkpoint를 기본값으로 쓴다.
-7. 선택된 checkpoint의 branch가 현재 branch와 다르면 경고만 하고 막지는 않는다.
-8. 결과는 항상 "무엇을 하고 있었는지 / 남은 일 / 주의사항" 중심으로 compact하게 정리한다.
+   - recent checkpoint list if needed
+3. For `Save`, infer the title, status, and modified files from the current context
+4. Create a new append-only Markdown file in `.codex/checkpoints/`
+5. For `List`, show current-branch items first in newest-first order
+6. For `Resume`, use the user-specified item or default to the latest relevant checkpoint
+7. Warn on branch mismatch, but do not block resume
+8. Keep the result focused on prior work, remaining work, and warnings
 
 ## Resume Matching Rules
 
-- 명시적 지정이 있으면 그 항목을 우선한다.
-  - 파일명 일부
-  - 제목 일부
-  - 날짜
-- 명시적 지정이 없으면 현재 branch의 최신 checkpoint를 먼저 찾는다.
-- 현재 branch에 checkpoint가 없으면 전체 최신 checkpoint를 사용하고 branch mismatch 경고를 붙인다.
+- Explicit user selection wins:
+  - partial filename
+  - partial title
+  - date
+- If the user does not specify anything, prefer the latest checkpoint on the current branch
+- If the current branch has no checkpoint, use the latest checkpoint overall and add a branch mismatch warning
 
 ## Boundaries
 
-- `~/.codex/...` 또는 다른 hidden home-directory state에 의존하지 않는다.
-- telemetry, update check, session analytics를 두지 않는다.
-- 기존 checkpoint를 조용히 수정하거나 덮어쓰지 않는다.
-- branch mismatch를 이유로 resume을 막지 않는다.
-- built-in session persistence가 있다고 가정해 checkpoint 작성을 생략하지 않는다.
+- Do not depend on `~/.codex/...` or any other hidden home-directory state
+- Do not add telemetry, update checks, or session analytics
+- Do not silently edit or overwrite existing checkpoints
+- Do not block resume only because the branch differs
+- Do not assume built-in session persistence is enough and skip checkpoint creation
 
 ## Common Mistakes
 
-- checkpoint를 대화 한 줄 요약으로만 끝내고 durable file을 남기지 않는 것
-- `.codex/checkpoints/` 대신 hidden home-directory state를 도입하는 것
-- 기존 checkpoint를 덮어써서 시간축을 깨는 것
-- `Resume`에서 명시적 지정이 없을 때 branch를 무시하고 아무 파일이나 고르는 것
-- branch mismatch를 발견하고도 경고를 안 남기는 것
-- Plan Mode에서 실제 파일을 쓴 척하는 것
-- 공식 문서가 필요한데도 checkpoint를 커밋 문서 대용으로 쓰는 것
+- Leaving only a chat summary and no durable checkpoint file
+- Introducing hidden home-directory state instead of `.codex/checkpoints/`
+- Overwriting an older checkpoint and breaking the time sequence
+- Ignoring the current branch when auto-selecting a checkpoint to resume
+- Missing the warning for a branch mismatch
+- Pretending a file was written in Plan Mode
+- Using a checkpoint as a substitute for a real committed document

@@ -38,7 +38,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             with self.subTest(skill=skill_path.parent.name):
                 lines = read_text(skill_path).splitlines()
                 if len(lines) > 300:
-                    self.assertIn("## 목차", read_text(skill_path))
+                    self.assertIn("## Table of Contents", read_text(skill_path))
 
     def test_first_party_skills_do_not_reference_unknown_coding_convention_namespace(self) -> None:
         for skill_path in first_party_skill_paths():
@@ -112,9 +112,9 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
 
     def test_systematic_debugging_documents_reproduce_hypothesize_and_verify(self) -> None:
         text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-debugging" / "SKILL.md")
-        self.assertIn("재현", text)
-        self.assertIn("가설", text)
-        self.assertIn("최소 수정", text)
+        self.assertIn("reproduce", text)
+        self.assertIn("hypothesis", text)
+        self.assertIn("minimal fix", text)
         self.assertIn("shotgun", text)
         self.assertIn("## Debug Loop", text)
 
@@ -130,8 +130,8 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-verification-before-completion" / "SKILL.md")
         self.assertIn("fresh verification evidence", text)
         self.assertIn("## Verification Gate", text)
-        self.assertIn("증거", text)
-        self.assertIn("완료 주장", text)
+        self.assertIn("evidence", text)
+        self.assertIn("completion claim", text)
         self.assertIn("not run", text)
 
     def test_ship_documents_branch_gate_pr_flow_and_doc_sync(self) -> None:
@@ -175,9 +175,9 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
     def test_receiving_review_documents_verification_before_changes_and_pushback(self) -> None:
         text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-receiving-review" / "SKILL.md")
         self.assertIn("performative agreement", text)
-        self.assertIn("기술적 반박", text)
-        self.assertIn("코드베이스", text)
-        self.assertIn("명확하지", text)
+        self.assertIn("technical pushback", text)
+        self.assertIn("codebase", text)
+        self.assertIn("unclear", text)
         self.assertIn("## Mode-Aware Behavior", text)
 
     def test_writing_skills_documents_english_first_authoring_policy(self) -> None:
@@ -186,6 +186,33 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("core `SKILL.md`", text)
         self.assertIn("agents/openai.yaml", text)
         self.assertIn("Korean", text)
+        self.assertIn("user's language", text)
+        self.assertIn("output-language rule", text)
+
+    def test_output_template_skills_document_user_language_rendering(self) -> None:
+        for skill_name in [
+            "jy-ship",
+            "jy-checkpoint",
+            "jy-document-release",
+            "jy-env-sync-admin",
+        ]:
+            with self.subTest(skill=skill_name):
+                text = read_text(FIRST_PARTY_SKILL_ROOT / skill_name / "SKILL.md")
+                self.assertIn("## Output Template", text)
+                self.assertIn("user's language", text)
+
+    def test_skill_docs_are_english_first(self) -> None:
+        for skill_path in first_party_skill_paths():
+            with self.subTest(skill=skill_path.parent.name):
+                text = read_text(skill_path)
+                self.assertIsNone(re.search(r"[가-힣]", text))
+
+    def test_writing_skill_references_are_english_first(self) -> None:
+        reference_root = FIRST_PARTY_SKILL_ROOT / "jy-writing-skills" / "references"
+        for ref_path in sorted(reference_root.glob("*.md")):
+            with self.subTest(reference=ref_path.name):
+                text = read_text(ref_path)
+                self.assertIsNone(re.search(r"[가-힣]", text))
 
     def test_execution_skills_have_mode_aware_behavior(self) -> None:
         """Execution-oriented skills that modify files should document mode awareness."""
@@ -223,7 +250,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             text = read_text(skill_path)
             with self.subTest(skill=skill_name):
                 self.assertTrue(
-                    "코드 수정 금지" in text or "구현하지 않는다" in text or "코드 작성 금지" in text,
+                    "Do not modify code" in text or "Do not write code" in text or "no code changes" in text,
                     f"{skill_name} is advisory but does not explicitly state no-modification boundary")
 
     def test_research_skills_require_evidence(self) -> None:
@@ -238,7 +265,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             text = read_text(skill_path)
             with self.subTest(skill=skill_name):
                 self.assertTrue(
-                    "증거" in text or "permalink" in text or "출처" in text or "링크" in text,
+                    "evidence" in text or "permalink" in text or "sources" in text or "links" in text,
                     f"{skill_name} is research-oriented but does not require evidence/sources")
 
     def test_cross_skill_references_point_to_existing_skills(self) -> None:

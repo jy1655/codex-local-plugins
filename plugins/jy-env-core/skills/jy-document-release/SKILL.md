@@ -7,189 +7,188 @@ description: Use when shipped changes in this repo need README, instructions, sk
 
 ## Overview
 
-변경된 동작과 문서가 어긋나지 않게 마지막 문서 정리를 수행하는 skill.
+Run the final documentation sync so behavior and docs stay aligned after a change ships.
 
-원본 `gstack`의 `document-release`에서 가져올 핵심은 "출시 후 문서 동기화"이고, 버리는 것은
-hidden runtime, telemetry, self-update, 그리고 존재하지 않는 문서 파일을 억지로 만드는 습관이다.
+The useful part of upstream `document-release` is post-ship documentation sync. The parts
+to reject are hidden runtime state, telemetry, self-update behavior, and inventing docs the
+repo does not actually use.
 
-이 skill의 기본 자세는 targeted patch가 아니라 full consistency audit다.
-이번 diff가 어디서 시작됐든, repo에 이미 존재하는 문서 전체가 현재 동작과 같은 말을 하는지 확인한다.
+This skill defaults to a full consistency audit, not a one-file patch. Even if the diff
+starts in one place, finish by checking whether the existing docs still describe the same
+reality.
 
 ## When to Use
 
-- "문서 업데이트해", "docs sync", "post-ship docs" 요청
-- skill, manifest, instruction, install surface를 바꾼 뒤 설명 문서를 맞춰야 할 때
-- handoff 전에 README와 verification artifact를 현재 동작과 맞춰야 할 때
+- "Update the docs", "docs sync", "post-ship docs"
+- a skill, manifest, instruction, or install-surface change needs docs to match
+- README and verification artifacts must reflect the shipped behavior before handoff
 
-사용하지 않을 때:
+Do not use it when:
 
-- 코드가 아직 불안정해서 문서보다 구현이 먼저일 때
-- 단순 오탈자 수정만 필요한 경우
+- the implementation is still unstable and docs should wait
+- the task is only a trivial typo fix
 
 ## Quick Reference
 
-| 단계 | 해야 할 일 |
-|------|-------------|
-| 0. 모드 확인 | Default면 실제 갱신, Plan이면 preview만 |
-| 1. 변경 표면 확인 | diff와 changed files에서 무엇이 바뀌었는지 파악 |
-| 2. 문서 표면 매핑 | 어떤 문서가 영향 받는지 결정 |
-| 3. 최소 갱신 | 실제로 바뀐 내용만 맞춤 |
-| 4. 검증 | 관련 테스트와 scenario artifact까지 확인 |
+| Step | Action |
+|------|--------|
+| 0. Mode check | mutate in Default, preview in Plan |
+| 1. Inspect change surface | understand the diff and changed files |
+| 2. Map doc surface | decide which docs are affected |
+| 3. Apply the minimum sync | update only what truly changed |
+| 4. Verify | run related tests and artifact checks |
 
 ## Repo-Local Doc Surface
 
-이 repo에서 우선 검토할 문서 표면:
+Review these docs first in this repo:
 
 - `README.md`
 - `instructions/AGENTS.md`
 - `plugins/jy-env-core/skills/<skill>/SKILL.md`
 - `skill-tests/first-party/<skill>/`
-- 필요하면 `docs/` 아래의 명시적 plan 또는 design note
+- explicit plan or design notes under `docs/` when relevant
 
-Do not invent 새 top-level 문서:
+Do not invent new top-level docs:
 
 - `CHANGELOG`
 - `VERSION`
 - `ARCHITECTURE.md`
 - `CONTRIBUTING.md`
 
-위 파일이 repo에 없으면 upstream 관성만으로 새로 만들지 않는다.
+If the repo does not already contain them, `Do not invent` them just because upstream workflows often do.
 
 ## Full Consistency Audit
 
-문서 누락은 보통 "이번 변경과 직접 연결된 파일만" 보고 지나갈 때 생긴다.
-그래서 이 skill은 시작점은 좁게 잡더라도, 마무리는 항상 repo에 이미 존재하는 문서 전체 audit로 닫는다.
+Doc drift usually happens when only the directly changed file gets updated. This skill uses
+the current diff as a starting point, but it closes with a `full consistency audit` across
+the existing doc surface.
 
-최소 audit 대상:
+Minimum audit set:
 
 - `README.md`
 - `instructions/AGENTS.md`
 - `plugins/jy-env-core/skills/*/SKILL.md`
 - `skill-tests/first-party/*/README.md`
 - `skill-tests/first-party/*/pressure-scenarios.json`
-- `docs/` 아래의 명시적 설계 또는 계획 문서
+- explicit design or plan docs under `docs/`
 
-핵심 질문:
+Key questions:
 
-- 같은 경로, 명령, mode rule, storage location이 문서마다 같은 말로 적혀 있는가
-- 한 문서에서는 있는 규칙이 다른 문서에서는 빠져 있지 않은가
-- 이전에 빠뜨린 문서 drift가 이번 pass에서 회수됐는가
+- are the same paths, commands, mode rules, and storage locations described consistently?
+- is a rule present in one doc but missing in another?
+- does this pass recover older drift that was previously skipped?
 
 ## Change-to-Docs Routing Matrix
 
 ### 1. Skill behavior change
 
-필수 검토:
+Required review:
 
 - `plugins/jy-env-core/skills/<skill>/SKILL.md`
 - `skill-tests/first-party/<skill>/`
-- 필요하면 해당 skill을 참조하는 `instructions/AGENTS.md`
+- `instructions/AGENTS.md` when that skill's routing is affected
 
-기본 규칙:
+Rules:
 
-- skill wording만 바뀐 것이 아니라 behavior나 trigger가 바뀌면 scenario pack도 같이 본다.
-- static verification rule이 바뀌면 관련 test도 같이 본다.
+- wording-only edits can stay narrow, but behavior or trigger changes require the scenario pack too
+- static verification rule changes require the matching tests
 
 ### 2. Install surface or environment rule change
 
-필수 검토:
+Required review:
 
 - `README.md`
 - `instructions/AGENTS.md`
-- 필요하면 `plugins/jy-env-core/skills/jy-env-sync-admin/SKILL.md`
+- `plugins/jy-env-core/skills/jy-env-sync-admin/SKILL.md` when relevant
 
-기본 규칙:
+Rules:
 
-- 경로, 명령, restart 요구사항, storage location이 바뀌면 README와 AGENTS를 둘 다 맞춘다.
+- if paths, commands, restart expectations, or storage locations change, sync both README and AGENTS
 
 ### 3. Routing or skill selection rule change
 
-필수 검토:
+Required review:
 
 - `instructions/AGENTS.md`
-- 해당 routing을 다루는 skill 문서
-- 필요하면 관련 scenario pack
+- the relevant skill docs
+- related scenario packs when needed
 
-기본 규칙:
+Rules:
 
-- repo-level routing 문구를 바꿨으면 skill 쪽과 전역 instruction 쪽을 따로 놀게 두지 않는다.
+- if repo-level routing changes, do not let the skill docs and AGENTS diverge
 
 ### 4. Docs-only cleanup
 
-필수 검토:
+Required review:
 
-- 실제로 수정하는 문서만
+- only the docs actually being touched
 
-기본 규칙:
+Rules:
 
-- docs-only 변경이면 범위를 넓히지 않는다.
-- verification asset이나 test를 억지로 건드리지 않는다.
+- keep docs-only changes narrow
+- do not force verification artifacts or tests into scope unless the behavior contract changed
 
 ## Output Template
 
-- `Change Surface:` 이번에 바뀐 기능, skill, install surface
-- `Docs Updated:` 실제로 맞춘 문서 목록
-- `Docs Skipped:` 존재하지 않거나 영향이 없어 건드리지 않은 문서
-- `Verification:` 실행한 테스트나 확인 결과
+- Render headings and short status phrases in the user's language unless the user explicitly asks for English.
+- Keep the template structure stable even when the labels are localized.
+
+- `Change Surface:` changed behavior, skill, or install surface
+- `Docs Updated:` the docs that were actually synced
+- `Docs Skipped:` docs that were unaffected or do not exist
+- `Verification:` tests or checks that were run
 
 ## Mode-Aware Behavior
 
 ### If current collaboration mode is Default
 
-- 이 skill의 정상 실행 모드다.
-- 실제 문서와 verification artifact를 수정한다.
-- 필요하면 관련 테스트까지 바로 돌린다.
+- This is the normal execution mode
+- Edit docs and verification artifacts for real
+- Run related tests when needed
 
 ### If current collaboration mode is Plan
 
-- 실제 문서 수정은 하지 않는다.
-- 이렇게 유도한다:
-  - "이건 문서 갱신 실행형 workflow라 Default mode가 맞습니다. `Shift+Tab`으로 Plan Mode에서 나온 뒤 `/jy-document-release`를 다시 실행하세요."
-- 대신 preview는 남긴다.
-  - 어떤 문서가 바뀔지
-  - 어떤 문서는 건드리면 안 되는지
-  - 어떤 검증을 돌릴지
+- Do not edit docs for real
+- Route like this:
+  - "This is an execution-oriented docs sync workflow. Leave Plan Mode with `Shift+Tab`, then run `/jy-document-release` again."
+- Still leave a preview:
+  - which docs will change
+  - which docs must stay untouched
+  - which verification will run
 
 ## Workflow
 
-1. 변경 표면을 수집한다.
-   - `git diff --name-only`
-   - 필요하면 관련 파일 본문
-2. 영향 받는 문서를 매핑한다.
-   - skill 변경이면 해당 `SKILL.md`와 `skill-tests/first-party/<skill>/`
-   - install surface 변경이면 `README.md`와 `instructions/AGENTS.md`
-   - routing 변경이면 `instructions/AGENTS.md`와 관련 skill 문서를 같이 본다
-   - 문서-only 변경이면 범위를 더 넓히지 않는다
-3. 그 다음 repo에 이미 존재하는 문서 전체를 full consistency audit 대상으로 다시 훑는다.
-4. 실제 동작과 어긋난 설명만 고친다.
-5. 사용자-facing next step, command, storage path, routing rule이 바뀌었으면 문서에도 같은 표현으로 반영한다.
-6. verification artifact도 같이 본다.
+1. Collect the change surface with `git diff --name-only` and targeted reads
+2. Map the affected docs
+3. Then scan the existing repo docs again as a full consistency audit
+4. Fix only the statements that no longer match real behavior
+5. If a user-facing path, command, storage location, or routing rule changed, update docs to match exactly
+6. Review verification artifacts too:
    - scenario pack
-   - compliance or bundle test
-7. change surface에 따라 mandatory doc pair가 빠지지 않았는지 다시 확인한다.
-   - skill behavior change -> skill doc + scenario pack
-   - install surface change -> README + AGENTS
-   - routing change -> AGENTS + related skill doc
-8. 전체 audit에서 같은 개념이 서로 다른 표현으로 drift한 곳이 없는지 마지막으로 확인한다.
-9. 테스트를 돌려 문서와 정적 검증이 함께 맞는지 확인한다.
+   - compliance or bundle tests
+7. Recheck the mandatory doc pairs:
+   - `skill behavior change -> skill doc + scenario pack`
+   - `install surface change -> README + AGENTS`
+   - `routing change -> AGENTS + related skill doc`
+8. Run tests so the docs and static verification agree
 
 ## Scope Rules
 
-- 시작점은 change surface로 잡되, 최종 검토는 existing docs 전체 audit로 닫는다.
-- 문서 톤만 손보려고 unrelated file을 넓게 건드리지 않는다.
-- skill을 바꿨으면 해당 scenario pack과 정적 test를 같이 본다.
-- install surface를 바꿨으면 README와 AGENTS를 둘 다 본다.
-- routing을 바꿨으면 AGENTS와 관련 skill 문서를 둘 다 본다.
-- repo에 없는 release artifact를 억지로 도입하지 않는다.
+- Start from the change surface, but close with an existing-doc audit
+- Do not broaden unrelated files just to polish tone
+- If a skill changes, inspect its scenario pack and static tests too
+- If the install surface changes, inspect both README and AGENTS
+- If routing changes, inspect both AGENTS and the related skill docs
+- Do not introduce release artifacts the repo does not already use
 
 ## Common Mistakes
 
-- upstream 습관대로 `CHANGELOG`, `VERSION`, `ARCHITECTURE.md`, `CONTRIBUTING.md`를 자동 생성하는 것
-- README만 고치고 `instructions/AGENTS.md`나 scenario pack을 놓치는 것
-- install surface 변경인데 README 또는 AGENTS 하나만 고치고 끝내는 것
-- routing 변경인데 AGENTS와 관련 skill 문서를 같이 안 맞추는 것
-- "이번 diff와 직접 관련 없어 보인다"는 이유로 기존 drift 문서를 그대로 남기는 것
-- 구현 diff를 안 보고 generic 문구로 문서를 덮어쓰는 것
-- 실제 사용자나 maintainer가 보는 경로, 명령, 저장 위치를 문서에 반영하지 않는 것
-- docs-only 변경인데 범위를 불필요하게 넓히는 것
-- Plan Mode에서 실제 편집을 한 척하는 것
+- Auto-creating `CHANGELOG`, `VERSION`, `ARCHITECTURE.md`, or `CONTRIBUTING.md`
+- Updating README and forgetting `instructions/AGENTS.md` or the scenario pack
+- Touching only README or only AGENTS after an install-surface change
+- Changing routing without syncing AGENTS and the related skill docs together
+- Leaving known drift behind because it was not part of today's diff
+- Writing generic prose without checking the actual implementation diff
+- Failing to reflect the real maintainer-facing paths, commands, and storage locations
+- Broadening a docs-only change unnecessarily
+- Pretending Plan Mode already edited the files

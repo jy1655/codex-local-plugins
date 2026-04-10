@@ -27,6 +27,9 @@ It is meant for maintenance work inside this environment repo, not for arbitrary
 
 ## Output Template
 
+- Render the headings and short status phrases in the user's language unless the user explicitly asks for English.
+- Keep the structure stable even when the labels are localized.
+
 - `Repo:` resolved repo root
 - `Install Surface:` plugin root, skills root, marketplace path, instruction targets
 - `Action:` inspect, apply, or bootstrap result with next step if restart is required

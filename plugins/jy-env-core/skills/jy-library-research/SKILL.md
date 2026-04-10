@@ -7,60 +7,63 @@ description: Use when working with an unfamiliar library, package, or external d
 
 ## Overview
 
-외부 라이브러리, 패키지, 의존성에 대한 질문에 증거 기반으로 답한다.
-추측이 아니라 공식 문서, 소스 코드, GitHub permalink로 뒷받침한다.
+Answer questions about external libraries, packages, and dependencies with evidence.
+Prefer official docs, source code, and GitHub permalinks over guesswork.
 
 ## When to Use
 
-- "[라이브러리] 어떻게 쓰지?", "이 패키지 best practice가 뭐야?"
-- 외부 의존성의 이상한 동작을 이해해야 할 때
-- 오픈소스 라이브러리 내부 구현을 확인해야 할 때
-- 익숙하지 않은 npm/pip/cargo 패키지 사용법을 찾을 때
+- "How do I use this library?", "What is the best practice for this package?"
+- You need to understand odd behavior from an external dependency
+- You need to inspect the internal implementation of an open-source library
+- You need usage guidance for an unfamiliar npm, pip, cargo, or similar package
 
-사용하지 않을 때:
-- 현재 프로젝트 코드 내부 탐색 (jy-codebase-explore 사용)
-- 이미 알고 있는 라이브러리의 단순 사용
-- 아키텍처 결정 (jy-consult 사용)
+Do not use it when:
+
+- The question is about the current project codebase instead of an external dependency
+- The library is already well understood and the answer is straightforward
+- The task is really an architecture tradeoff (`jy-consult`)
 
 ## Quick Reference
 
-| 요청 유형 | 접근 |
-|----------|------|
-| **개념** ("어떻게 쓰지?") | 공식 문서 → 사용 예제 → 핵심 패턴 |
-| **소스 분석** ("내부 동작이 뭐지?") | GitHub 소스 → permalink → 동작 설명 |
-| **구현** ("이걸로 X 만들기") | 공식 예제 → 프로젝트 맥락 적용 → 코드 제안 |
-| **디버그** ("왜 이상하게 동작해?") | 이슈 트래커 → 소스 → 알려진 제한 사항 |
+| Request Type | Approach |
+|--------------|----------|
+| Concept | Official docs -> examples -> key pattern |
+| Source analysis | GitHub source -> permalink -> behavior explanation |
+| Implementation | Official example -> adapt to current project context |
+| Debugging | Issue tracker -> source -> known limits or caveats |
 
 ## Research Protocol
 
-### Step 1: 요청 분류
+### Step 1: Classify the request
 
-요청을 개념/소스/구현/디버그 중 하나로 분류한 뒤 해당 접근을 따른다.
+Classify the task as concept, source analysis, implementation guidance, or debugging.
+Then follow the matching research path.
 
-### Step 2: 증거 수집
+### Step 2: Gather evidence
 
-- 공식 문서를 먼저 확인
-- 소스 코드가 필요하면 GitHub에서 permalink 확보
-- 날짜 인식: 현재 연도 기준으로 검색, 작년 결과는 충돌 시 무시
+- Check official documentation first
+- If source inspection is needed, capture a GitHub permalink
+- Be date-aware when source material may be stale
 
-### Step 3: 증거 기반 답변
+### Step 3: Answer with evidence
 
-모든 주장에 출처를 첨부:
-- 공식 문서 링크
-- GitHub permalink (파일 + 라인)
-- 이슈/PR 번호
+Attach sources to every important claim:
 
-추측은 명시적으로 표시: "문서에 명시되지 않았지만, 소스에서 추론하면..."
+- official docs links
+- GitHub permalinks with file and line references
+- issue or PR references when relevant
 
-### Step 4: 프로젝트 맥락 연결
+If you infer something from the source, say so explicitly.
 
-라이브러리 정보를 현재 프로젝트에 어떻게 적용할지까지 연결.
-일반적인 튜토리얼이 아니라 현재 코드에 맞는 적용 방법.
+### Step 4: Connect it back to the project
+
+Do not stop at a generic tutorial answer. Explain how the library guidance applies to the
+current project context.
 
 ## Common Mistakes
 
-- 증거 없이 "보통 이렇게 한다"로 답하는 것 — 문서/소스 링크 필수
-- 작년 정보를 현재인 것처럼 제시하는 것 — 날짜 확인
-- 일반적인 튜토리얼만 제공하고 프로젝트 맥락을 무시하는 것
-- 코드를 수정하는 것 — 리서치 결과를 제공할 뿐, 구현은 별도
-- 현재 프로젝트 내부 코드를 조사하는 것 — 그건 jy-codebase-explore 역할
+- Saying "people usually do this" without evidence, links, or a permalink
+- Presenting stale information as current without checking dates
+- Giving a generic tutorial and ignoring the actual project context
+- Modifying code instead of staying in research mode
+- Exploring the current project codebase instead of the external dependency

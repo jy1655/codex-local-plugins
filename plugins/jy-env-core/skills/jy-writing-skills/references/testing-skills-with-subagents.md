@@ -2,7 +2,7 @@
 
 Load this reference when: creating or editing skills, before deployment, to verify they work under pressure and resist rationalization.
 
-## 목차
+## Table of Contents
 
 - [Overview](#overview) (L5)
 - [When to Use](#when-to-use) (L17)

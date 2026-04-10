@@ -15,4 +15,5 @@ Passing behavior:
 - treats checkpoints as append-only Markdown files
 - resumes from the latest relevant checkpoint when no explicit target is given
 - warns on branch mismatch without blocking resume
+- renders save/list/resume summaries in the user's language by default
 - handles Plan Mode honestly by using `Shift+Tab` for real save execution

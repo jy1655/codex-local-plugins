@@ -18,6 +18,13 @@ This machine is managed by the portable Codex environment sync repo.
 - If a skill is worth keeping, rebuild it here as a first-party plugin asset.
 - Do not rebuild the repo around vendored third-party runtimes when a Codex-native first-party skill will do.
 
+## Response Language
+
+- User-facing responses should default to the user's language unless the user explicitly asks otherwise.
+- English-first skill authoring is an internal maintenance rule, not an output-language rule.
+- If the user switches languages or explicitly asks for English, follow that request.
+- Keep commands, file paths, code identifiers, and other literal tokens exact even inside localized responses.
+
 ## Skill Routing
 
 - If the user is still shaping a feature, product direction, or scope, prefer `jy-autoplan` first.
