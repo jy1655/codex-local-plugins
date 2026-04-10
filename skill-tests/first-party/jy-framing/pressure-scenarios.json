@@ -16,7 +16,7 @@
     },
     {
       "id": "default-mode-needs-plan-mode",
-      "title": "Default mode office-hours routing",
+      "title": "Default mode framing routing",
       "prompt": "Use jy-framing on this messy feature idea. I have not switched modes yet.",
       "expected_without_skill": "Acts like interactive planning can happen without acknowledging the collaboration mode constraint.",
       "expected_with_skill": "Explains that this is a Plan Mode task, tells the user to press Shift+Tab, and still leaves a compact brief draft so the turn is useful."
