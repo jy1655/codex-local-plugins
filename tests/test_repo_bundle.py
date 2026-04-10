@@ -48,6 +48,19 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("`jy-env-sync-admin`", text)
         self.assertIn("`jy-writing-skills`", text)
 
+    def test_readme_language_switch_and_korean_doc_exist(self) -> None:
+        repo_root = Path(__file__).resolve().parents[1]
+        english = (repo_root / "README.md").read_text(encoding="utf-8")
+        korean_path = repo_root / "README.ko.md"
+        korean = korean_path.read_text(encoding="utf-8")
+
+        self.assertTrue(korean_path.exists())
+        self.assertIn("./README.ko.md", english)
+        self.assertIn("./README.md", korean)
+        self.assertIn("Language-English", english)
+        self.assertIn("Language-Korean", english)
+        self.assertIn("## First-Party Skill Catalog", korean)
+
     def test_codex_env_core_bundle_includes_korean_law_mcp(self) -> None:
         mcp_path = Path(__file__).resolve().parents[1] / "plugins" / "jy-env-core" / ".mcp.json"
         data = json.loads(mcp_path.read_text(encoding="utf-8"))

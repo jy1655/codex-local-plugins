@@ -1,5 +1,8 @@
 # Portable Codex Environment Sync
 
+[![Language: English](https://img.shields.io/badge/Language-English-111827?style=for-the-badge)](./README.md)
+[![Language: Korean](https://img.shields.io/badge/Language-Korean-0A66C2?style=for-the-badge)](./README.ko.md)
+
 This repo defines a portable Codex working environment.
 
 It is not trying to reproduce an entire machine. It only syncs the parts that make
