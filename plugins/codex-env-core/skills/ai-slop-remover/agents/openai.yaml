@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Slop Remover"
+  short_description: "Remove AI-generated code smells from files"
+  default_prompt: "Use $ai-slop-remover to clean AI-generated code patterns from the specified file."

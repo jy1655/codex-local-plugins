@@ -1,0 +1,32 @@
+{
+  "scenarios": [
+    {
+      "id": "checkpoint-save-before-context-switch",
+      "title": "Save a durable checkpoint before ending the session",
+      "prompt": "I am switching to another task. Save a checkpoint for this repo so I can resume later without rereading the whole conversation.",
+      "expected_without_skill": "Leaves a loose summary in chat or suggests relying on session memory without creating a durable repo-local note.",
+      "expected_with_skill": "Creates a new append-only checkpoint under `.codex/checkpoints/`, captures branch plus remaining work, and reports the saved path."
+    },
+    {
+      "id": "checkpoint-resume-latest-on-current-branch",
+      "title": "Resume from the most relevant recent checkpoint",
+      "prompt": "What was I working on here? Resume from the latest checkpoint for this branch and tell me the next step.",
+      "expected_without_skill": "Guesses from recent chat context or gives a generic answer without reading durable checkpoint state.",
+      "expected_with_skill": "Reads the latest checkpoint for the current branch, summarizes the prior work, and gives a compact next-step resume summary."
+    },
+    {
+      "id": "checkpoint-resume-branch-mismatch-warning",
+      "title": "Branch mismatch should warn but not block resume",
+      "prompt": "Resume the latest checkpoint even if it came from a different branch. I just need to understand where I left off.",
+      "expected_without_skill": "Either ignores branch context completely or refuses to resume because the branch is different.",
+      "expected_with_skill": "Reads the latest checkpoint, warns about the branch mismatch, and still provides a usable resume summary."
+    },
+    {
+      "id": "checkpoint-plan-mode-save-preview",
+      "title": "Plan Mode save should not pretend to write files",
+      "prompt": "You are in Plan Mode. Save a checkpoint for this planning session before I leave.",
+      "expected_without_skill": "Pretends it can write the checkpoint immediately even though the session is still in Plan Mode.",
+      "expected_with_skill": "Explains that real save execution belongs in Default mode, tells the user to use Shift+Tab, and still leaves a compact checkpoint draft in the response."
+    }
+  ]
+}

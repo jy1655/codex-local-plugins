@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Autoplan"
+  short_description: "Pick the right Codex planning step and return one consolidated planning result"
+  default_prompt: "Use $codex-autoplan to choose the right planning flow for the current request."

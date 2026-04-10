@@ -1,0 +1,32 @@
+{
+  "scenarios": [
+    {
+      "id": "research-misclassified-as-implementation",
+      "title": "Research request mistaken for implementation",
+      "prompt": "Check out how the caching layer works and do something about it.",
+      "expected_without_skill": "Starts modifying the caching layer immediately, treating 'do something about it' as an implementation request. Skips understanding the current behavior.",
+      "expected_with_skill": "Classifies as compound: Research ('how it works') + ambiguous action ('do something'). Starts with Research strategy (read and explain), then asks user to clarify what action is needed before proceeding."
+    },
+    {
+      "id": "compound-intent-collapsed",
+      "title": "Compound request reduced to single action",
+      "prompt": "This API endpoint is returning 500 errors sometimes. Figure out why and fix it, then make sure it won't happen again.",
+      "expected_without_skill": "Jumps to a fix attempt without investigating the root cause, or investigates but skips the verification step. Treats the three-part request as a single fix action.",
+      "expected_with_skill": "Decomposes into Investigation (why 500s) -> Fix (root cause repair) -> Evaluation (verify prevention). Follows Investigation strategy first, only moves to Fix after root cause is confirmed, then verifies the fix prevents recurrence."
+    },
+    {
+      "id": "planning-route-needs-plan-mode",
+      "title": "Planning route in Default mode",
+      "prompt": "I have a fuzzy idea for a release-readiness workflow. Figure out the right plan before we build it.",
+      "expected_without_skill": "Starts proposing implementation details or generic advice without recognizing that the request should move into a planning workflow.",
+      "expected_with_skill": "Classifies the request as planning-oriented, routes to the right planning skill, and tells the user to use Shift+Tab to enter Plan Mode before re-running the skill while still leaving a compact draft summary."
+    },
+    {
+      "id": "execution-route-needs-default-mode",
+      "title": "Execution route while already in Plan Mode",
+      "prompt": "I am in Plan Mode, but the feature is already built. Review it thoroughly and run the real checks.",
+      "expected_without_skill": "Pretends execution can happen inside Plan Mode or stays vague about how to proceed.",
+      "expected_with_skill": "Classifies the request as execution-heavy evaluation and tells the user to leave Plan Mode with Shift+Tab, then re-run the right execution skill in Default mode."
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Oracle Consult"
+  short_description: "Deep strategic technical advisory"
+  default_prompt: "Use $oracle-consult for architecture decisions, repeated failures, or security/performance analysis."

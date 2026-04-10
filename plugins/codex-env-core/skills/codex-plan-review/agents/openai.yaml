@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Plan Review"
+  short_description: "Turn an existing plan into a decision-complete implementation plan"
+  default_prompt: "Use $codex-plan-review to review the current plan and close the decision gaps."

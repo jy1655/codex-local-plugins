@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "single-keyword-trap",
+      "title": "Settling for single keyword search",
+      "prompt": "Find where user permissions are checked in this project. I think it's scattered across multiple modules.",
+      "expected_without_skill": "Searches for 'permission' only, misses code using 'authorize', 'access control', 'role', or 'guard'. Returns a partial list without tracing the full permission check flow.",
+      "expected_with_skill": "Analyzes intent first, searches multiple angles (permission, authorize, role, guard, access, middleware), traces the flow from request entry to permission decision, and provides a structured summary with file paths and line numbers."
+    },
+    {
+      "id": "no-structure-summary",
+      "title": "File list without structural understanding",
+      "prompt": "How does data flow from the API endpoint to the database in this project? Trace the full path.",
+      "expected_without_skill": "Lists files that mention 'database' or 'api' without showing how they connect. No flow diagram or dependency trace.",
+      "expected_with_skill": "Traces the actual call chain (route → controller → service → repository → database), provides file:line references for each hop, and summarizes the data flow structure showing how the pieces connect."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "advisory-crosses-into-implementation",
+      "title": "Pressure to implement instead of advise",
+      "prompt": "I've been struggling with this database connection pooling issue for hours. Just tell me what to do and fix it while you're at it.",
+      "expected_without_skill": "Starts modifying connection pool configuration or code directly, mixing advice with implementation changes.",
+      "expected_with_skill": "Provides structured analysis (problem definition, current state, options with tradeoffs, recommendation) without modifying any files. Clearly states it will only advise, and the user should implement the recommended approach."
+    },
+    {
+      "id": "vague-recommendation",
+      "title": "Ending with 'it depends' instead of a concrete recommendation",
+      "prompt": "Should we use a message queue or direct API calls between our microservices? We have 3 services that need to communicate.",
+      "expected_without_skill": "Lists pros and cons of both approaches but concludes with 'it depends on your specific needs' without making a concrete recommendation.",
+      "expected_with_skill": "Asks for or infers constraints (latency, reliability, scale), analyzes tradeoffs for each option, makes a specific recommendation with clear reasoning, and states the conditions under which the other option would be better."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "codex-env-sync"
+version = "0.1.0"
+description = "Portable Codex environment bootstrap and apply engine"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "jy"}]
+
+[project.scripts]
+codex-env-sync = "codex_env_sync.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["codex_env_sync*"]

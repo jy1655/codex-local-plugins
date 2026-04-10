@@ -1,0 +1,20 @@
+{
+  "name": "personal-codex",
+  "interface": {
+    "displayName": "Personal Codex"
+  },
+  "plugins": [
+    {
+      "name": "codex-env-core",
+      "source": {
+        "source": "local",
+        "path": "./plugins/codex-env-core"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

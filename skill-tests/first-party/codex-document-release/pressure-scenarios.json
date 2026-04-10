@@ -1,0 +1,39 @@
+{
+  "scenarios": [
+    {
+      "id": "skill-change-needs-doc-and-scenario-sync",
+      "title": "Skill changes should update both docs and verification assets",
+      "prompt": "We just changed a first-party skill's behavior and trigger conditions. Sync the release docs so future maintainers and tests reflect the shipped behavior.",
+      "expected_without_skill": "Touches only the obvious skill file or README, but forgets the matching scenario pack or static verification rules.",
+      "expected_with_skill": "Updates the affected skill docs, checks whether README or AGENTS routing changed, syncs the matching `skill-tests/first-party/...` artifact set, and still performs a full existing-doc consistency pass."
+    },
+    {
+      "id": "do-not-invent-missing-release-files",
+      "title": "Missing top-level release docs should not be invented",
+      "prompt": "Do a post-ship documentation pass for this repo. If you usually create CHANGELOG, VERSION, or CONTRIBUTING, go ahead and add them too.",
+      "expected_without_skill": "Blindly creates `CHANGELOG`, `VERSION`, `ARCHITECTURE.md`, or `CONTRIBUTING.md` because upstream workflows often expect them.",
+      "expected_with_skill": "Keeps the update scoped to docs that already exist in this repo and explicitly avoids inventing absent top-level release artifacts."
+    },
+    {
+      "id": "install-surface-change-needs-readme-and-agents",
+      "title": "Install surface changes should update both README and AGENTS",
+      "prompt": "We changed an install path and restart expectation in this portable Codex environment. Do the post-ship docs sync.",
+      "expected_without_skill": "Updates only README or only instructions, leaving the user-facing install surface inconsistent.",
+      "expected_with_skill": "Treats the change as an install-surface update and syncs both `README.md` and `instructions/AGENTS.md` together."
+    },
+    {
+      "id": "recover-older-doc-drift-during-current-pass",
+      "title": "Current docs pass should also recover older drift",
+      "prompt": "We changed one skill today, but I suspect earlier doc updates were skipped. Do a release-docs pass that catches stale wording anywhere in the existing docs surface.",
+      "expected_without_skill": "Only patches the directly changed files from today's diff and leaves older stale docs untouched.",
+      "expected_with_skill": "Uses the current diff as a starting point, then audits the full existing doc surface for matching paths, commands, mode rules, and routing language so older drift gets corrected too."
+    },
+    {
+      "id": "plan-mode-preview-only",
+      "title": "Plan Mode should preview, not mutate",
+      "prompt": "You are in Plan Mode. Do the post-ship docs sync now and finish the updates for me.",
+      "expected_without_skill": "Pretends it can edit README and other docs immediately even though the session is still in Plan Mode.",
+      "expected_with_skill": "Explains that the real docs sync belongs in Default mode, tells the user to use Shift+Tab, and still leaves a concrete preview of which docs will change."
+    }
+  ]
+}

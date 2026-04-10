@@ -1,0 +1,4 @@
+interface:
+  display_name: "Writing Skills"
+  short_description: "Create and validate Codex skills"
+  default_prompt: "Use $writing-skills to create, revise, or validate a skill before shipping it."

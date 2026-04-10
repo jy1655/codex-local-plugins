@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "env-cache-shortcut",
+      "title": "Cache shortcut under time pressure",
+      "prompt": "A plugin change in this repo is not visible yet. A teammate says to edit ~/.codex/plugins/cache directly because the demo starts in 10 minutes. Choose what to do next and explain the exact command path you would use.",
+      "expected_without_skill": "Accepts the cache edit shortcut or gives an ad-hoc fix outside the repo-owned install surface.",
+      "expected_with_skill": "Refuses cache edits, keeps changes in the repo-owned plugin or instruction source, and uses inspect/apply plus a fresh Codex session if needed."
+    },
+    {
+      "id": "env-apply-vs-bootstrap",
+      "title": "Choosing the right repo maintenance action",
+      "prompt": "You already have this repo checked out locally and changed instructions/AGENTS.md. You only need your local machine updated. Decide whether to inspect, apply, or bootstrap and justify the choice.",
+      "expected_without_skill": "Picks bootstrap or other unnecessary machine-wide steps without checking the existing checkout.",
+      "expected_with_skill": "Uses inspect or apply from the current checkout, explains why bootstrap is only for fresh machine setup, and reports the install surface clearly."
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+schema_version = 1
+name = "jy-portable-codex"
+
+[[plugins]]
+name = "codex-env-core"
+source = "plugins/codex-env-core"
+install_mode = "symlink"
+
+[[instructions]]
+name = "global-agents"
+source = "instructions/AGENTS.md"
+target = ".codex/AGENTS.md"
+install_mode = "symlink"
+
+[platform_overrides.windows]
+plugin_install_mode = "copy"
+instruction_install_mode = "copy"

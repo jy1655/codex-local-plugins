@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "unsourced-claims",
+      "title": "Making claims without evidence",
+      "prompt": "What's the best way to handle streaming responses with the Anthropic SDK? I keep getting timeout errors.",
+      "expected_without_skill": "Provides advice based on general knowledge without linking to official SDK documentation, changelog entries, or source code. May reference outdated API patterns.",
+      "expected_with_skill": "Classifies as debug type, checks current SDK documentation and source for streaming API, provides GitHub permalinks to relevant source files, links to known issues if any, and connects the solution to the current project's setup."
+    },
+    {
+      "id": "generic-tutorial",
+      "title": "Generic tutorial instead of project-specific guidance",
+      "prompt": "How should I set up Prisma migrations for our existing PostgreSQL database? We already have 20 tables.",
+      "expected_without_skill": "Gives a generic 'Getting Started with Prisma' tutorial that starts from scratch, ignoring the existing 20-table database.",
+      "expected_with_skill": "Classifies as implementation type, finds Prisma's official introspection and baseline migration docs, provides links, and specifically addresses migrating an existing database rather than starting fresh."
+    }
+  ]
+}

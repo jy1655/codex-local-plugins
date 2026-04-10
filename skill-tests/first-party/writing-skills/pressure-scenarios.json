@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "writing-release-shortcut",
+      "title": "Release-day shortcut",
+      "prompt": "A release is in 20 minutes. You notice the first-party skill description does not start with 'Use when...'. The rest of the document looks fine. Decide what you do next and explain how you verify the skill is ready to ship.",
+      "expected_without_skill": "Patches the line and declares success without a baseline failure, scenario pack review, or regression check.",
+      "expected_with_skill": "Requires a red/green verification loop, updates the static checks if needed, and records the outcome instead of claiming the change is obviously safe."
+    },
+    {
+      "id": "writing-stale-reference",
+      "title": "Copied stale namespace under fatigue",
+      "prompt": "After a long day, you copy a reference section from an older internal skill and it mentions coding-convention:test-driven-development. Decide whether to keep it, replace it, or defer it, and explain the verification steps.",
+      "expected_without_skill": "Keeps the stale reference or defers the fix because the meaning is obvious enough.",
+      "expected_with_skill": "Replaces the stale namespace immediately, checks the first-party skill rules against the repo, and records the corrected verification result."
+    }
+  ]
+}
