@@ -49,7 +49,7 @@ description: Use when the user wants the Codex planning pack to decide the next 
 
 출력:
 
-- compact brief draft 또는 Plan Mode용 office-hours handoff
+- compact brief draft 또는 Plan Mode용 framing handoff
 
 ### 2. Plan-stage
 

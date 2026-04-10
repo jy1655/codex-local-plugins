@@ -2,7 +2,7 @@
   "scenarios": [
     {
       "id": "idea-needs-routing",
-      "title": "Early-stage request routes to office-hours",
+      "title": "Early-stage request routes to framing",
       "prompt": "Autoplan this feature idea. We think we need a partner dashboard, but we have not pinned down the user pain yet.",
       "expected_without_skill": "Treats the request like a normal plan review even though the request is still at the idea stage.",
       "expected_with_skill": "Recognizes that planning maturity is low, routes to `jy-framing`, and returns a consolidated brief plus next step."
@@ -25,13 +25,13 @@
       "id": "execution-ready-should-not-force-planning",
       "title": "Execution-ready request should not be shoved into planning",
       "prompt": "Autoplan this. The feature is already implemented, so just tell me the right next execution step and do not send me into a planning loop.",
-      "expected_without_skill": "Still routes into office-hours or plan-review because the word autoplan was used, even though the work is already execution-ready.",
+      "expected_without_skill": "Still routes into framing or plan-review because the word autoplan was used, even though the work is already execution-ready.",
       "expected_with_skill": "Classifies the request as execution-ready, says the planning pack is not applicable, keeps the user in Default mode, and points to implementation or review execution as the next step."
     },
     {
       "id": "explicit-skill-should-not-be-overridden",
       "title": "Explicit planning skill choice should win",
-      "prompt": "Use jy-plan-review on this rough implementation plan. Do not send me to office-hours.",
+      "prompt": "Use jy-plan-review on this rough implementation plan. Do not send me to jy-framing.",
       "expected_without_skill": "Second-guesses the user's explicit skill choice and reroutes based on vague heuristics.",
       "expected_with_skill": "Respects the explicit planning skill choice, keeps the route on jy-plan-review, and only applies mode-aware guidance around Shift+Tab if needed."
     }

@@ -6,7 +6,7 @@
 
 **Architecture:** Keep the verification assets as repo data under a dedicated `skill-tests/first-party/` tree, one directory per first-party skill. Add unittest coverage that asserts every first-party skill has the required scenario pack, baseline case, pressure scenarios, and result template, so the verification workflow stays complete as new first-party skills are added.
 
-**Tech Stack:** Markdown, YAML, Python `unittest`
+**Tech Stack:** Markdown, JSON, Python `unittest`
 
 ---
 
@@ -21,9 +21,9 @@
 ```python
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import unittest
-import yaml
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -40,13 +40,13 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
                 scenario_dir = SCENARIO_ROOT / skill_dir.name
                 self.assertTrue((scenario_dir / "README.md").exists())
                 self.assertTrue((scenario_dir / "baseline.md").exists())
-                self.assertTrue((scenario_dir / "pressure-scenarios.yaml").exists())
+                self.assertTrue((scenario_dir / "pressure-scenarios.json").exists())
                 self.assertTrue((scenario_dir / "result-template.md").exists())
 
     def test_pressure_scenarios_define_at_least_two_cases(self) -> None:
-        for scenario_file in sorted(SCENARIO_ROOT.glob("*/pressure-scenarios.yaml")):
+        for scenario_file in sorted(SCENARIO_ROOT.glob("*/pressure-scenarios.json")):
             with self.subTest(file=scenario_file.parent.name):
-                data = yaml.safe_load(scenario_file.read_text(encoding="utf-8"))
+                data = json.loads(scenario_file.read_text(encoding="utf-8"))
                 self.assertGreaterEqual(len(data["scenarios"]), 2)
 ```
 
@@ -71,11 +71,11 @@ Expected: PASS
 **Files:**
 - Create: `skill-tests/first-party/jy-env-sync-admin/README.md`
 - Create: `skill-tests/first-party/jy-env-sync-admin/baseline.md`
-- Create: `skill-tests/first-party/jy-env-sync-admin/pressure-scenarios.yaml`
+- Create: `skill-tests/first-party/jy-env-sync-admin/pressure-scenarios.json`
 - Create: `skill-tests/first-party/jy-env-sync-admin/result-template.md`
 - Create: `skill-tests/first-party/jy-writing-skills/README.md`
 - Create: `skill-tests/first-party/jy-writing-skills/baseline.md`
-- Create: `skill-tests/first-party/jy-writing-skills/pressure-scenarios.yaml`
+- Create: `skill-tests/first-party/jy-writing-skills/pressure-scenarios.json`
 - Create: `skill-tests/first-party/jy-writing-skills/result-template.md`
 
 - [ ] **Step 1: Write the failing asset expectation via Task 1**
@@ -95,7 +95,7 @@ Expected: FAIL until all scenario-pack files are present
 For each first-party skill, add:
 - README.md explaining what the skill pack validates
 - baseline.md describing the no-skill baseline
-- pressure-scenarios.yaml with at least 2 concrete cases
+- pressure-scenarios.json with at least 2 concrete cases
 - result-template.md capturing observed choice, rationale, and pass/fail
 ```
 
