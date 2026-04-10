@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Test-Driven Development"
+  short_description: "Implement features and bugfixes by writing a failing test first, then minimal code"
+  default_prompt: "Use $jy-test-driven-development to implement this change with a failing test first and a red-green-refactor loop."

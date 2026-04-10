@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Office Hours"
+  short_description: "Shape an idea into a sharp product brief before planning"
+  default_prompt: "Use $jy-office-hours to turn the current idea into a scoped brief."

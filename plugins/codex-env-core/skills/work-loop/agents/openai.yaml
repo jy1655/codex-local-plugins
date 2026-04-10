@@ -1,4 +1,0 @@
-interface:
-  display_name: "Work Loop"
-  short_description: "Iterative execution until verified completion"
-  default_prompt: "Use $work-loop to keep working on the task until it passes verification."

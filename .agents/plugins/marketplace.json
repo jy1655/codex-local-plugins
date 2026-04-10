@@ -5,10 +5,10 @@
   },
   "plugins": [
     {
-      "name": "codex-env-core",
+      "name": "jy-env-core",
       "source": {
         "source": "local",
-        "path": "./plugins/codex-env-core"
+        "path": "./plugins/jy-env-core"
       },
       "policy": {
         "installation": "AVAILABLE",

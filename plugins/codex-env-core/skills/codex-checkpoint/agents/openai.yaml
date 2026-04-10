@@ -1,4 +1,0 @@
-interface:
-  display_name: "Codex Checkpoint"
-  short_description: "Save, list, and resume repo-local working-state checkpoints"
-  default_prompt: "Use $codex-checkpoint to save, list, or resume repo-local working-state checkpoints for the current repo."

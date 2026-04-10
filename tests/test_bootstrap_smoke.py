@@ -12,8 +12,8 @@ from codex_env_sync.platforms import ManagedPaths
 
 
 def write_bootstrap_repo(root: Path) -> None:
-    (root / "plugins" / "codex-env-core" / ".codex-plugin").mkdir(parents=True, exist_ok=True)
-    (root / "plugins" / "codex-env-core" / "skills" / "env-sync-admin").mkdir(parents=True, exist_ok=True)
+    (root / "plugins" / "jy-env-core" / ".codex-plugin").mkdir(parents=True, exist_ok=True)
+    (root / "plugins" / "jy-env-core" / "skills" / "jy-env-sync-admin").mkdir(parents=True, exist_ok=True)
     (root / "instructions").mkdir(parents=True, exist_ok=True)
 
     (root / "codex-env.toml").write_text(
@@ -23,8 +23,8 @@ def write_bootstrap_repo(root: Path) -> None:
             name = "bootstrap-fixture"
 
             [[plugins]]
-            name = "codex-env-core"
-            source = "plugins/codex-env-core"
+            name = "jy-env-core"
+            source = "plugins/jy-env-core"
 
             [[instructions]]
             name = "global-agents"
@@ -35,10 +35,10 @@ def write_bootstrap_repo(root: Path) -> None:
         + "\n",
         encoding="utf-8",
     )
-    (root / "plugins" / "codex-env-core" / ".codex-plugin" / "plugin.json").write_text(
+    (root / "plugins" / "jy-env-core" / ".codex-plugin" / "plugin.json").write_text(
         json.dumps(
             {
-                "name": "codex-env-core",
+                "name": "jy-env-core",
                 "version": "0.1.0",
                 "description": "fixture",
                 "skills": "./skills/",
@@ -50,9 +50,9 @@ def write_bootstrap_repo(root: Path) -> None:
         + "\n",
         encoding="utf-8",
     )
-    (root / "plugins" / "codex-env-core" / ".mcp.json").write_text('{"mcpServers":{}}\n', encoding="utf-8")
-    (root / "plugins" / "codex-env-core" / "skills" / "env-sync-admin" / "SKILL.md").write_text(
-        "---\nname: env-sync-admin\ndescription: fixture\n---\n",
+    (root / "plugins" / "jy-env-core" / ".mcp.json").write_text('{"mcpServers":{}}\n', encoding="utf-8")
+    (root / "plugins" / "jy-env-core" / "skills" / "jy-env-sync-admin" / "SKILL.md").write_text(
+        "---\nname: jy-env-sync-admin\ndescription: fixture\n---\n",
         encoding="utf-8",
     )
     (root / "instructions" / "AGENTS.md").write_text("# smoke\n", encoding="utf-8")
@@ -92,8 +92,8 @@ class BootstrapSmokeTests(unittest.TestCase):
                     report = bootstrap_environment(str(git_repo), home=home_dir, os_name=os_name)
 
                     self.assertIsNotNone(report.managed_repo)
-                    self.assertTrue((Path(home_dir) / "plugins" / "codex-env-core").exists())
-                    self.assertTrue((Path(home_dir) / ".agents" / "skills" / "codex-env-core" / "env-sync-admin" / "SKILL.md").exists())
+                    self.assertTrue((Path(home_dir) / "plugins" / "jy-env-core").exists())
+                    self.assertTrue((Path(home_dir) / ".agents" / "skills" / "jy-env-core" / "jy-env-sync-admin" / "SKILL.md").exists())
                     self.assertTrue((Path(home_dir) / ".codex" / "AGENTS.md").exists())
                     self.assertTrue((Path(home_dir) / ".agents" / "plugins" / "marketplace.json").exists())
 

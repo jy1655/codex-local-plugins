@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Verification Before Completion"
+  short_description: "Require fresh verification evidence before any completion or success claim"
+  default_prompt: "Use $jy-verification-before-completion before claiming this work is complete, fixed, or passing."

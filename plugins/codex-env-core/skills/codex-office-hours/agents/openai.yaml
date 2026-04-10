@@ -1,4 +1,0 @@
-interface:
-  display_name: "Codex Office Hours"
-  short_description: "Shape an idea into a sharp product brief before planning"
-  default_prompt: "Use $codex-office-hours to turn the current idea into a scoped brief."

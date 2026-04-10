@@ -2,8 +2,8 @@ schema_version = 1
 name = "jy-portable-codex"
 
 [[plugins]]
-name = "codex-env-core"
-source = "plugins/codex-env-core"
+name = "jy-env-core"
+source = "plugins/jy-env-core"
 install_mode = "symlink"
 
 [[instructions]]

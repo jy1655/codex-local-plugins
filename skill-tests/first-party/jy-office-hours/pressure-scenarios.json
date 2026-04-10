@@ -1,0 +1,25 @@
+{
+  "scenarios": [
+    {
+      "id": "vague-product-direction",
+      "title": "Vague feature direction needs a brief",
+      "prompt": "We need something better for team onboarding. I do not know if it is docs, automation, or AI. Help me pin it down.",
+      "expected_without_skill": "Starts proposing solutions immediately and mixes product ideas with execution steps without first narrowing the user and problem.",
+      "expected_with_skill": "Clarifies the target user, current workaround, sharpest pain, and smallest useful wedge, then returns a brief with success criteria and recommended next step."
+    },
+    {
+      "id": "scope-panic",
+      "title": "Broad request gets narrowed before planning",
+      "prompt": "I want a whole planning system for feature requests, product reviews, and launch readiness. Where do we even start?",
+      "expected_without_skill": "Treats the request as one giant implementation problem and produces a bloated solution space.",
+      "expected_with_skill": "Reduces the request to a tractable first wedge, states non-goals, and outputs a scoped brief that can be reviewed next."
+    },
+    {
+      "id": "default-mode-needs-plan-mode",
+      "title": "Default mode office-hours routing",
+      "prompt": "Use jy-office-hours on this messy feature idea. I have not switched modes yet.",
+      "expected_without_skill": "Acts like interactive planning can happen without acknowledging the collaboration mode constraint.",
+      "expected_with_skill": "Explains that this is a Plan Mode task, tells the user to press Shift+Tab, and still leaves a compact brief draft so the turn is useful."
+    }
+  ]
+}

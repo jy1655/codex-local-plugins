@@ -1,4 +1,0 @@
-interface:
-  display_name: "Codebase Explore"
-  short_description: "Multi-angle codebase exploration"
-  default_prompt: "Use $codebase-explore to find code, trace dependencies, and understand codebase structure."

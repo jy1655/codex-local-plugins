@@ -6,7 +6,7 @@ import unittest
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-FIRST_PARTY_SKILL_ROOT = REPO_ROOT / "plugins" / "codex-env-core" / "skills"
+FIRST_PARTY_SKILL_ROOT = REPO_ROOT / "plugins" / "jy-env-core" / "skills"
 SCENARIO_ROOT = REPO_ROOT / "skill-tests" / "first-party"
 
 
@@ -17,9 +17,9 @@ def first_party_skill_dirs() -> list[Path]:
 class FirstPartySkillScenarioTests(unittest.TestCase):
     def test_new_workflow_skills_have_scenario_packs(self) -> None:
         for skill_name in [
-            "systematic-debugging",
-            "test-driven-development",
-            "verification-before-completion",
+            "jy-systematic-debugging",
+            "jy-test-driven-development",
+            "jy-verification-before-completion",
         ]:
             with self.subTest(skill=skill_name):
                 scenario_dir = SCENARIO_ROOT / skill_name
@@ -58,18 +58,18 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
 
     def test_mode_aware_skill_packs_cover_collaboration_mode_cases(self) -> None:
         mode_aware_skills = [
-            "ai-slop-remover",
-            "codex-office-hours",
-            "codex-plan-review",
-            "codex-autoplan",
-            "codex-checkpoint",
-            "codex-document-release",
-            "intent-gate",
-            "review-work",
-            "work-loop",
-            "systematic-debugging",
-            "test-driven-development",
-            "verification-before-completion",
+            "jy-ai-slop-remover",
+            "jy-office-hours",
+            "jy-plan-review",
+            "jy-autoplan",
+            "jy-checkpoint",
+            "jy-document-release",
+            "jy-intent-gate",
+            "jy-review-work",
+            "jy-work-loop",
+            "jy-systematic-debugging",
+            "jy-test-driven-development",
+            "jy-verification-before-completion",
         ]
         for skill_name in mode_aware_skills:
             with self.subTest(skill=skill_name):

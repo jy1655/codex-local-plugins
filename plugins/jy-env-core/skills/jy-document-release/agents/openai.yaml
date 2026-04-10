@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Document Release"
+  short_description: "Sync README, instructions, and verification docs after shipped changes"
+  default_prompt: "Use $jy-document-release to sync docs and verification artifacts with the shipped changes in this repo."

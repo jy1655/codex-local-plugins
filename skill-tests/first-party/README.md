@@ -1,7 +1,7 @@
 # First-Party Skill Verification Packs
 
 This directory contains local, repeatable verification assets for the first-party skills
-shipped in `plugins/codex-env-core/skills/`.
+shipped in `plugins/jy-env-core/skills/`.
 
 Each skill pack includes:
 

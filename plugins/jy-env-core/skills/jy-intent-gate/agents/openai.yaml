@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Intent Gate"
+  short_description: "Classify user intent before choosing action strategy"
+  default_prompt: "Use $jy-intent-gate to classify the user's request and route to the right strategy."

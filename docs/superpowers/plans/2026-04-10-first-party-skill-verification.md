@@ -27,7 +27,7 @@ import yaml
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-FIRST_PARTY_SKILL_ROOT = REPO_ROOT / "plugins" / "codex-env-core" / "skills"
+FIRST_PARTY_SKILL_ROOT = REPO_ROOT / "plugins" / "jy-env-core" / "skills"
 SCENARIO_ROOT = REPO_ROOT / "skill-tests" / "first-party"
 
 
@@ -69,14 +69,14 @@ Expected: PASS
 ### Task 2: Add First-Party Scenario Packs
 
 **Files:**
-- Create: `skill-tests/first-party/env-sync-admin/README.md`
-- Create: `skill-tests/first-party/env-sync-admin/baseline.md`
-- Create: `skill-tests/first-party/env-sync-admin/pressure-scenarios.yaml`
-- Create: `skill-tests/first-party/env-sync-admin/result-template.md`
-- Create: `skill-tests/first-party/writing-skills/README.md`
-- Create: `skill-tests/first-party/writing-skills/baseline.md`
-- Create: `skill-tests/first-party/writing-skills/pressure-scenarios.yaml`
-- Create: `skill-tests/first-party/writing-skills/result-template.md`
+- Create: `skill-tests/first-party/jy-env-sync-admin/README.md`
+- Create: `skill-tests/first-party/jy-env-sync-admin/baseline.md`
+- Create: `skill-tests/first-party/jy-env-sync-admin/pressure-scenarios.yaml`
+- Create: `skill-tests/first-party/jy-env-sync-admin/result-template.md`
+- Create: `skill-tests/first-party/jy-writing-skills/README.md`
+- Create: `skill-tests/first-party/jy-writing-skills/baseline.md`
+- Create: `skill-tests/first-party/jy-writing-skills/pressure-scenarios.yaml`
+- Create: `skill-tests/first-party/jy-writing-skills/result-template.md`
 
 - [ ] **Step 1: Write the failing asset expectation via Task 1**
 

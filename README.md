@@ -23,16 +23,56 @@ installed plugin bundle and global instructions without re-copying. Windows keep
 via platform override.
 
 Repo-local working state that should not be committed can live under `.codex/`.
-The first such path is `.codex/checkpoints/`, used by the first-party `codex-checkpoint`
+The first such path is `.codex/checkpoints/`, used by the first-party `jy-checkpoint`
 skill for session handoff notes.
 
 Authoring references that support local skill development can live in `references/`.
 They are part of this repo for maintenance work, not part of the installed Codex surface.
 
-First-party skill authoring happens in `plugins/codex-env-core/skills/`. That directory is
+First-party skill authoring happens in `plugins/jy-env-core/skills/`. That directory is
 the source of truth for both local development and the installed Codex skill surface.
 The current first-party workflow pack covers planning, debugging, test-first implementation,
 review, and verification disciplines.
+
+## First-Party Skill Catalog
+
+Skill command names stay short as `jy-*`. Role grouping lives here in the README so day-to-day
+invocation stays compact while the intended use stays explicit.
+
+### Planning
+
+- `jy-autoplan` chooses the right planning path for the current request and routes to `jy-office-hours` or `jy-plan-review` without making the user decide first.
+- `jy-office-hours` turns a vague feature or product idea into a sharper problem brief, constraints list, and next planning step.
+- `jy-plan-review` takes an existing plan or outline and closes decision gaps before implementation starts.
+
+### Execution
+
+- `jy-systematic-debugging` forces reproduction, hypothesis testing, and root-cause verification before patching a bug.
+- `jy-test-driven-development` enforces a failing test first and keeps implementation inside a red-green-refactor loop.
+- `jy-verification-before-completion` blocks success claims until fresh verification commands and results exist.
+- `jy-review-work` runs a structured multi-angle review pass on completed implementation before handoff or merge.
+- `jy-work-loop` keeps working a task iteratively until the stated completion criteria are actually verified.
+- `jy-ai-slop-remover` cleans obvious AI-generated code smells without turning into broad stylistic refactoring.
+
+### Routing
+
+- `jy-intent-gate` classifies ambiguous requests before choosing a planning, execution, or research path.
+
+### Research
+
+- `jy-codebase-explore` performs multi-angle repository exploration when the structure is unfamiliar or spread across modules.
+- `jy-library-research` gathers evidence-backed answers about external libraries, packages, APIs, and usage patterns.
+- `jy-oracle-consult` stays in advisory mode for architecture, reliability, performance, and repeated-failure decisions that need deeper judgment.
+
+### Maintenance
+
+- `jy-checkpoint` stores repo-local checkpoint notes under `.codex/checkpoints/` for pause, resume, and branch handoff workflows.
+- `jy-document-release` syncs README, AGENTS instructions, skill docs, and verification packs after shipped changes.
+- `jy-env-sync-admin` validates this environment repo and reapplies the repo-owned install surface into the home Codex environment.
+
+### Authoring
+
+- `jy-writing-skills` is the first-party skill authoring guide, including TDD-style scenario validation and deployment checks for skill changes.
 
 ## Secret handling
 
@@ -46,7 +86,11 @@ definition.
 
 For plugin-managed MCP secrets, use a local-only overlay file:
 
-- `~/.codex-env-sync/local/plugins/codex-env-core.mcp.json`
+- `~/.codex-env-sync/local/plugins/jy-env-core.mcp.json`
+
+If you are migrating from the previous plugin id, `apply` also reads
+`~/.codex-env-sync/local/plugins/codex-env-core.mcp.json` only when the new file does not
+exist yet.
 
 Example:
 
@@ -103,10 +147,10 @@ installed Codex surface immediately.
 codex-env.toml                 # Minimal manifest: plugins + instructions + platform overrides
 codex_env_sync/                # Apply engine and CLI
 plugins/                       # First-party plugin bundles that get installed into ~/plugins
-plugins/codex-env-core/skills/ # First-party Codex skills, authoring source and install source
+plugins/jy-env-core/skills/ # First-party Codex skills, authoring source and install source
 instructions/                  # Generated instruction artifacts
 references/                    # Local authoring references used while building first-party skills
-.codex/checkpoints/            # Repo-local ignored checkpoint notes created by codex-checkpoint
+.codex/checkpoints/            # Repo-local ignored checkpoint notes created by jy-checkpoint
 .agents/plugins/               # Repo-local marketplace metadata for local plugin discovery
 .agents/skills/                # Home install target for Codex native skill discovery
 scripts/bootstrap.sh           # First-run shell bootstrap for macOS/Linux
@@ -120,7 +164,7 @@ skill-tests/                   # First-party skill verification packs (baseline 
 - Upstream open source or company skills are seed material only.
 - Raw seed sources normally stay local and are not committed here.
 - Curated authoring references that we actively use to build first-party skills may be vendored under `references/`.
-- First-party Codex skills are authored directly in `plugins/codex-env-core/skills/`.
+- First-party Codex skills are authored directly in `plugins/jy-env-core/skills/`.
 - This repo does not keep vendored upstream runtimes as part of the maintained execution surface.
 - Repo-local checkpoint notes belong under `.codex/checkpoints/` and stay gitignored.
 - What gets committed here is the first-party result after customization.

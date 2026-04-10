@@ -1,0 +1,39 @@
+{
+  "scenarios": [
+    {
+      "id": "idea-needs-routing",
+      "title": "Early-stage request routes to office-hours",
+      "prompt": "Autoplan this feature idea. We think we need a partner dashboard, but we have not pinned down the user pain yet.",
+      "expected_without_skill": "Treats the request like a normal plan review even though the request is still at the idea stage.",
+      "expected_with_skill": "Recognizes that planning maturity is low, routes to `jy-office-hours`, and returns a consolidated brief plus next step."
+    },
+    {
+      "id": "existing-plan-needs-review",
+      "title": "Existing plan routes to plan review",
+      "prompt": "Autoplan this. We already have a plan doc for API key rotation and admin audit screens. I want the gaps closed before implementation.",
+      "expected_without_skill": "Repeats generic planning advice and does not choose a concrete review path.",
+      "expected_with_skill": "Detects that a plan already exists, routes to `jy-plan-review`, and returns a single revised-plan oriented outcome."
+    },
+    {
+      "id": "default-mode-autoplan-routing",
+      "title": "Autoplan should acknowledge mode before interactive planning",
+      "prompt": "Autoplan this in Default mode. I want you to choose the right planning path and keep going.",
+      "expected_without_skill": "Pretends it can switch collaboration modes automatically and continue with an interactive planning flow.",
+      "expected_with_skill": "Chooses the right planning route, tells the user to enter Plan Mode with Shift+Tab for the interactive path, and still leaves a compact consolidated planning draft."
+    },
+    {
+      "id": "execution-ready-should-not-force-planning",
+      "title": "Execution-ready request should not be shoved into planning",
+      "prompt": "Autoplan this. The feature is already implemented, so just tell me the right next execution step and do not send me into a planning loop.",
+      "expected_without_skill": "Still routes into office-hours or plan-review because the word autoplan was used, even though the work is already execution-ready.",
+      "expected_with_skill": "Classifies the request as execution-ready, says the planning pack is not applicable, keeps the user in Default mode, and points to implementation or review execution as the next step."
+    },
+    {
+      "id": "explicit-skill-should-not-be-overridden",
+      "title": "Explicit planning skill choice should win",
+      "prompt": "Use jy-plan-review on this rough implementation plan. Do not send me to office-hours.",
+      "expected_without_skill": "Second-guesses the user's explicit skill choice and reroutes based on vague heuristics.",
+      "expected_with_skill": "Respects the explicit planning skill choice, keeps the route on jy-plan-review, and only applies mode-aware guidance around Shift+Tab if needed."
+    }
+  ]
+}

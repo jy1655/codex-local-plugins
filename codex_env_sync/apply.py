@@ -13,6 +13,9 @@ from .platforms import ManagedPaths, resolve_target_path
 
 
 MANIFEST_NAME = "codex-env.toml"
+LEGACY_PLUGIN_OVERLAY_NAMES = {
+    "jy-env-core": ["codex-env-core"],
+}
 
 
 @dataclass
@@ -147,6 +150,19 @@ def merge_plugin_mcp_overlay(plugin_dir: Path, overlay_path: Path) -> None:
     target_path.write_text(json.dumps(merged, indent=2, sort_keys=False) + "\n", encoding="utf-8")
 
 
+def resolve_plugin_overlay_path(plugin_name: str, paths: ManagedPaths) -> tuple[Path | None, str | None]:
+    preferred = paths.local_plugin_overlay_root / f"{plugin_name}.mcp.json"
+    if preferred.exists():
+        return preferred, "local mcp overlay"
+
+    for legacy_name in LEGACY_PLUGIN_OVERLAY_NAMES.get(plugin_name, []):
+        candidate = paths.local_plugin_overlay_root / f"{legacy_name}.mcp.json"
+        if candidate.exists():
+            return candidate, "legacy local mcp overlay fallback"
+
+    return None, None
+
+
 def _existing_copy_hash(path: Path) -> str | None:
     if not path.exists() or path.is_symlink():
         return None
@@ -240,9 +256,9 @@ def _apply_plugin(
 ) -> ApplyItem:
     source = repo_root / plugin.source
     destination = paths.plugin_root / plugin.name
-    overlay_path = paths.local_plugin_overlay_root / f"{plugin.name}.mcp.json"
+    overlay_path, overlay_detail = resolve_plugin_overlay_path(plugin.name, paths)
     desired_hash = hash_path(source)
-    overlay_hash = hash_path(overlay_path) if overlay_path.exists() else None
+    overlay_hash = hash_path(overlay_path) if overlay_path is not None else None
     previous = state["plugins"].get(plugin.name, {})
     mode = manifest.plugin_mode_for(paths.os_name, plugin)
 
@@ -261,16 +277,16 @@ def _apply_plugin(
 
         copy_directory(source, destination)
         detail = "copied plugin bundle"
-        if overlay_path.exists():
+        if overlay_path is not None:
             merge_plugin_mcp_overlay(destination, overlay_path)
-            detail = "copied plugin bundle + merged local mcp overlay"
+            detail = f"copied plugin bundle + merged {overlay_detail}"
 
         installed_hash = hash_path(destination)
         state["plugins"][plugin.name] = _plugin_state(source, "copy", desired_hash, overlay_hash, installed_hash)
         return ApplyItem(plugin.name, destination, "applied", detail)
 
     if mode == "symlink":
-        if overlay_path.exists():
+        if overlay_path is not None:
             installed_hash = _existing_copy_hash(destination)
             if (
                 destination.exists()
@@ -285,7 +301,7 @@ def _apply_plugin(
                     plugin.name,
                     destination,
                     "skipped",
-                    "content unchanged (symlink fallback due to local mcp overlay)",
+                    f"content unchanged (symlink fallback due to {overlay_detail})",
                 )
 
             copy_directory(source, destination)
@@ -296,7 +312,7 @@ def _apply_plugin(
                 plugin.name,
                 destination,
                 "applied",
-                "copied plugin bundle + merged local mcp overlay (symlink fallback due to local overlay)",
+                f"copied plugin bundle + merged {overlay_detail} (symlink fallback due to local overlay)",
             )
 
         if is_symlink_to(destination, source):

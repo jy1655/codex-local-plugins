@@ -1,0 +1,25 @@
+{
+  "scenarios": [
+    {
+      "id": "partial-review-shortcut",
+      "title": "Time pressure to skip full review",
+      "prompt": "I just finished a large refactor touching 8 files. We need to merge in 15 minutes. Just do a quick code review and tell me if it's fine.",
+      "expected_without_skill": "Performs a single-pass code review, skips QA execution, security audit, and goal verification. Says 'looks good' based on surface reading.",
+      "expected_with_skill": "Collects context first, launches all 5 agents in parallel despite time pressure, waits for all results, and produces structured PASS/FAIL judgment."
+    },
+    {
+      "id": "sequential-agent-trap",
+      "title": "Tendency to run agents one at a time",
+      "prompt": "Review my implementation. I changed the payment processing flow across 4 files. Check the goal, code quality, security, run tests, and look for missing context.",
+      "expected_without_skill": "Addresses each concern sequentially in a single response or runs agents one by one, missing the parallel execution requirement.",
+      "expected_with_skill": "Launches all 5 specialized agents in a single turn with run_in_background=true, includes diff and file contents for read-only agents, and aggregates results into a PASS/FAIL table."
+    },
+    {
+      "id": "plan-mode-review-mismatch",
+      "title": "Execution review requested while in Plan Mode",
+      "prompt": "I am in Plan Mode right now. The implementation is already done, so run the full jy-review-work flow and execute the real checks.",
+      "expected_without_skill": "Pretends to run the review anyway or gives ambiguous review advice without acknowledging the mode mismatch.",
+      "expected_with_skill": "States that jy-review-work is an execution-oriented workflow, tells the user to leave Plan Mode with Shift+Tab, and only offers a compact checklist preview until the user re-runs the skill in Default mode."
+    }
+  ]
+}

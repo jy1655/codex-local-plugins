@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import json
+import shutil
 import tempfile
 import textwrap
 import unittest
@@ -14,8 +15,8 @@ def write_fixture_repo(
     plugin_install_mode: str = "copy",
     instruction_install_mode: str = "copy",
 ) -> None:
-    (root / "plugins" / "codex-env-core" / ".codex-plugin").mkdir(parents=True, exist_ok=True)
-    (root / "plugins" / "codex-env-core" / "skills" / "env-sync-admin").mkdir(parents=True, exist_ok=True)
+    (root / "plugins" / "jy-env-core" / ".codex-plugin").mkdir(parents=True, exist_ok=True)
+    (root / "plugins" / "jy-env-core" / "skills" / "jy-env-sync-admin").mkdir(parents=True, exist_ok=True)
     (root / "instructions").mkdir(parents=True, exist_ok=True)
 
     (root / "codex-env.toml").write_text(
@@ -25,8 +26,8 @@ def write_fixture_repo(
             name = "fixture"
 
             [[plugins]]
-            name = "codex-env-core"
-            source = "plugins/codex-env-core"
+            name = "jy-env-core"
+            source = "plugins/jy-env-core"
             install_mode = "{plugin_install_mode}"
 
             [[instructions]]
@@ -42,10 +43,10 @@ def write_fixture_repo(
         + "\n",
         encoding="utf-8",
     )
-    (root / "plugins" / "codex-env-core" / ".codex-plugin" / "plugin.json").write_text(
+    (root / "plugins" / "jy-env-core" / ".codex-plugin" / "plugin.json").write_text(
         json.dumps(
             {
-                "name": "codex-env-core",
+                "name": "jy-env-core",
                 "version": "0.1.0",
                 "description": "fixture",
                 "skills": "./skills/",
@@ -57,12 +58,12 @@ def write_fixture_repo(
         + "\n",
         encoding="utf-8",
     )
-    (root / "plugins" / "codex-env-core" / ".mcp.json").write_text('{"mcpServers":{}}\n', encoding="utf-8")
-    (root / "plugins" / "codex-env-core" / "skills" / "env-sync-admin" / "SKILL.md").write_text(
-        "---\nname: env-sync-admin\ndescription: fixture\n---\n",
+    (root / "plugins" / "jy-env-core" / ".mcp.json").write_text('{"mcpServers":{}}\n', encoding="utf-8")
+    (root / "plugins" / "jy-env-core" / "skills" / "jy-env-sync-admin" / "SKILL.md").write_text(
+        "---\nname: jy-env-sync-admin\ndescription: fixture\n---\n",
         encoding="utf-8",
     )
-    (root / "plugins" / "codex-env-core" / "payload.txt").write_text("fixture\n", encoding="utf-8")
+    (root / "plugins" / "jy-env-core" / "payload.txt").write_text("fixture\n", encoding="utf-8")
     (root / "instructions" / "AGENTS.md").write_text("# fixture\n", encoding="utf-8")
 
 
@@ -88,10 +89,10 @@ class ApplyEnvironmentTests(unittest.TestCase):
 
             report = apply_environment(repo_root, home=home_root, os_name="darwin")
 
-            plugin_json = home_root / "plugins" / "codex-env-core" / ".codex-plugin" / "plugin.json"
+            plugin_json = home_root / "plugins" / "jy-env-core" / ".codex-plugin" / "plugin.json"
             agents_file = home_root / ".codex" / "AGENTS.md"
             marketplace = home_root / ".agents" / "plugins" / "marketplace.json"
-            skill_file = home_root / ".agents" / "skills" / "codex-env-core" / "env-sync-admin" / "SKILL.md"
+            skill_file = home_root / ".agents" / "skills" / "jy-env-core" / "jy-env-sync-admin" / "SKILL.md"
 
             self.assertTrue(plugin_json.exists())
             self.assertTrue(agents_file.exists())
@@ -110,7 +111,7 @@ class ApplyEnvironmentTests(unittest.TestCase):
             home_root = Path(home_dir)
             write_fixture_repo(repo_root, plugin_install_mode="symlink")
 
-            overlay = home_root / ".codex-env-sync" / "local" / "plugins" / "codex-env-core.mcp.json"
+            overlay = home_root / ".codex-env-sync" / "local" / "plugins" / "jy-env-core.mcp.json"
             overlay.parent.mkdir(parents=True, exist_ok=True)
             overlay.write_text(
                 json.dumps(
@@ -131,9 +132,9 @@ class ApplyEnvironmentTests(unittest.TestCase):
 
             report = apply_environment(repo_root, home=home_root, os_name="linux")
 
-            installed_mcp = home_root / "plugins" / "codex-env-core" / ".mcp.json"
+            installed_mcp = home_root / "plugins" / "jy-env-core" / ".mcp.json"
             data = json.loads(installed_mcp.read_text(encoding="utf-8"))
-            self.assertFalse((home_root / "plugins" / "codex-env-core").is_symlink())
+            self.assertFalse((home_root / "plugins" / "jy-env-core").is_symlink())
             self.assertEqual(
                 report.plugins[0].detail,
                 "copied plugin bundle + merged local mcp overlay (symlink fallback due to local overlay)",
@@ -146,6 +147,70 @@ class ApplyEnvironmentTests(unittest.TestCase):
                 second_report.plugins[0].detail,
                 "content unchanged (symlink fallback due to local mcp overlay)",
             )
+
+    def test_apply_reads_legacy_plugin_overlay_name_during_plugin_rename(self) -> None:
+        with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
+            repo_root = Path(repo_dir)
+            home_root = Path(home_dir)
+            write_fixture_repo(repo_root, plugin_install_mode="symlink")
+
+            overlay = home_root / ".codex-env-sync" / "local" / "plugins" / "codex-env-core.mcp.json"
+            overlay.parent.mkdir(parents=True, exist_ok=True)
+            overlay.write_text(
+                json.dumps(
+                    {
+                        "mcpServers": {
+                            "korean-law": {
+                                "env": {
+                                    "LAW_OC": "legacy-token",
+                                }
+                            }
+                        }
+                    },
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            report = apply_environment(repo_root, home=home_root, os_name="linux")
+
+            installed_mcp = home_root / "plugins" / "jy-env-core" / ".mcp.json"
+            data = json.loads(installed_mcp.read_text(encoding="utf-8"))
+            self.assertEqual(data["mcpServers"]["korean-law"]["env"]["LAW_OC"], "legacy-token")
+            self.assertEqual(
+                report.plugins[0].detail,
+                "copied plugin bundle + merged legacy local mcp overlay fallback (symlink fallback due to local overlay)",
+            )
+
+            second_report = apply_environment(repo_root, home=home_root, os_name="linux")
+            self.assertEqual(
+                second_report.plugins[0].detail,
+                "content unchanged (symlink fallback due to legacy local mcp overlay fallback)",
+            )
+
+    def test_apply_prefers_new_overlay_name_over_legacy_overlay_name(self) -> None:
+        with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
+            repo_root = Path(repo_dir)
+            home_root = Path(home_dir)
+            write_fixture_repo(repo_root, plugin_install_mode="symlink")
+
+            overlay_root = home_root / ".codex-env-sync" / "local" / "plugins"
+            overlay_root.mkdir(parents=True, exist_ok=True)
+            (overlay_root / "codex-env-core.mcp.json").write_text(
+                json.dumps({"mcpServers": {"korean-law": {"env": {"LAW_OC": "legacy-token"}}}}, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            (overlay_root / "jy-env-core.mcp.json").write_text(
+                json.dumps({"mcpServers": {"korean-law": {"env": {"LAW_OC": "new-token"}}}}, indent=2) + "\n",
+                encoding="utf-8",
+            )
+
+            apply_environment(repo_root, home=home_root, os_name="linux")
+
+            installed_mcp = home_root / "plugins" / "jy-env-core" / ".mcp.json"
+            data = json.loads(installed_mcp.read_text(encoding="utf-8"))
+            self.assertEqual(data["mcpServers"]["korean-law"]["env"]["LAW_OC"], "new-token")
 
     def test_apply_preserves_existing_non_managed_marketplace_entries(self) -> None:
         with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
@@ -178,7 +243,7 @@ class ApplyEnvironmentTests(unittest.TestCase):
 
             data = json.loads(marketplace.read_text(encoding="utf-8"))
             names = [entry["name"] for entry in data["plugins"]]
-            self.assertEqual(names, ["existing-plugin", "codex-env-core"])
+            self.assertEqual(names, ["existing-plugin", "jy-env-core"])
 
     def test_apply_recovers_from_copy_mode_drift(self) -> None:
         with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
@@ -188,7 +253,7 @@ class ApplyEnvironmentTests(unittest.TestCase):
 
             apply_environment(repo_root, home=home_root, os_name="linux")
 
-            installed_payload = home_root / "plugins" / "codex-env-core" / "payload.txt"
+            installed_payload = home_root / "plugins" / "jy-env-core" / "payload.txt"
             installed_agents = home_root / ".codex" / "AGENTS.md"
             installed_payload.write_text("drifted\n", encoding="utf-8")
             installed_agents.write_text("# drifted\n", encoding="utf-8")
@@ -221,13 +286,78 @@ class ApplyEnvironmentTests(unittest.TestCase):
 
             apply_environment(repo_root, home=home_root, os_name="linux")
 
-            self.assertFalse((home_root / "plugins" / "codex-env-core").exists())
+            self.assertFalse((home_root / "plugins" / "jy-env-core").exists())
             self.assertFalse((home_root / ".codex" / "AGENTS.md").exists())
-            self.assertFalse((home_root / ".agents" / "skills" / "codex-env-core").exists())
+            self.assertFalse((home_root / ".agents" / "skills" / "jy-env-core").exists())
 
             marketplace = home_root / ".agents" / "plugins" / "marketplace.json"
             data = json.loads(marketplace.read_text(encoding="utf-8"))
             self.assertEqual(data["plugins"], [])
+
+    def test_apply_removes_old_plugin_surface_after_plugin_rename(self) -> None:
+        with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
+            repo_root = Path(repo_dir)
+            home_root = Path(home_dir)
+            write_fixture_repo(repo_root)
+
+            legacy_plugin_root = repo_root / "plugins" / "codex-env-core"
+            legacy_plugin_root.mkdir(parents=True, exist_ok=True)
+            (legacy_plugin_root / ".codex-plugin").mkdir(parents=True, exist_ok=True)
+            (legacy_plugin_root / ".codex-plugin" / "plugin.json").write_text(
+                json.dumps(
+                    {
+                        "name": "codex-env-core",
+                        "version": "0.1.0",
+                        "description": "legacy",
+                        "skills": "./skills/",
+                        "mcpServers": "./.mcp.json",
+                        "interface": {"category": "Productivity"},
+                    },
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            (legacy_plugin_root / ".mcp.json").write_text('{"mcpServers":{}}\n', encoding="utf-8")
+            (legacy_plugin_root / "skills" / "env-sync-admin").mkdir(parents=True, exist_ok=True)
+            (legacy_plugin_root / "skills" / "env-sync-admin" / "SKILL.md").write_text(
+                "---\nname: env-sync-admin\ndescription: fixture\n---\n",
+                encoding="utf-8",
+            )
+
+            (repo_root / "codex-env.toml").write_text(
+                textwrap.dedent(
+                    """
+                    schema_version = 1
+                    name = "fixture"
+
+                    [[plugins]]
+                    name = "codex-env-core"
+                    source = "plugins/codex-env-core"
+                    install_mode = "copy"
+
+                    [[instructions]]
+                    name = "global-agents"
+                    source = "instructions/AGENTS.md"
+                    target = ".codex/AGENTS.md"
+                    install_mode = "copy"
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            apply_environment(repo_root, home=home_root, os_name="linux")
+
+            shutil.rmtree(legacy_plugin_root)
+            write_fixture_repo(repo_root)
+
+            apply_environment(repo_root, home=home_root, os_name="linux")
+
+            self.assertFalse((home_root / "plugins" / "codex-env-core").exists())
+            self.assertFalse((home_root / ".agents" / "skills" / "codex-env-core").exists())
+            self.assertTrue((home_root / "plugins" / "jy-env-core").exists())
+            self.assertTrue((home_root / ".agents" / "skills" / "jy-env-core").exists())
 
     @unittest.skipUnless(supports_symlinks(), "symlinks are not supported on this host")
     def test_apply_symlink_mode_links_to_repo_sources(self) -> None:
@@ -238,18 +368,18 @@ class ApplyEnvironmentTests(unittest.TestCase):
 
             report = apply_environment(repo_root, home=home_root, os_name="darwin")
 
-            plugin_root = home_root / "plugins" / "codex-env-core"
+            plugin_root = home_root / "plugins" / "jy-env-core"
             agents_file = home_root / ".codex" / "AGENTS.md"
-            skills_root = home_root / ".agents" / "skills" / "codex-env-core"
+            skills_root = home_root / ".agents" / "skills" / "jy-env-core"
 
             self.assertEqual(report.plugins[0].detail, "symlinked plugin bundle")
             self.assertEqual(report.instructions[0].detail, "symlinked instruction artifact")
             self.assertTrue(plugin_root.is_symlink())
             self.assertTrue(agents_file.is_symlink())
             self.assertTrue(skills_root.is_symlink())
-            self.assertEqual(plugin_root.resolve(), (repo_root / "plugins" / "codex-env-core").resolve())
+            self.assertEqual(plugin_root.resolve(), (repo_root / "plugins" / "jy-env-core").resolve())
             self.assertEqual(agents_file.resolve(), (repo_root / "instructions" / "AGENTS.md").resolve())
-            self.assertEqual(skills_root.resolve(), (repo_root / "plugins" / "codex-env-core" / "skills").resolve())
+            self.assertEqual(skills_root.resolve(), (repo_root / "plugins" / "jy-env-core" / "skills").resolve())
 
             (repo_root / "instructions" / "AGENTS.md").write_text("# updated\n", encoding="utf-8")
             self.assertEqual(agents_file.read_text(encoding="utf-8"), "# updated\n")

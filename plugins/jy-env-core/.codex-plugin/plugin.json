@@ -1,0 +1,42 @@
+{
+  "name": "jy-env-core",
+  "version": "0.1.0",
+  "description": "JY first-party skill bundle for the portable Codex environment defined by this repo.",
+  "author": {
+    "name": "jy",
+    "email": "jy@example.invalid",
+    "url": "https://github.com/jy"
+  },
+  "homepage": "https://github.com/jy/codex-env-sync",
+  "repository": "https://github.com/jy/codex-env-sync",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "skills",
+    "mcp",
+    "bootstrap"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "JY Env Core",
+    "shortDescription": "JY first-party skill bundle for this portable Codex environment",
+    "longDescription": "Packages JY first-party skills and MCP bundle definitions used by the portable Codex environment sync repo.",
+    "developerName": "jy",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/jy/codex-env-sync",
+    "privacyPolicyURL": "https://openai.com/policies/privacy-policy/",
+    "termsOfServiceURL": "https://openai.com/policies/terms-of-use/",
+    "defaultPrompt": [
+      "Inspect the portable Codex environment repo and explain what will be installed.",
+      "Apply the environment from the current repo checkout into my home directory.",
+      "Show the current plugin and instruction install targets for this environment."
+    ],
+    "brandColor": "#2563EB"
+  }
+}

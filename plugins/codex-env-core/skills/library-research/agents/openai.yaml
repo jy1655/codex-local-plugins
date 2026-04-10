@@ -1,4 +1,0 @@
-interface:
-  display_name: "Library Research"
-  short_description: "Evidence-based answers about external libraries"
-  default_prompt: "Use $library-research to find documentation, source code, and usage examples for an external library."
