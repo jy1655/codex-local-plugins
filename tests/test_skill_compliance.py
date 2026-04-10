@@ -51,6 +51,8 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-framing",
             "jy-plan-review",
             "jy-autoplan",
+            "jy-writing-plans",
+            "jy-worktrees",
             "jy-checkpoint",
             "jy-document-release",
             "jy-intent-gate",
@@ -58,6 +60,8 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-loop",
             "jy-debugging",
             "jy-test-driven",
+            "jy-executing-plans",
+            "jy-receiving-review",
             "jy-ship",
             "jy-verification-before-completion",
         ]
@@ -75,8 +79,12 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("## Routing Matrix", text)
         self.assertIn("Idea-stage", text)
         self.assertIn("Plan-stage", text)
+        self.assertIn("Task-plan-stage", text)
+        self.assertIn("Execution-stage", text)
         self.assertIn("Execution-ready", text)
         self.assertIn("planning pack not applicable", text)
+        self.assertIn("jy-writing-plans", text)
+        self.assertIn("jy-executing-plans", text)
 
     def test_codex_checkpoint_documents_storage_contract(self) -> None:
         text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-checkpoint" / "SKILL.md")
@@ -135,6 +143,47 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("VERSION", text)
         self.assertIn("CHANGELOG", text)
 
+    def test_writing_plans_documents_plan_doc_contract_and_placeholder_bans(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-writing-plans" / "SKILL.md")
+        self.assertIn("docs/superpowers/plans/", text)
+        self.assertIn("decision-complete", text)
+        self.assertIn("acceptance criteria", text)
+        self.assertIn("No Placeholders", text)
+        self.assertIn("TBD", text)
+        self.assertIn("## Mode-Aware Behavior", text)
+
+    def test_executing_plans_documents_current_session_execution_without_auto_subagents(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-executing-plans" / "SKILL.md")
+        self.assertIn("current session", text)
+        self.assertIn("jy-test-driven", text)
+        self.assertIn("jy-verification-before-completion", text)
+        self.assertIn("jy-review-work", text)
+        self.assertIn("does not auto-spawn subagents", text)
+        self.assertIn("## Mode-Aware Behavior", text)
+
+    def test_worktrees_documents_directory_policy_and_ignore_verification(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-worktrees" / "SKILL.md")
+        self.assertIn(".worktrees/", text)
+        self.assertIn("worktrees/", text)
+        self.assertIn("gitignored", text)
+        self.assertIn("git check-ignore", text)
+        self.assertIn("## Mode-Aware Behavior", text)
+
+    def test_receiving_review_documents_verification_before_changes_and_pushback(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-receiving-review" / "SKILL.md")
+        self.assertIn("performative agreement", text)
+        self.assertIn("기술적 반박", text)
+        self.assertIn("코드베이스", text)
+        self.assertIn("명확하지", text)
+        self.assertIn("## Mode-Aware Behavior", text)
+
+    def test_writing_skills_documents_english_first_authoring_policy(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-writing-skills" / "SKILL.md")
+        self.assertIn("English-first", text)
+        self.assertIn("core `SKILL.md`", text)
+        self.assertIn("agents/openai.yaml", text)
+        self.assertIn("Korean", text)
+
     def test_execution_skills_have_mode_aware_behavior(self) -> None:
         """Execution-oriented skills that modify files should document mode awareness."""
         execution_skills = [
@@ -145,6 +194,8 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-checkpoint",
             "jy-debugging",
             "jy-test-driven",
+            "jy-executing-plans",
+            "jy-receiving-review",
             "jy-ship",
             "jy-verification-before-completion",
         ]

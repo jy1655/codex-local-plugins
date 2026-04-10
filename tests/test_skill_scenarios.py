@@ -19,6 +19,10 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
         for skill_name in [
             "jy-debugging",
             "jy-test-driven",
+            "jy-writing-plans",
+            "jy-worktrees",
+            "jy-executing-plans",
+            "jy-receiving-review",
             "jy-ship",
             "jy-verification-before-completion",
         ]:
@@ -63,6 +67,8 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
             "jy-framing",
             "jy-plan-review",
             "jy-autoplan",
+            "jy-writing-plans",
+            "jy-worktrees",
             "jy-checkpoint",
             "jy-document-release",
             "jy-intent-gate",
@@ -70,6 +76,8 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
             "jy-loop",
             "jy-debugging",
             "jy-test-driven",
+            "jy-executing-plans",
+            "jy-receiving-review",
             "jy-ship",
             "jy-verification-before-completion",
         ]

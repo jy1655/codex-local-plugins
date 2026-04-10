@@ -5,7 +5,7 @@ This document defines the first-party rules for the Codex-native planning and re
 ## Purpose
 
 These skills exist to help Codex move from vague intent to decision-complete implementation
-plans without importing a third-party runtime or state system.
+plans and safe execution handoffs without importing a third-party runtime or state system.
 
 ## Collaboration Mode Contract
 
@@ -50,7 +50,9 @@ Codex planning skills must be mode-aware.
 
 - `jy-framing` outputs a scoped brief.
 - `jy-plan-review` outputs findings plus a revised decision-complete plan.
+- `jy-writing-plans` outputs a taskized implementation plan under `docs/superpowers/plans/`.
 - `jy-autoplan` orchestrates the pack and produces a single consolidated next-action result.
+- This wave stores plan docs only; it does not require repo-visible spec documents.
 
 ## Boundaries
 

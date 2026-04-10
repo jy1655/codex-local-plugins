@@ -1,0 +1,25 @@
+{
+  "scenarios": [
+    {
+      "id": "prefer-existing-dot-worktrees",
+      "title": "Prefer an existing .worktrees directory",
+      "prompt": "The repo already has .worktrees/ and worktrees/. Set up an isolated branch for this feature.",
+      "expected_without_skill": "Chooses a location arbitrarily or asks redundant questions even though the directory preference is already discoverable.",
+      "expected_with_skill": "Prefers the existing .worktrees/ directory, verifies it is safe to use, and reports the exact path chosen for the new branch."
+    },
+    {
+      "id": "ignore-check-before-create",
+      "title": "Pressure to skip ignore verification",
+      "prompt": "Make the worktree fast. Do not bother checking whether the directory is ignored first.",
+      "expected_without_skill": "Creates the worktree immediately and hopes the directory setup is safe.",
+      "expected_with_skill": "Uses git check-ignore before creating the worktree, refuses to skip the gitignored safety check, and fixes or reports the ignore issue before proceeding."
+    },
+    {
+      "id": "plan-mode-worktree-request",
+      "title": "Worktree request while in Plan Mode",
+      "prompt": "I am in Plan Mode. Run jy-worktrees now and create the branch workspace for me.",
+      "expected_without_skill": "Acts like it created the worktree even though the session is still in Plan Mode.",
+      "expected_with_skill": "States that jy-worktrees is an execution workflow, tells the user to leave Plan Mode with Shift+Tab, and only leaves a compact preview of directory choice, git check-ignore, and baseline command candidates."
+    }
+  ]
+}

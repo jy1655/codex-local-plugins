@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Receiving Review"
+  short_description: "Triage review feedback, verify it against the codebase, and only then change code"
+  default_prompt: "Use $jy-receiving-review to triage the current review feedback and verify each item before making changes."

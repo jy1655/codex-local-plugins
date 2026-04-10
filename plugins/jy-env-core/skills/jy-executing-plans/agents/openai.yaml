@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Executing Plans"
+  short_description: "Execute a written implementation plan step by step in the current session"
+  default_prompt: "Use $jy-executing-plans to execute the current written plan step by step in this session."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Writing Plans"
+  short_description: "Turn approved requirements into a detailed implementation plan with exact tasks and verification"
+  default_prompt: "Use $jy-writing-plans to turn the current approved brief or reviewed plan into a detailed implementation plan."

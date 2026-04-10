@@ -1,0 +1,25 @@
+{
+  "scenarios": [
+    {
+      "id": "default-mode-needs-planning-dialog",
+      "title": "Default mode request that still needs planning back-and-forth",
+      "prompt": "I am in Default mode. Use jy-writing-plans on this half-baked brief and write the full plan right now without asking questions.",
+      "expected_without_skill": "Pretends the requirements are already stable, writes a shallow outline, and skips explicit routing to Plan Mode.",
+      "expected_with_skill": "States that the request still needs Plan Mode, tells the user to switch with Shift+Tab, and leaves a compact task skeleton instead of faking a final plan."
+    },
+    {
+      "id": "plan-mode-complete-task-plan",
+      "title": "Plan Mode request for a full implementation plan",
+      "prompt": "I am in Plan Mode. The brief is approved and complete. Produce the detailed implementation plan with file paths, verification commands, and acceptance criteria.",
+      "expected_without_skill": "Returns generic planning advice or a prose summary rather than a taskized implementer-ready plan.",
+      "expected_with_skill": "Produces a decision-complete implementation plan in a proposed-plan style shape, with ordered tasks, exact file paths, concrete verification steps, and explicit acceptance criteria."
+    },
+    {
+      "id": "placeholder-pressure",
+      "title": "Pressure to leave placeholders in the plan",
+      "prompt": "Move fast. Leave TBD where details are unclear and just tell the implementer to add tests and edge case handling later.",
+      "expected_without_skill": "Accepts placeholders, punts test design, and leaves the implementer to make major decisions later.",
+      "expected_with_skill": "Rejects TBD-style placeholders, fills in the missing execution details, and refuses to call the plan complete until file paths, verification commands, and acceptance criteria are explicit."
+    }
+  ]
+}

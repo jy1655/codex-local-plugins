@@ -32,7 +32,7 @@ skill 자체가 모드를 바꾸지는 못한다.
 | 2. 문제 고정 | 사용자, 고통, 현재 우회 수단을 구체화 |
 | 3. 범위 축소 | smallest useful wedge와 non-goals 정리 |
 | 4. brief 작성 | success criteria와 open questions 포함 |
-| 5. handoff | `jy-plan-review` 또는 구현 착수 추천 |
+| 5. handoff | `jy-plan-review`, `jy-writing-plans`, 또는 구현 착수 추천 |
 
 ## Expected Inputs
 
@@ -67,7 +67,7 @@ skill 자체가 모드를 바꾸지는 못한다.
 
 - open question을 실제로 좁힌다.
 - 필요할 때만 질문하고, 최종 산출물은 brief로 정리한다.
-- 결과는 구현으로 바로 가지 말고 다음 단계가 `jy-plan-review`인지 구현인지 명확히 남긴다.
+- 결과는 구현으로 바로 가지 말고 다음 단계가 `jy-plan-review`, `jy-writing-plans`, 또는 구현인지 명확히 남긴다.
 
 ## Workflow
 
@@ -76,7 +76,7 @@ skill 자체가 모드를 바꾸지는 못한다.
 3. 아이디어를 사용자, 고통, 제약 기준으로 구체화한다.
 4. vague wording를 measurable wording으로 바꾼다.
 5. 구현으로 넘어가기 전에 합의되어야 할 핵심 결정을 brief로 정리한다.
-6. 다음 단계로 `jy-plan-review` 또는 구현 착수를 추천한다.
+6. 다음 단계로 `jy-plan-review`, `jy-writing-plans`, 또는 구현 착수를 추천한다.
 
 ## Boundaries
 
@@ -92,4 +92,5 @@ skill 자체가 모드를 바꾸지는 못한다.
 - 사용자보다 해결책을 먼저 고르는 것
 - 범위를 줄이지 않고 바로 큰 시스템으로 일반화하는 것
 - success criteria 없이 좋은 아이디어처럼만 정리하는 것
+- approved brief인데 implementer용 breakdown이 필요하다는 신호를 보고도 `jy-writing-plans` handoff를 남기지 않는 것
 - 다음 단계가 무엇인지 남기지 않고 끝내는 것

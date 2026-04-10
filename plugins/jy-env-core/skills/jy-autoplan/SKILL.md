@@ -7,8 +7,8 @@ description: Use when the user wants the Codex planning pack to decide the next 
 
 ## Overview
 
-현재 요청이 brief 단계인지, plan review 단계인지 먼저 판단하고 `jy-framing`와
-`jy-plan-review` 중 필요한 경로를 자동으로 선택하는 orchestrator.
+현재 요청이 brief 단계인지, plan review 단계인지, taskized implementation plan 작성 단계인지,
+이미 존재하는 written plan 실행 단계인지 먼저 판단하고 적절한 `jy-*` 경로를 자동으로 선택하는 orchestrator.
 
 중요한 제약이 하나 있다. 이 skill은 적절한 planning 경로는 고를 수 있지만, Codex의 Plan Mode를
 직접 켜지는 못한다. 모드 전환이 필요하면 사용자에게 `Shift+Tab`을 안내해야 한다.
@@ -28,9 +28,9 @@ description: Use when the user wants the Codex planning pack to decide the next 
 | 단계 | 행동 |
 |------|------|
 | 0. 모드 확인 | 현재가 Default인지 Plan인지 판단 |
-| 1. maturity 판정 | 아이디어 단계인지 plan 단계인지 구분 |
-| 2. route 선택 | `jy-framing` 또는 `jy-plan-review` 선택 |
-| 3. 결과 통합 | brief 또는 revised plan을 하나로 요약 |
+| 1. maturity 판정 | 아이디어/plan/task-plan/execution 단계 구분 |
+| 2. route 선택 | `jy-framing`, `jy-plan-review`, `jy-writing-plans`, `jy-executing-plans` 중 선택 |
+| 3. 결과 통합 | brief, revised plan, task-plan handoff, execution handoff 중 하나로 요약 |
 | 4. next step | 사용자가 바로 다음 행동을 고를 수 있게 정리 |
 
 ## Routing Matrix
@@ -67,7 +67,39 @@ description: Use when the user wants the Codex planning pack to decide the next 
 
 - compact review summary 또는 Plan Mode용 plan-review handoff
 
-### 3. Execution-ready
+### 3. Task-plan-stage
+
+신호:
+
+- approved brief나 reviewed plan은 이미 있고, 이제 implementer용 task breakdown이 필요함
+- "구현 계획 써줘", "task list로 풀어줘", "바로 집을 수 있는 계획으로 바꿔줘"
+- decision gap보다 실행 단위 분해가 병목인 상태
+
+경로:
+
+- `jy-writing-plans`
+
+출력:
+
+- compact task-plan preview 또는 Plan Mode용 writing-plans handoff
+
+### 4. Execution-stage
+
+신호:
+
+- written plan이 이미 존재하고, 그 계획을 따라 실제 작업을 시작해야 함
+- "이 계획 실행해", "plan 기준으로 진행해", "checkbox 따라 진행해"
+- Execution-ready 요청이지만 plan artifact가 이미 준비돼 있음
+
+경로:
+
+- `jy-executing-plans`
+
+출력:
+
+- compact execution handoff 또는 Default mode execution next step
+
+### 5. Execution-ready
 
 신호:
 
@@ -86,13 +118,19 @@ description: Use when the user wants the Codex planning pack to decide the next 
 
 ## Routing Rules
 
-- 사용자가 `jy-framing` 또는 `jy-plan-review`를 직접 지정했으면 autoplan이 덮어쓰지 않는다.
+- 사용자가 `jy-framing`, `jy-plan-review`, `jy-writing-plans`, `jy-executing-plans`를 직접 지정했으면 autoplan이 덮어쓰지 않는다.
 - idea-stage면 `jy-framing`
 - plan-stage면 `jy-plan-review`
+- task-plan-stage면 `jy-writing-plans`
+- execution-stage면 `jy-executing-plans`
 - 아이디어와 plan이 섞여 있지만 핵심 불확실성이 문제 정의 쪽이면 `jy-framing` 먼저
+- reviewed plan은 있지만 implementer가 바로 집을 수 없으면 `jy-writing-plans`
+- written plan이 이미 있으면 planning pack으로 되돌리지 말고 `jy-executing-plans`
 - execution-ready면 planning pack으로 보내지 않는다
 - 요청이 "구현 전 결정 잠금"인지 "지금 실행"인지 애매하면, 사용자의 마지막 동사를 우선한다
   - "review the plan" -> plan-stage
+  - "write the implementation plan" -> task-plan-stage
+  - "execute this plan" -> execution-stage
   - "review my implementation" -> execution-ready
 
 ## Expected Output
@@ -100,7 +138,7 @@ description: Use when the user wants the Codex planning pack to decide the next 
 - 현재 요청의 maturity 판정
 - 그 판정 이유 한 줄
 - 선택한 skill 경로 또는 planning pack not applicable 판정
-- 최종 brief, revised plan, 또는 compact routing summary
+- 최종 brief, revised plan, task-plan preview, execution handoff, 또는 compact routing summary
 - 다음 실행 단계 하나
 
 ## Mode-Aware Behavior
@@ -114,6 +152,12 @@ description: Use when the user wants the Codex planning pack to decide the next 
 - 그래도 사용자가 바로 얻을 수 있는 최소 결과는 남긴다.
   - idea stage면 compact brief draft
   - plan stage면 compact review summary
+- 현재 요청이 task-plan-stage면:
+  - "이건 구현 계획 작성 단계입니다. `Shift+Tab`으로 Plan Mode로 바꾼 뒤 `/jy-writing-plans`를 다시 실행하세요."라고 유도한다.
+  - 동시에 compact task breakdown 초안은 남긴다.
+- 현재 요청이 execution-stage면:
+  - Plan Mode를 권하지 않는다.
+  - "이건 written plan 실행 단계입니다. Default mode에서 `/jy-executing-plans`로 진행하세요."라고 정리한다.
 - 현재 요청이 execution-ready면:
   - Plan Mode를 권하지 않는다.
   - "이건 planning보다 실행이 먼저입니다. Default mode에서 바로 구현하거나 `/jy-review-work` 같은 실행형 skill로 가세요."라고 정리한다.
@@ -123,7 +167,11 @@ description: Use when the user wants the Codex planning pack to decide the next 
 
 - idea-stage면 `jy-framing` 경로로 실제 대화를 이어간다.
 - plan-stage면 `jy-plan-review` 경로로 실제 대화를 이어간다.
+- task-plan-stage면 `jy-writing-plans` 경로로 실제 대화를 이어간다.
 - 결과가 plan-review 쪽이면 최종 출력은 `<proposed_plan>` 기준을 따른다.
+- 결과가 writing-plans 쪽이면 implementation plan 기준의 `<proposed_plan>`을 따른다.
+- execution-stage면 Plan Mode에 머물지 않는다.
+  - "이건 실행형 plan workflow라 Default mode가 맞습니다. `Shift+Tab`으로 나온 뒤 `/jy-executing-plans`를 다시 실행하세요."라고 유도한다.
 - execution-ready면 Plan Mode에 머물지 않는다.
   - "이건 실행형 작업이라 Plan Mode보다 Default mode가 맞습니다. `Shift+Tab`으로 나온 뒤 다시 실행하세요."라고 유도한다.
 - 결과를 하나의 consolidated planning outcome으로 합친다.
@@ -132,7 +180,7 @@ description: Use when the user wants the Codex planning pack to decide the next 
 
 1. 현재 collaboration mode가 Default인지 Plan인지 확인한다.
 2. 사용자가 특정 planning skill을 이미 직접 지정했는지 확인한다.
-3. 현재 요청과 repo 문맥에서 maturity를 `idea-stage / plan-stage / execution-ready` 중 하나로 판단한다.
+3. 현재 요청과 repo 문맥에서 maturity를 `idea-stage / plan-stage / task-plan-stage / execution-stage / execution-ready` 중 하나로 판단한다.
 4. 판정 이유를 한 줄로 정리한다.
 5. 필요한 skill 경로를 고르거나 planning pack not applicable로 판정한다.
 6. mode에 맞는 방식으로 결과를 생성한다.
@@ -151,6 +199,8 @@ description: Use when the user wants the Codex planning pack to decide the next 
 - skill routing과 mode switching을 같은 일로 착각하는 것
 - Plan Mode가 필요한데 그냥 skill 이름만 추천하고 끝내는 것
 - Default mode에서 consolidated output 없이 "Plan Mode로 가라"만 말하는 것
+- 구현 계획 작성 단계인데 plan review나 execution으로 잘못 보내는 것
+- written plan 실행 단계인데 다시 brief나 review로 되돌리는 것
 - execution-ready 요청도 무조건 planning pack으로 밀어 넣는 것
 - 사용자가 이미 직접 지정한 planning skill을 autoplan이 덮어쓰는 것
 - routing 결정을 하지 않고 planning 조언만 섞어서 주는 것

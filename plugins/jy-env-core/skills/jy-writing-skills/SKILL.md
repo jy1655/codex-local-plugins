@@ -12,6 +12,7 @@ description: Use when creating a new skill, revising an existing skill, or verif
 - 스킬을 언제 작성할 것인가
 - 스킬 유형
 - SKILL.md 구조
+- 작성 언어 정책
 - Claude Search Optimization
 - 테스트 전략
 - Common Mistakes
@@ -39,6 +40,9 @@ description: Use when creating a new skill, revising an existing skill, or verif
 스킬은 검증된 기법, 패턴, 도구에 대한 참조 가이드다. 향후 Claude 인스턴스가 효과적인 접근 방식을 찾고 적용하도록 돕는다.
 
 스킬은 재사용 가능한 기법이자 패턴이자 도구다. 한 번 문제를 해결한 과정의 내러티브가 아니다.
+
+이 repo에서 최근 확장 중인 대표적인 first-party workflow 예시는 `jy-writing-plans`,
+`jy-executing-plans`, `jy-worktrees`, `jy-receiving-review` 같은 Codex-native 운영 스킬이다.
 
 ## TDD를 스킬 작성에 적용
 
@@ -108,6 +112,28 @@ Frontmatter (YAML):
 - Quick Reference — 표 또는 글머리 목록으로 훑기
 - Implementation — 간단하면 인라인, 길면 파일 링크
 - Common Mistakes — 실패와 해결책
+
+## 작성 언어 정책
+
+기본값은 간단하다.
+
+- core `SKILL.md` 본문은 `English-first`로 작성한다
+- `agents/openai.yaml`의 `display_name`, `short_description`, `default_prompt`도 같은 기준을 따른다
+- supporting reference도 모델이 직접 읽을 가능성이 높으면 영어를 우선한다
+
+이유:
+
+- 스킬은 사람보다 모델이 먼저 읽는 문서다
+- 검색, trigger matching, cross-skill reuse, tool/provider portability가 영어 쪽이 더 안정적이다
+- 동일 repo 안에서 core workflow 문서 언어가 섞이면 유지보수 drift가 커진다
+
+예외:
+
+- 사용자용 README, 한국어 운영 문서, 결과 기록 템플릿은 bilingual 또는 Korean이어도 된다
+- repo-specific human note가 목적이라면 한국어를 써도 된다
+- 단, core workflow instruction 자체를 한국어로 쓰는 것은 명확한 이유가 있을 때만 한다
+
+즉 "사람이 보기 편하다"만으로 core skill을 한국어로 쓰는 쪽을 기본값으로 삼지 않는다.
 
 ## Claude Search Optimization (CSO) — 핵심
 
@@ -223,6 +249,7 @@ CSO(조건-스킬-출력) 형식의 정확한 예시·반례·작성 절차는 r
 - 존재하지 않는 스킬 네임스페이스나 오래된 참조명을 그대로 복사하는 것
 - 기준선 실패를 보지 않고 "문서만 보면 분명하다"라고 가정하는 것
 - supporting file이 있는데 본문에서 언제 읽어야 하는지 연결하지 않는 것
+- core workflow instruction을 특별한 이유 없이 한국어로 작성해서 English-first 규칙을 깨는 것
 
 ## RED-GREEN-REFACTOR 사이클
 
@@ -243,6 +270,7 @@ GREEN Phase — 최소한 스킬 작성:
 - 이름: 소문자, 숫자, 하이픈만
 - Frontmatter: `name`, `description` (max 1024 chars)
 - Description: "Use when..."으로 시작, 제3인칭, 트리거만
+- core `SKILL.md`와 agent prompt surface는 English-first 유지
 - 검색 키워드 포함 (에러, 증상, 도구)
 - 명확한 개요와 핵심 원칙
 - RED에서 식별한 구체적 실패 해결
