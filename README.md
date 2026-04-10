@@ -13,6 +13,7 @@ Codex behave the same way everywhere:
 The install surface is intentionally small:
 
 - plugins are installed into `~/plugins`
+- skill discovery links are installed into `~/.agents/skills/`
 - marketplace is written to `~/.agents/plugins/marketplace.json`
 - instructions are installed into `~/.codex/...`
 - Codex runtime cache under `~/.codex/plugins/cache` is left alone
@@ -90,9 +91,9 @@ Apply the local checkout into your home directory:
 python3 -m codex_env_sync.cli apply --repo-root .
 ```
 
-On macOS and Linux, that creates symlinks for the repo-managed plugin bundle and
-instructions. A later `git pull` in the same checkout updates the installed Codex surface
-immediately.
+On macOS and Linux, that creates symlinks for the repo-managed plugin bundle, skill
+discovery surface, and instructions. A later `git pull` in the same checkout updates the
+installed Codex surface immediately.
 
 ## Layout
 
@@ -105,6 +106,7 @@ instructions/                  # Generated instruction artifacts
 references/                    # Local authoring references used while building first-party skills
 .codex/checkpoints/            # Repo-local ignored checkpoint notes created by codex-checkpoint
 .agents/plugins/               # Repo-local marketplace metadata for local plugin discovery
+.agents/skills/                # Home install target for Codex native skill discovery
 scripts/bootstrap.sh           # First-run shell bootstrap for macOS/Linux
 scripts/bootstrap.ps1          # First-run shell bootstrap for Windows
 tests/                         # Unit + integration tests

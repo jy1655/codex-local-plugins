@@ -13,6 +13,7 @@ from codex_env_sync.platforms import ManagedPaths
 
 def write_bootstrap_repo(root: Path) -> None:
     (root / "plugins" / "codex-env-core" / ".codex-plugin").mkdir(parents=True, exist_ok=True)
+    (root / "plugins" / "codex-env-core" / "skills" / "env-sync-admin").mkdir(parents=True, exist_ok=True)
     (root / "instructions").mkdir(parents=True, exist_ok=True)
 
     (root / "codex-env.toml").write_text(
@@ -50,6 +51,10 @@ def write_bootstrap_repo(root: Path) -> None:
         encoding="utf-8",
     )
     (root / "plugins" / "codex-env-core" / ".mcp.json").write_text('{"mcpServers":{}}\n', encoding="utf-8")
+    (root / "plugins" / "codex-env-core" / "skills" / "env-sync-admin" / "SKILL.md").write_text(
+        "---\nname: env-sync-admin\ndescription: fixture\n---\n",
+        encoding="utf-8",
+    )
     (root / "instructions" / "AGENTS.md").write_text("# smoke\n", encoding="utf-8")
 
 
@@ -88,6 +93,7 @@ class BootstrapSmokeTests(unittest.TestCase):
 
                     self.assertIsNotNone(report.managed_repo)
                     self.assertTrue((Path(home_dir) / "plugins" / "codex-env-core").exists())
+                    self.assertTrue((Path(home_dir) / ".agents" / "skills" / "codex-env-core" / "env-sync-admin" / "SKILL.md").exists())
                     self.assertTrue((Path(home_dir) / ".codex" / "AGENTS.md").exists())
                     self.assertTrue((Path(home_dir) / ".agents" / "plugins" / "marketplace.json").exists())
 

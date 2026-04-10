@@ -24,6 +24,13 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("codex-checkpoint", text)
         self.assertIn(".codex/checkpoints/", text)
 
+    def test_global_agents_instructions_include_native_skill_discovery_surface(self) -> None:
+        agents_path = Path(__file__).resolve().parents[1] / "instructions" / "AGENTS.md"
+        text = agents_path.read_text(encoding="utf-8")
+
+        self.assertIn("~/.agents/skills/", text)
+        self.assertIn("source-owned install surface", text)
+
     def test_codex_env_core_bundle_includes_korean_law_mcp(self) -> None:
         mcp_path = Path(__file__).resolve().parents[1] / "plugins" / "codex-env-core" / ".mcp.json"
         data = json.loads(mcp_path.read_text(encoding="utf-8"))

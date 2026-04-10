@@ -28,6 +28,7 @@ class ApplyReport:
     repo_root: Path
     os_name: str
     plugins: list[ApplyItem] = field(default_factory=list)
+    skills: list[ApplyItem] = field(default_factory=list)
     instructions: list[ApplyItem] = field(default_factory=list)
     marketplace_action: str = "skipped"
     state_path: Path | None = None
@@ -70,8 +71,14 @@ def hash_path(path: Path) -> str:
 
 def load_state(path: Path) -> dict:
     if not path.exists():
-        return {"plugins": {}, "instructions": {}, "last_apply": None}
-    return json.loads(path.read_text(encoding="utf-8"))
+        return {"plugins": {}, "skills": {}, "instructions": {}, "last_apply": None}
+
+    state = json.loads(path.read_text(encoding="utf-8"))
+    state.setdefault("plugins", {})
+    state.setdefault("skills", {})
+    state.setdefault("instructions", {})
+    state.setdefault("last_apply", None)
+    return state
 
 
 def save_state(path: Path, state: dict) -> None:
@@ -176,6 +183,20 @@ def _instruction_state(
     }
 
 
+def _skill_state(
+    destination: Path,
+    mode: str,
+    desired_hash: str,
+    installed_hash: str | None = None,
+) -> dict:
+    return {
+        "hash": desired_hash,
+        "mode": mode,
+        "installed_hash": installed_hash,
+        "target": str(destination),
+    }
+
+
 def _remove_managed_plugin(plugin_name: str, paths: ManagedPaths, state: dict) -> ApplyItem:
     destination = paths.plugin_root / plugin_name
     existed = destination.exists() or destination.is_symlink()
@@ -183,6 +204,17 @@ def _remove_managed_plugin(plugin_name: str, paths: ManagedPaths, state: dict) -
         replace_path(destination)
     state["plugins"].pop(plugin_name, None)
     detail = "removed stale managed plugin" if existed else "cleared stale managed plugin state"
+    action = "removed" if existed else "skipped"
+    return ApplyItem(plugin_name, destination, action, detail)
+
+
+def _remove_managed_skill(plugin_name: str, paths: ManagedPaths, state: dict) -> ApplyItem:
+    destination = paths.skills_root / plugin_name
+    existed = destination.exists() or destination.is_symlink()
+    if existed:
+        replace_path(destination)
+    state["skills"].pop(plugin_name, None)
+    detail = "removed stale managed skill link" if existed else "cleared stale managed skill state"
     action = "removed" if existed else "skipped"
     return ApplyItem(plugin_name, destination, action, detail)
 
@@ -276,6 +308,60 @@ def _apply_plugin(
         return ApplyItem(plugin.name, destination, "applied", "symlinked plugin bundle")
 
     raise ValueError(f"Unsupported plugin install mode for v1: {mode}")
+
+
+def _plugin_skills_source(destination: Path) -> Path | None:
+    manifest_path = destination / ".codex-plugin" / "plugin.json"
+    data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    relative = data.get("skills")
+    if not isinstance(relative, str) or not relative:
+        return None
+
+    skills_path = destination / Path(relative)
+    if not skills_path.exists():
+        return None
+    return skills_path
+
+
+def _apply_plugin_skills(
+    plugin: PluginSpec,
+    paths: ManagedPaths,
+    state: dict,
+) -> ApplyItem | None:
+    plugin_root = paths.plugin_root / plugin.name
+    source = _plugin_skills_source(plugin_root)
+    if source is None:
+        state["skills"].pop(plugin.name, None)
+        return None
+
+    destination = paths.skills_root / plugin.name
+    desired_hash = hash_path(source)
+    previous = state["skills"].get(plugin.name, {})
+
+    if paths.os_name == "windows":
+        installed_hash = _existing_copy_hash(destination)
+        if (
+            destination.exists()
+            and not destination.is_symlink()
+            and previous.get("mode") == "copy"
+            and previous.get("hash") == desired_hash
+            and previous.get("installed_hash") == installed_hash
+        ):
+            state["skills"][plugin.name] = _skill_state(destination, "copy", desired_hash, installed_hash)
+            return ApplyItem(plugin.name, destination, "skipped", "skill content unchanged")
+
+        copy_directory(source, destination)
+        installed_hash = hash_path(destination)
+        state["skills"][plugin.name] = _skill_state(destination, "copy", desired_hash, installed_hash)
+        return ApplyItem(plugin.name, destination, "applied", "copied skill directory")
+
+    if is_symlink_to(destination, source):
+        state["skills"][plugin.name] = _skill_state(destination, "symlink", desired_hash)
+        return ApplyItem(plugin.name, destination, "skipped", "skill symlink unchanged")
+
+    symlink_path(source, destination)
+    state["skills"][plugin.name] = _skill_state(destination, "symlink", desired_hash)
+    return ApplyItem(plugin.name, destination, "applied", "symlinked skill directory")
 
 
 def _apply_instruction(
@@ -394,6 +480,7 @@ def apply_environment(repo_root: str | Path, home: str | Path | None = None, os_
     previous_plugin_names = set(state["plugins"])
     stale_plugin_names = previous_plugin_names - current_plugin_names
     for plugin_name in sorted(stale_plugin_names):
+        report.skills.append(_remove_managed_skill(plugin_name, paths, state))
         report.plugins.append(_remove_managed_plugin(plugin_name, paths, state))
 
     current_instruction_names = {instruction.name for instruction in manifest.instructions}
@@ -403,6 +490,9 @@ def apply_environment(repo_root: str | Path, home: str | Path | None = None, os_
 
     for plugin in manifest.plugins:
         report.plugins.append(_apply_plugin(plugin, repo_path, paths, manifest, state))
+        skill_item = _apply_plugin_skills(plugin, paths, state)
+        if skill_item is not None:
+            report.skills.append(skill_item)
 
     report.marketplace_action = write_marketplace(repo_path, manifest, paths, stale_managed_names=stale_plugin_names)
 

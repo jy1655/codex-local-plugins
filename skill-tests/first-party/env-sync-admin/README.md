@@ -12,5 +12,6 @@ Run order:
 Passing behavior:
 
 - The operator stays inside the repo-owned install surface.
+- The operator knows that Codex skill discovery is wired through `~/.agents/skills/`.
 - The operator uses `inspect`, `apply`, or `bootstrap` instead of editing cache paths.
 - The operator calls out when a fresh Codex session is required.

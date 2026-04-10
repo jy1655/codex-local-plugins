@@ -4,7 +4,7 @@ This machine is managed by the portable Codex environment sync repo.
 
 ## Environment Rules
 
-- Treat `~/plugins` and `~/.agents/plugins/marketplace.json` as the source-owned plugin surface.
+- Treat `~/plugins`, `~/.agents/skills/`, and `~/.agents/plugins/marketplace.json` as the source-owned install surface.
 - Do not edit `~/.codex/plugins/cache` directly.
 - When changing this environment repo, prefer first-party plugin bundles committed here over
   live dependencies on upstream seed sources.

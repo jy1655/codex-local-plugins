@@ -58,6 +58,10 @@ def write_fixture_repo(
         encoding="utf-8",
     )
     (root / "plugins" / "codex-env-core" / ".mcp.json").write_text('{"mcpServers":{}}\n', encoding="utf-8")
+    (root / "plugins" / "codex-env-core" / "skills" / "env-sync-admin" / "SKILL.md").write_text(
+        "---\nname: env-sync-admin\ndescription: fixture\n---\n",
+        encoding="utf-8",
+    )
     (root / "plugins" / "codex-env-core" / "payload.txt").write_text("fixture\n", encoding="utf-8")
     (root / "instructions" / "AGENTS.md").write_text("# fixture\n", encoding="utf-8")
 
@@ -87,10 +91,12 @@ class ApplyEnvironmentTests(unittest.TestCase):
             plugin_json = home_root / "plugins" / "codex-env-core" / ".codex-plugin" / "plugin.json"
             agents_file = home_root / ".codex" / "AGENTS.md"
             marketplace = home_root / ".agents" / "plugins" / "marketplace.json"
+            skill_file = home_root / ".agents" / "skills" / "codex-env-core" / "env-sync-admin" / "SKILL.md"
 
             self.assertTrue(plugin_json.exists())
             self.assertTrue(agents_file.exists())
             self.assertTrue(marketplace.exists())
+            self.assertTrue(skill_file.exists())
             self.assertEqual(report.marketplace_action, "applied")
 
             second_report = apply_environment(repo_root, home=home_root, os_name="darwin")
@@ -217,6 +223,7 @@ class ApplyEnvironmentTests(unittest.TestCase):
 
             self.assertFalse((home_root / "plugins" / "codex-env-core").exists())
             self.assertFalse((home_root / ".codex" / "AGENTS.md").exists())
+            self.assertFalse((home_root / ".agents" / "skills" / "codex-env-core").exists())
 
             marketplace = home_root / ".agents" / "plugins" / "marketplace.json"
             data = json.loads(marketplace.read_text(encoding="utf-8"))
@@ -233,13 +240,16 @@ class ApplyEnvironmentTests(unittest.TestCase):
 
             plugin_root = home_root / "plugins" / "codex-env-core"
             agents_file = home_root / ".codex" / "AGENTS.md"
+            skills_root = home_root / ".agents" / "skills" / "codex-env-core"
 
             self.assertEqual(report.plugins[0].detail, "symlinked plugin bundle")
             self.assertEqual(report.instructions[0].detail, "symlinked instruction artifact")
             self.assertTrue(plugin_root.is_symlink())
             self.assertTrue(agents_file.is_symlink())
+            self.assertTrue(skills_root.is_symlink())
             self.assertEqual(plugin_root.resolve(), (repo_root / "plugins" / "codex-env-core").resolve())
             self.assertEqual(agents_file.resolve(), (repo_root / "instructions" / "AGENTS.md").resolve())
+            self.assertEqual(skills_root.resolve(), (repo_root / "plugins" / "codex-env-core" / "skills").resolve())
 
             (repo_root / "instructions" / "AGENTS.md").write_text("# updated\n", encoding="utf-8")
             self.assertEqual(agents_file.read_text(encoding="utf-8"), "# updated\n")

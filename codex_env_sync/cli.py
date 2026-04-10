@@ -43,6 +43,10 @@ def _render_report(report: ApplyReport) -> str:
     for item in report.plugins:
         lines.append(f"  - {item.name}: {item.action} ({item.detail}) -> {item.destination}")
 
+    lines.append("skills:")
+    for item in report.skills:
+        lines.append(f"  - {item.name}: {item.action} ({item.detail}) -> {item.destination}")
+
     lines.append("instructions:")
     for item in report.instructions:
         lines.append(f"  - {item.name}: {item.action} ({item.detail}) -> {item.destination}")
@@ -72,6 +76,7 @@ def command_inspect(args: argparse.Namespace) -> int:
         f"os: {paths.os_name}",
         f"home: {paths.home}",
         f"plugin_root: {paths.plugin_root}",
+        f"skills_root: {paths.skills_root}",
         f"local_plugin_overlay_root: {paths.local_plugin_overlay_root}",
         f"marketplace_path: {paths.marketplace_path}",
         f"codex_home: {paths.codex_home}",

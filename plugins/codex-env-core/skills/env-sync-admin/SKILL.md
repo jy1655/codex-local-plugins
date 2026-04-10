@@ -28,18 +28,18 @@ It is meant for maintenance work inside this environment repo, not for arbitrary
 ## Output Template
 
 - `Repo:` resolved repo root
-- `Install Surface:` plugin root, marketplace path, instruction targets
+- `Install Surface:` plugin root, skills root, marketplace path, instruction targets
 - `Action:` inspect, apply, or bootstrap result with next step if restart is required
 
 ## Guardrails
 
-- Treat `~/plugins` and `~/.agents/plugins/marketplace.json` as the install surface
+- Treat `~/plugins`, `~/.agents/skills/`, and `~/.agents/plugins/marketplace.json` as the install surface
 - Do not edit `~/.codex/plugins/cache` directly
 - Keep upstream seed material local-only; only first-party results belong in this repo
 - Restart Codex after apply if plugin or instruction changes are not visible yet
 
 ## Common Mistakes
 
-- Editing `~/.codex/plugins/cache` instead of `plugins/` or `instructions/`
+- Editing `~/.codex/plugins/cache` instead of the repo-owned plugin, instruction, or skill source
 - Treating this skill like a general project bootstrap instead of an environment maintenance tool
 - Forgetting that plugin or instruction changes may require a fresh Codex session to become visible
