@@ -1,0 +1,4 @@
+interface:
+  display_name: "Systematic Debugging"
+  short_description: "Debug bugs and failing tests through reproduction, hypotheses, and verified root-cause fixes"
+  default_prompt: "Use $systematic-debugging to debug this bug or failing test with verified root-cause analysis before patching."

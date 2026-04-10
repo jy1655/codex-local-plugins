@@ -56,6 +56,9 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "intent-gate",
             "review-work",
             "work-loop",
+            "systematic-debugging",
+            "test-driven-development",
+            "verification-before-completion",
         ]
         for skill_name in mode_aware_skills:
             skill_path = FIRST_PARTY_SKILL_ROOT / skill_name / "SKILL.md"
@@ -98,6 +101,29 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("full consistency audit", text)
         self.assertIn("plugins/codex-env-core/skills/*/SKILL.md", text)
 
+    def test_systematic_debugging_documents_reproduce_hypothesize_and_verify(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "systematic-debugging" / "SKILL.md")
+        self.assertIn("재현", text)
+        self.assertIn("가설", text)
+        self.assertIn("최소 수정", text)
+        self.assertIn("shotgun", text)
+        self.assertIn("## Debug Loop", text)
+
+    def test_test_driven_development_documents_red_green_refactor(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "test-driven-development" / "SKILL.md")
+        self.assertIn("RED", text)
+        self.assertIn("GREEN", text)
+        self.assertIn("REFACTOR", text)
+        self.assertIn("failing test first", text)
+        self.assertIn("Plan Mode", text)
+
+    def test_verification_before_completion_requires_fresh_evidence(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "verification-before-completion" / "SKILL.md")
+        self.assertIn("fresh verification evidence", text)
+        self.assertIn("## Verification Gate", text)
+        self.assertIn("증거", text)
+        self.assertIn("완료 주장", text)
+        self.assertIn("not run", text)
 
     def test_execution_skills_have_mode_aware_behavior(self) -> None:
         """Execution-oriented skills that modify files should document mode awareness."""
@@ -107,6 +133,9 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "work-loop",
             "codex-document-release",
             "codex-checkpoint",
+            "systematic-debugging",
+            "test-driven-development",
+            "verification-before-completion",
         ]
         for skill_name in execution_skills:
             skill_path = FIRST_PARTY_SKILL_ROOT / skill_name / "SKILL.md"

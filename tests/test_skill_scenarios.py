@@ -15,6 +15,20 @@ def first_party_skill_dirs() -> list[Path]:
 
 
 class FirstPartySkillScenarioTests(unittest.TestCase):
+    def test_new_workflow_skills_have_scenario_packs(self) -> None:
+        for skill_name in [
+            "systematic-debugging",
+            "test-driven-development",
+            "verification-before-completion",
+        ]:
+            with self.subTest(skill=skill_name):
+                scenario_dir = SCENARIO_ROOT / skill_name
+                self.assertTrue((FIRST_PARTY_SKILL_ROOT / skill_name / "SKILL.md").exists())
+                self.assertTrue((scenario_dir / "README.md").exists())
+                self.assertTrue((scenario_dir / "baseline.md").exists())
+                self.assertTrue((scenario_dir / "pressure-scenarios.json").exists())
+                self.assertTrue((scenario_dir / "result-template.md").exists())
+
     def test_each_first_party_skill_has_a_scenario_pack(self) -> None:
         for skill_dir in first_party_skill_dirs():
             with self.subTest(skill=skill_dir.name):
@@ -53,6 +67,9 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
             "intent-gate",
             "review-work",
             "work-loop",
+            "systematic-debugging",
+            "test-driven-development",
+            "verification-before-completion",
         ]
         for skill_name in mode_aware_skills:
             with self.subTest(skill=skill_name):

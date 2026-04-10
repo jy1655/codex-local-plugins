@@ -73,6 +73,19 @@ class RepoBundleTests(unittest.TestCase):
         self.assertTrue((skill_root / "SKILL.md").exists())
         self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
 
+    def test_codex_env_core_bundle_includes_debugging_and_verification_workflow_skills(self) -> None:
+        repo_root = Path(__file__).resolve().parents[1]
+        skill_root = repo_root / "plugins" / "codex-env-core" / "skills"
+
+        for skill_name in [
+            "systematic-debugging",
+            "test-driven-development",
+            "verification-before-completion",
+        ]:
+            with self.subTest(skill=skill_name):
+                self.assertTrue((skill_root / skill_name / "SKILL.md").exists())
+                self.assertTrue((skill_root / skill_name / "agents" / "openai.yaml").exists())
+
     def test_global_agents_instructions_include_execution_skill_routing(self) -> None:
         agents_path = Path(__file__).resolve().parents[1] / "instructions" / "AGENTS.md"
         text = agents_path.read_text(encoding="utf-8")
@@ -81,6 +94,9 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("review-work", text)
         self.assertIn("work-loop", text)
         self.assertIn("ai-slop-remover", text)
+        self.assertIn("systematic-debugging", text)
+        self.assertIn("test-driven-development", text)
+        self.assertIn("verification-before-completion", text)
 
     def test_global_agents_instructions_include_advisory_skill_routing(self) -> None:
         agents_path = Path(__file__).resolve().parents[1] / "instructions" / "AGENTS.md"

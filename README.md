@@ -31,6 +31,8 @@ They are part of this repo for maintenance work, not part of the installed Codex
 
 First-party skill authoring happens in `plugins/codex-env-core/skills/`. That directory is
 the source of truth for both local development and the installed Codex skill surface.
+The current first-party workflow pack covers planning, debugging, test-first implementation,
+review, and verification disciplines.
 
 ## Secret handling
 

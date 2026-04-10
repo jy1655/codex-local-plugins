@@ -32,6 +32,9 @@ This machine is managed by the portable Codex environment sync repo.
 
 ## Execution Skill Routing
 
+- If the user is debugging a bug, failing test, or unexpected behavior, prefer `systematic-debugging`.
+- If the user is starting a feature or bugfix implementation, prefer `test-driven-development`.
+- If the user is about to claim work is complete, fixed, or passing, prefer `verification-before-completion`.
 - If the user completed implementation and wants multi-angle review, prefer `review-work`.
 - If the user needs iterative work until verified completion, prefer `work-loop`.
 - If the user wants to clean AI-generated code smells from files, prefer `ai-slop-remover`.
