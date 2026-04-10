@@ -23,7 +23,7 @@ description: Use when creating a new skill, revising an existing skill, or verif
 
 핵심 원칙: 스킬 없이 에이전트가 실패하는 모습을 직접 보지 못했다면, 그 스킬이 올바른 것을 가르치는지 알 수 없다.
 
-필수 배경: `jy-test-driven-development`를 반드시 먼저 이해해야 한다. 그 스킬이 RED-GREEN-REFACTOR 사이클의 기초를 정의한다.
+필수 배경: `jy-test-driven`를 반드시 먼저 이해해야 한다. 그 스킬이 RED-GREEN-REFACTOR 사이클의 기초를 정의한다.
 
 ## Quick Reference
 
@@ -153,7 +153,7 @@ Claude가 검색할 말들을 사용한다:
 ### 다른 스킬 참조
 
 ```markdown
-필수 선행: `jy-test-driven-development`를 반드시 이해해야 한다
+필수 선행: `jy-test-driven`를 반드시 이해해야 한다
 ```
 
 `@` 링크는 사용 금지 — 파일을 즉시 로드하여 맥락을 낭비한다.

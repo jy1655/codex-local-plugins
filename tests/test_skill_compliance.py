@@ -47,17 +47,17 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
 
     def test_mode_aware_skills_document_collaboration_mode_routing(self) -> None:
         mode_aware_skills = [
-            "jy-ai-slop-remover",
-            "jy-office-hours",
+            "jy-slop-remover",
+            "jy-framing",
             "jy-plan-review",
             "jy-autoplan",
             "jy-checkpoint",
             "jy-document-release",
             "jy-intent-gate",
             "jy-review-work",
-            "jy-work-loop",
-            "jy-systematic-debugging",
-            "jy-test-driven-development",
+            "jy-loop",
+            "jy-debugging",
+            "jy-test-driven",
             "jy-verification-before-completion",
         ]
         for skill_name in mode_aware_skills:
@@ -102,7 +102,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("plugins/jy-env-core/skills/*/SKILL.md", text)
 
     def test_systematic_debugging_documents_reproduce_hypothesize_and_verify(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-systematic-debugging" / "SKILL.md")
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-debugging" / "SKILL.md")
         self.assertIn("재현", text)
         self.assertIn("가설", text)
         self.assertIn("최소 수정", text)
@@ -110,7 +110,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("## Debug Loop", text)
 
     def test_test_driven_development_documents_red_green_refactor(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-test-driven-development" / "SKILL.md")
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-test-driven" / "SKILL.md")
         self.assertIn("RED", text)
         self.assertIn("GREEN", text)
         self.assertIn("REFACTOR", text)
@@ -128,13 +128,13 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
     def test_execution_skills_have_mode_aware_behavior(self) -> None:
         """Execution-oriented skills that modify files should document mode awareness."""
         execution_skills = [
-            "jy-ai-slop-remover",
+            "jy-slop-remover",
             "jy-review-work",
-            "jy-work-loop",
+            "jy-loop",
             "jy-document-release",
             "jy-checkpoint",
-            "jy-systematic-debugging",
-            "jy-test-driven-development",
+            "jy-debugging",
+            "jy-test-driven",
             "jy-verification-before-completion",
         ]
         for skill_name in execution_skills:
@@ -149,7 +149,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
     def test_advisory_skills_do_not_modify_files(self) -> None:
         """Advisory skills should state they do not modify code."""
         advisory_skills = [
-            "jy-oracle-consult",
+            "jy-consult",
         ]
         for skill_name in advisory_skills:
             skill_path = FIRST_PARTY_SKILL_ROOT / skill_name / "SKILL.md"
@@ -179,7 +179,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
     def test_cross_skill_references_point_to_existing_skills(self) -> None:
         """Skills that reference other skills by name should reference existing ones."""
         existing_skill_names = {p.parent.name for p in first_party_skill_paths()}
-        # Pattern: backtick-quoted skill names like `jy-oracle-consult`
+        # Pattern: backtick-quoted skill names like `jy-consult`
         ref_pattern = re.compile(r"`([\w-]+)`")
         known_non_skill_refs = {
             "run_in_background", "run_in_background=true", "Shift+Tab",

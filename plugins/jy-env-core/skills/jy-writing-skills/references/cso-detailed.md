@@ -152,9 +152,9 @@ wc -w skills/path/SKILL.md
 다른 스킬을 참조할 때:
 
 스킬 이름만 사용, 명시적 필수 마커:
-- ✅ Good: `필수 선행: jy-test-driven-development를 반드시 이해해야 한다`
-- ✅ Good: `필수 배경: jy-systematic-debugging를 이해해야 한다`
-- ❌ Bad: `skills/testing/jy-test-driven-development 참조` (필수인지 불명확)
-- ❌ Bad: `@skills/testing/jy-test-driven-development/SKILL.md` (강제 로드, 맥락 낭비)
+- ✅ Good: `필수 선행: jy-test-driven를 반드시 이해해야 한다`
+- ✅ Good: `필수 배경: jy-debugging를 이해해야 한다`
+- ❌ Bad: `skills/testing/jy-test-driven 참조` (필수인지 불명확)
+- ❌ Bad: `@skills/testing/jy-test-driven/SKILL.md` (강제 로드, 맥락 낭비)
 
 왜 @ 링크 사용 금지: `@` 구문은 파일을 즉시 로드하여 필요하기 전에 200k+ 맥락을 소비한다.

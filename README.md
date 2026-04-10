@@ -44,18 +44,18 @@ invocation stays compact while the intended use stays explicit.
 
 ### Planning
 
-- `jy-autoplan` chooses the right planning path for the current request and routes to `jy-office-hours` or `jy-plan-review` without making the user decide first.
-- `jy-office-hours` turns a vague feature or product idea into a sharper problem brief, constraints list, and next planning step.
+- `jy-autoplan` chooses the right planning path for the current request and routes to `jy-framing` or `jy-plan-review` without making the user decide first.
+- `jy-framing` turns a vague feature or product idea into a sharper problem brief, constraints list, and next planning step.
 - `jy-plan-review` takes an existing plan or outline and closes decision gaps before implementation starts.
 
 ### Execution
 
-- `jy-systematic-debugging` forces reproduction, hypothesis testing, and root-cause verification before patching a bug.
-- `jy-test-driven-development` enforces a failing test first and keeps implementation inside a red-green-refactor loop.
+- `jy-debugging` forces reproduction, hypothesis testing, and root-cause verification before patching a bug.
+- `jy-test-driven` enforces a failing test first and keeps implementation inside a red-green-refactor loop.
 - `jy-verification-before-completion` blocks success claims until fresh verification commands and results exist.
 - `jy-review-work` runs a structured multi-angle review pass on completed implementation before handoff or merge.
-- `jy-work-loop` keeps working a task iteratively until the stated completion criteria are actually verified.
-- `jy-ai-slop-remover` cleans obvious AI-generated code smells without turning into broad stylistic refactoring.
+- `jy-loop` keeps working a task iteratively until the stated completion criteria are actually verified.
+- `jy-slop-remover` cleans obvious AI-generated code smells without turning into broad stylistic refactoring.
 
 ### Routing
 
@@ -65,7 +65,7 @@ invocation stays compact while the intended use stays explicit.
 
 - `jy-codebase-explore` performs multi-angle repository exploration when the structure is unfamiliar or spread across modules.
 - `jy-library-research` gathers evidence-backed answers about external libraries, packages, APIs, and usage patterns.
-- `jy-oracle-consult` stays in advisory mode for architecture, reliability, performance, and repeated-failure decisions that need deeper judgment.
+- `jy-consult` stays in advisory mode for architecture, reliability, performance, and repeated-failure decisions that need deeper judgment.
 
 ### Maintenance
 

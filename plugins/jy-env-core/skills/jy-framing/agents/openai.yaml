@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Framing"
+  short_description: "Shape an idea into a sharp product brief before planning"
+  default_prompt: "Use $jy-framing to turn the current idea into a scoped brief."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Consult"
+  short_description: "Deep strategic technical advisory"
+  default_prompt: "Use $jy-consult for architecture decisions, repeated failures, or security/performance analysis."

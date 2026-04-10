@@ -17,8 +17,8 @@ def first_party_skill_dirs() -> list[Path]:
 class FirstPartySkillScenarioTests(unittest.TestCase):
     def test_new_workflow_skills_have_scenario_packs(self) -> None:
         for skill_name in [
-            "jy-systematic-debugging",
-            "jy-test-driven-development",
+            "jy-debugging",
+            "jy-test-driven",
             "jy-verification-before-completion",
         ]:
             with self.subTest(skill=skill_name):
@@ -58,17 +58,17 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
 
     def test_mode_aware_skill_packs_cover_collaboration_mode_cases(self) -> None:
         mode_aware_skills = [
-            "jy-ai-slop-remover",
-            "jy-office-hours",
+            "jy-slop-remover",
+            "jy-framing",
             "jy-plan-review",
             "jy-autoplan",
             "jy-checkpoint",
             "jy-document-release",
             "jy-intent-gate",
             "jy-review-work",
-            "jy-work-loop",
-            "jy-systematic-debugging",
-            "jy-test-driven-development",
+            "jy-loop",
+            "jy-debugging",
+            "jy-test-driven",
             "jy-verification-before-completion",
         ]
         for skill_name in mode_aware_skills:

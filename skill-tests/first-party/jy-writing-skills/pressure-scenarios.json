@@ -10,7 +10,7 @@
     {
       "id": "writing-stale-reference",
       "title": "Copied stale namespace under fatigue",
-      "prompt": "After a long day, you copy a reference section from an older internal skill and it mentions coding-convention:jy-test-driven-development. Decide whether to keep it, replace it, or defer it, and explain the verification steps.",
+      "prompt": "After a long day, you copy a reference section from an older internal skill and it mentions coding-convention:jy-test-driven. Decide whether to keep it, replace it, or defer it, and explain the verification steps.",
       "expected_without_skill": "Keeps the stale reference or defers the fix because the meaning is obvious enough.",
       "expected_with_skill": "Replaces the stale namespace immediately, checks the first-party skill rules against the repo, and records the corrected verification result."
     }

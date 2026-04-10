@@ -48,7 +48,7 @@ Codex planning skills must be mode-aware.
 
 ## Output Rules
 
-- `jy-office-hours` outputs a scoped brief.
+- `jy-framing` outputs a scoped brief.
 - `jy-plan-review` outputs findings plus a revised decision-complete plan.
 - `jy-autoplan` orchestrates the pack and produces a single consolidated next-action result.
 

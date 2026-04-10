@@ -1,4 +1,0 @@
-interface:
-  display_name: "JY Oracle Consult"
-  short_description: "Deep strategic technical advisory"
-  default_prompt: "Use $jy-oracle-consult for architecture decisions, repeated failures, or security/performance analysis."

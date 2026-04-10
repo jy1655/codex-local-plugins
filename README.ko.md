@@ -44,18 +44,18 @@ review, verification discipline을 다룹니다.
 
 ### Planning
 
-- `jy-autoplan`은 현재 요청에 맞는 planning 경로를 고르고, 사용자가 먼저 선택하지 않아도 `jy-office-hours` 또는 `jy-plan-review`로 라우팅합니다.
-- `jy-office-hours`는 모호한 feature 또는 product idea를 더 선명한 problem brief, 제약 조건 목록, 다음 planning step으로 정리합니다.
+- `jy-autoplan`은 현재 요청에 맞는 planning 경로를 고르고, 사용자가 먼저 선택하지 않아도 `jy-framing` 또는 `jy-plan-review`로 라우팅합니다.
+- `jy-framing`는 모호한 feature 또는 product idea를 더 선명한 problem brief, 제약 조건 목록, 다음 planning step으로 정리합니다.
 - `jy-plan-review`는 이미 있는 plan 또는 outline을 받아 구현 전에 decision gap을 닫습니다.
 
 ### Execution
 
-- `jy-systematic-debugging`은 버그를 patch하기 전에 reproduction, hypothesis test, root-cause verification을 강제합니다.
-- `jy-test-driven-development`는 failing test first를 강제하고 구현을 red-green-refactor loop 안에 묶습니다.
+- `jy-debugging`은 버그를 patch하기 전에 reproduction, hypothesis test, root-cause verification을 강제합니다.
+- `jy-test-driven`는 failing test first를 강제하고 구현을 red-green-refactor loop 안에 묶습니다.
 - `jy-verification-before-completion`은 fresh verification command와 결과가 없으면 success claim을 막습니다.
 - `jy-review-work`는 handoff 또는 merge 전에 완료된 구현을 multi-angle review 방식으로 검토합니다.
-- `jy-work-loop`는 명시된 completion criteria가 실제로 verified될 때까지 반복 작업을 유지합니다.
-- `jy-ai-slop-remover`는 불필요하게 범위를 넓히지 않고 obvious AI-generated code smell만 정리합니다.
+- `jy-loop`는 명시된 completion criteria가 실제로 verified될 때까지 반복 작업을 유지합니다.
+- `jy-slop-remover`는 불필요하게 범위를 넓히지 않고 obvious AI-generated code smell만 정리합니다.
 
 ### Routing
 
@@ -65,7 +65,7 @@ review, verification discipline을 다룹니다.
 
 - `jy-codebase-explore`는 구조가 낯설거나 여러 모듈에 흩어진 repository를 multi-angle 방식으로 탐색합니다.
 - `jy-library-research`는 외부 library, package, API, usage pattern에 대해 evidence-backed answer를 수집합니다.
-- `jy-oracle-consult`는 architecture, reliability, performance, repeated-failure decision에 대해 advisory mode로 깊게 판단합니다.
+- `jy-consult`는 architecture, reliability, performance, repeated-failure decision에 대해 advisory mode로 깊게 판단합니다.
 
 ### Maintenance
 

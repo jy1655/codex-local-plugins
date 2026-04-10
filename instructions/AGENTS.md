@@ -21,7 +21,7 @@ This machine is managed by the portable Codex environment sync repo.
 ## Skill Routing
 
 - If the user is still shaping a feature, product direction, or scope, prefer `jy-autoplan` first.
-- If the user clearly needs idea narrowing or a product brief, prefer `jy-office-hours`.
+- If the user clearly needs idea narrowing or a product brief, prefer `jy-framing`.
 - If the user already has a plan and wants decision gaps closed before implementation, prefer `jy-plan-review`.
 - If the correct planning path is not obvious, route through `jy-autoplan` instead of choosing ad hoc.
 - If the user shipped changes and now needs docs, instructions, or skill verification artifacts synced, prefer `jy-document-release`.
@@ -32,17 +32,17 @@ This machine is managed by the portable Codex environment sync repo.
 
 ## Execution Skill Routing
 
-- If the user is debugging a bug, failing test, or unexpected behavior, prefer `jy-systematic-debugging`.
-- If the user is starting a feature or bugfix implementation, prefer `jy-test-driven-development`.
+- If the user is debugging a bug, failing test, or unexpected behavior, prefer `jy-debugging`.
+- If the user is starting a feature or bugfix implementation, prefer `jy-test-driven`.
 - If the user is about to claim work is complete, fixed, or passing, prefer `jy-verification-before-completion`.
 - If the user completed implementation and wants multi-angle review, prefer `jy-review-work`.
-- If the user needs iterative work until verified completion, prefer `jy-work-loop`.
-- If the user wants to clean AI-generated code smells from files, prefer `jy-ai-slop-remover`.
+- If the user needs iterative work until verified completion, prefer `jy-loop`.
+- If the user wants to clean AI-generated code smells from files, prefer `jy-slop-remover`.
 - Execution skills are mode-aware: if the user is in Plan Mode, tell them to press `Shift+Tab` and re-run in Default mode.
 
 ## Advisory and Research Skill Routing
 
-- If the user faces architecture decisions, repeated failures, or security/performance concerns, prefer `jy-oracle-consult`.
+- If the user faces architecture decisions, repeated failures, or security/performance concerns, prefer `jy-consult`.
 - If the user needs evidence-based answers about external libraries or packages, prefer `jy-library-research`.
 - If the user needs multi-angle codebase exploration across modules, prefer `jy-codebase-explore`.
 - If the user's request is ambiguous and needs intent classification, prefer `jy-intent-gate`.

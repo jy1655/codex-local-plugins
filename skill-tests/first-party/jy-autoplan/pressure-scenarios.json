@@ -5,7 +5,7 @@
       "title": "Early-stage request routes to office-hours",
       "prompt": "Autoplan this feature idea. We think we need a partner dashboard, but we have not pinned down the user pain yet.",
       "expected_without_skill": "Treats the request like a normal plan review even though the request is still at the idea stage.",
-      "expected_with_skill": "Recognizes that planning maturity is low, routes to `jy-office-hours`, and returns a consolidated brief plus next step."
+      "expected_with_skill": "Recognizes that planning maturity is low, routes to `jy-framing`, and returns a consolidated brief plus next step."
     },
     {
       "id": "existing-plan-needs-review",

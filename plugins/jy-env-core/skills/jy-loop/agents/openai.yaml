@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Loop"
+  short_description: "Iterative execution until verified completion"
+  default_prompt: "Use $jy-loop to keep working on the task until it passes verification."

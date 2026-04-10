@@ -7,7 +7,7 @@ description: Use when the user wants the Codex planning pack to decide the next 
 
 ## Overview
 
-현재 요청이 brief 단계인지, plan review 단계인지 먼저 판단하고 `jy-office-hours`와
+현재 요청이 brief 단계인지, plan review 단계인지 먼저 판단하고 `jy-framing`와
 `jy-plan-review` 중 필요한 경로를 자동으로 선택하는 orchestrator.
 
 중요한 제약이 하나 있다. 이 skill은 적절한 planning 경로는 고를 수 있지만, Codex의 Plan Mode를
@@ -29,7 +29,7 @@ description: Use when the user wants the Codex planning pack to decide the next 
 |------|------|
 | 0. 모드 확인 | 현재가 Default인지 Plan인지 판단 |
 | 1. maturity 판정 | 아이디어 단계인지 plan 단계인지 구분 |
-| 2. route 선택 | `jy-office-hours` 또는 `jy-plan-review` 선택 |
+| 2. route 선택 | `jy-framing` 또는 `jy-plan-review` 선택 |
 | 3. 결과 통합 | brief 또는 revised plan을 하나로 요약 |
 | 4. next step | 사용자가 바로 다음 행동을 고를 수 있게 정리 |
 
@@ -45,7 +45,7 @@ description: Use when the user wants the Codex planning pack to decide the next 
 
 경로:
 
-- `jy-office-hours`
+- `jy-framing`
 
 출력:
 
@@ -86,10 +86,10 @@ description: Use when the user wants the Codex planning pack to decide the next 
 
 ## Routing Rules
 
-- 사용자가 `jy-office-hours` 또는 `jy-plan-review`를 직접 지정했으면 autoplan이 덮어쓰지 않는다.
-- idea-stage면 `jy-office-hours`
+- 사용자가 `jy-framing` 또는 `jy-plan-review`를 직접 지정했으면 autoplan이 덮어쓰지 않는다.
+- idea-stage면 `jy-framing`
 - plan-stage면 `jy-plan-review`
-- 아이디어와 plan이 섞여 있지만 핵심 불확실성이 문제 정의 쪽이면 `jy-office-hours` 먼저
+- 아이디어와 plan이 섞여 있지만 핵심 불확실성이 문제 정의 쪽이면 `jy-framing` 먼저
 - execution-ready면 planning pack으로 보내지 않는다
 - 요청이 "구현 전 결정 잠금"인지 "지금 실행"인지 애매하면, 사용자의 마지막 동사를 우선한다
   - "review the plan" -> plan-stage
@@ -121,7 +121,7 @@ description: Use when the user wants the Codex planning pack to decide the next 
 
 ### If current collaboration mode is Plan
 
-- idea-stage면 `jy-office-hours` 경로로 실제 대화를 이어간다.
+- idea-stage면 `jy-framing` 경로로 실제 대화를 이어간다.
 - plan-stage면 `jy-plan-review` 경로로 실제 대화를 이어간다.
 - 결과가 plan-review 쪽이면 최종 출력은 `<proposed_plan>` 기준을 따른다.
 - execution-ready면 Plan Mode에 머물지 않는다.

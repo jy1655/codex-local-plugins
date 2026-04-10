@@ -20,7 +20,7 @@ description: Use when working with an unfamiliar library, package, or external d
 사용하지 않을 때:
 - 현재 프로젝트 코드 내부 탐색 (jy-codebase-explore 사용)
 - 이미 알고 있는 라이브러리의 단순 사용
-- 아키텍처 결정 (jy-oracle-consult 사용)
+- 아키텍처 결정 (jy-consult 사용)
 
 ## Quick Reference
 

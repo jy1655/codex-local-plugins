@@ -12,7 +12,7 @@ class RepoBundleTests(unittest.TestCase):
 
         self.assertIn("## Skill Routing", text)
         self.assertIn("jy-autoplan", text)
-        self.assertIn("jy-office-hours", text)
+        self.assertIn("jy-framing", text)
         self.assertIn("jy-plan-review", text)
         self.assertIn("jy-document-release", text)
         self.assertIn("Shift+Tab", text)
@@ -43,7 +43,7 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("### Maintenance", text)
         self.assertIn("### Authoring", text)
         self.assertIn("`jy-autoplan`", text)
-        self.assertIn("`jy-test-driven-development`", text)
+        self.assertIn("`jy-test-driven`", text)
         self.assertIn("`jy-intent-gate`", text)
         self.assertIn("`jy-env-sync-admin`", text)
         self.assertIn("`jy-writing-skills`", text)
@@ -81,8 +81,8 @@ class RepoBundleTests(unittest.TestCase):
         repo_root = Path(__file__).resolve().parents[1]
         skill_root = repo_root / "plugins" / "jy-env-core" / "skills"
 
-        self.assertTrue((skill_root / "jy-office-hours" / "SKILL.md").exists())
-        self.assertTrue((skill_root / "jy-office-hours" / "agents" / "openai.yaml").exists())
+        self.assertTrue((skill_root / "jy-framing" / "SKILL.md").exists())
+        self.assertTrue((skill_root / "jy-framing" / "agents" / "openai.yaml").exists())
         self.assertTrue((skill_root / "jy-plan-review" / "SKILL.md").exists())
         self.assertTrue((skill_root / "jy-plan-review" / "agents" / "openai.yaml").exists())
         self.assertTrue((skill_root / "jy-autoplan" / "SKILL.md").exists())
@@ -108,8 +108,8 @@ class RepoBundleTests(unittest.TestCase):
         skill_root = repo_root / "plugins" / "jy-env-core" / "skills"
 
         for skill_name in [
-            "jy-systematic-debugging",
-            "jy-test-driven-development",
+            "jy-debugging",
+            "jy-test-driven",
             "jy-verification-before-completion",
         ]:
             with self.subTest(skill=skill_name):
@@ -122,10 +122,10 @@ class RepoBundleTests(unittest.TestCase):
 
         self.assertIn("## Execution Skill Routing", text)
         self.assertIn("jy-review-work", text)
-        self.assertIn("jy-work-loop", text)
-        self.assertIn("jy-ai-slop-remover", text)
-        self.assertIn("jy-systematic-debugging", text)
-        self.assertIn("jy-test-driven-development", text)
+        self.assertIn("jy-loop", text)
+        self.assertIn("jy-slop-remover", text)
+        self.assertIn("jy-debugging", text)
+        self.assertIn("jy-test-driven", text)
         self.assertIn("jy-verification-before-completion", text)
 
     def test_global_agents_instructions_include_advisory_skill_routing(self) -> None:
@@ -133,7 +133,7 @@ class RepoBundleTests(unittest.TestCase):
         text = agents_path.read_text(encoding="utf-8")
 
         self.assertIn("## Advisory and Research Skill Routing", text)
-        self.assertIn("jy-oracle-consult", text)
+        self.assertIn("jy-consult", text)
         self.assertIn("jy-library-research", text)
         self.assertIn("jy-codebase-explore", text)
         self.assertIn("jy-intent-gate", text)

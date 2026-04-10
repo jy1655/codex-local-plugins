@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Slop Remover"
+  short_description: "Remove AI-generated code smells from files"
+  default_prompt: "Use $jy-slop-remover to clean AI-generated code patterns from the specified file."
