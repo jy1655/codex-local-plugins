@@ -69,6 +69,7 @@ invocation stays compact while the intended use stays explicit.
 ### Research
 
 - `jy-codebase-explore` performs multi-angle repository exploration when the structure is unfamiliar or spread across modules.
+- `jy-korean-law-search` routes Korean law, ordinance, precedent, annex, amendment, and procedure queries through the current `korean-law` MCP toolset.
 - `jy-library-research` gathers evidence-backed answers about external libraries, packages, APIs, and usage patterns.
 - `jy-consult` stays in advisory mode for architecture, reliability, performance, and repeated-failure decisions that need deeper judgment.
 

@@ -60,6 +60,7 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("`jy-executing-plans`", text)
         self.assertIn("`jy-receiving-review`", text)
         self.assertIn("`jy-intent-gate`", text)
+        self.assertIn("`jy-korean-law-search`", text)
         self.assertIn("`jy-ship`", text)
         self.assertIn("`jy-env-sync-admin`", text)
         self.assertIn("`jy-writing-skills`", text)
@@ -91,6 +92,13 @@ class RepoBundleTests(unittest.TestCase):
         self.assertTrue((skill_root / "SKILL.md").exists())
         self.assertTrue((skill_root / "references" / "skill-testing-guide.md").exists())
         self.assertTrue((skill_root / "references" / "graphviz-conventions.dot").exists())
+        self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
+
+    def test_codex_env_core_bundle_includes_korean_law_search_skill(self) -> None:
+        repo_root = Path(__file__).resolve().parents[1]
+        skill_root = repo_root / "plugins" / "jy-env-core" / "skills" / "jy-korean-law-search"
+
+        self.assertTrue((skill_root / "SKILL.md").exists())
         self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
 
     def test_codex_env_core_bundle_includes_codex_planning_pack(self) -> None:
@@ -167,6 +175,7 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("## Advisory and Research Skill Routing", text)
         self.assertIn("jy-consult", text)
         self.assertIn("jy-library-research", text)
+        self.assertIn("jy-korean-law-search", text)
         self.assertIn("jy-codebase-explore", text)
         self.assertIn("jy-intent-gate", text)
 
