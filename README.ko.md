@@ -69,6 +69,7 @@ shipping, verification discipline을 다룹니다.
 ### Research
 
 - `jy-codebase-explore`는 구조가 낯설거나 여러 모듈에 흩어진 repository를 multi-angle 방식으로 탐색합니다.
+- `jy-korean-law-search`는 한국 법령, 조례, 판례, 별표, 개정 연혁, 절차 질의를 현재 `korean-law` MCP 도구 체계에 맞춰 라우팅합니다.
 - `jy-library-research`는 외부 library, package, API, usage pattern에 대해 evidence-backed answer를 수집합니다.
 - `jy-consult`는 architecture, reliability, performance, repeated-failure decision에 대해 advisory mode로 깊게 판단합니다.
 

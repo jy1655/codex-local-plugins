@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "stale-tool-routing",
+      "title": "Using outdated tool names instead of the current MCP surface",
+      "prompt": "근로기준법 제74조 내용이랑 관련 해석례, 최근 개정 흐름을 같이 보고 싶어. 어떤 순서로 찾아야 해?",
+      "expected_without_skill": "Suggests outdated tool names from stale docs, mixes article search and interpretation search together, or answers from memory without identifying the current tool families.",
+      "expected_with_skill": "Classifies the request into article text, interpretation search, and amendment history; routes through `search_law` -> `get_law_text`, `search_decisions` for interpretation, and `chain_amendment_track` for history; and tells the reader to capture concrete identifiers from the retrieved results."
+    },
+    {
+      "id": "auth-error-and-fallback",
+      "title": "Primary MCP auth problem while checking an annex",
+      "prompt": "`korean-law` MCP가 API 키 에러를 내는데 산업안전보건법 별표를 먼저 확인해야 해. 안 되면 다른 경로도 생각해줘.",
+      "expected_without_skill": "Assumes the remote endpoint should always work without authentication, invents a new client stack, or jumps straight to a fallback source without acknowledging the installed MCP path and local overlay setup.",
+      "expected_with_skill": "Treats the installed `korean-law` MCP server as primary, recognizes a likely local `LAW_OC` overlay issue, prefers `get_annexes` for the annex lookup, and only suggests `beopmang` fallback when that capability is actually available and the primary path remains unavailable."
+    }
+  ]
+}

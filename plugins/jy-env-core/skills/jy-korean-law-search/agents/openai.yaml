@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Korean Law Search"
+  short_description: "Route Korean legal searches through current MCP tools"
+  default_prompt: "Use $jy-korean-law-search for Korean law, ordinance, precedent, annex, amendment, or procedure queries via the installed korean-law MCP server."
