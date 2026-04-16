@@ -96,6 +96,23 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
         self.assertIn("jy-document-release", text)
         self.assertIn("docs", text)
 
+    def test_korean_law_search_pack_covers_real_world_two_part_answers(self) -> None:
+        scenario_file = SCENARIO_ROOT / "jy-korean-law-search" / "pressure-scenarios.json"
+        result_template = (SCENARIO_ROOT / "jy-korean-law-search" / "result-template.md").read_text(encoding="utf-8")
+        baseline = (SCENARIO_ROOT / "jy-korean-law-search" / "baseline.md").read_text(encoding="utf-8")
+        text = scenario_file.read_text(encoding="utf-8")
+
+        self.assertIn("실제 분쟁", baseline)
+        self.assertIn("pure legal lookup", text)
+        self.assertIn("real-world", text)
+        self.assertIn("General legal answer", text)
+        self.assertIn("Practical answer", text)
+        self.assertIn("does not force the two-part answer shape", text)
+        self.assertIn("directly relevant precedent", text)
+        self.assertIn("For a pure legal lookup, did it avoid forcing the general legal answer / practical answer split", result_template)
+        self.assertIn("Did it separate the general legal answer from the practical answer", result_template)
+        self.assertIn("Did it hold back the practical answer when directly relevant support was missing", result_template)
+
     def test_output_template_skill_packs_track_response_language(self) -> None:
         for skill_name in [
             "jy-ship",
