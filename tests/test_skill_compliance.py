@@ -268,6 +268,19 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
                     "evidence" in text or "permalink" in text or "sources" in text or "links" in text,
                     f"{skill_name} is research-oriented but does not require evidence/sources")
 
+    def test_korean_law_search_documents_two_part_answers_for_real_world_questions(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-korean-law-search" / "SKILL.md")
+
+        self.assertIn("pure legal lookup", text)
+        self.assertIn("real-world situation", text)
+        self.assertIn("## Answer Shape", text)
+        self.assertIn("General legal answer", text)
+        self.assertIn("Practical answer", text)
+        self.assertIn("precedent", text)
+        self.assertIn("interpretation", text)
+        self.assertIn("If you do not find directly relevant", text)
+        self.assertIn("Do not fill the practical answer", text)
+
     def test_cross_skill_references_point_to_existing_skills(self) -> None:
         """Skills that reference other skills by name should reference existing ones."""
         existing_skill_names = {p.parent.name for p in first_party_skill_paths()}

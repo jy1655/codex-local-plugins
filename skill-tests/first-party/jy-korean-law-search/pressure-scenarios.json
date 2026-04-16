@@ -13,6 +13,27 @@
       "prompt": "`korean-law` MCP가 API 키 에러를 내는데 산업안전보건법 별표를 먼저 확인해야 해. 안 되면 다른 경로도 생각해줘.",
       "expected_without_skill": "Assumes the remote endpoint should always work without authentication, invents a new client stack, or jumps straight to a fallback source without acknowledging the installed MCP path and local overlay setup.",
       "expected_with_skill": "Treats the installed `korean-law` MCP server as primary, recognizes a likely local `LAW_OC` overlay issue, prefers `get_annexes` for the annex lookup, and only suggests `beopmang` fallback when that capability is actually available and the primary path remains unavailable."
+    },
+    {
+      "id": "pure-legal-lookup-stays-direct",
+      "title": "Pure legal lookup should not be forced into a practical two-part answer",
+      "prompt": "근로기준법 제74조 내용하고 시행령이나 해석상 기본 취지만 간단히 정리해줘. 판례나 현실 분쟁 얘기까지는 필요 없어.",
+      "expected_without_skill": "Overcomplicates the response, adds practical dispute speculation the user did not ask for, or forces a `General legal answer` / `Practical answer` split even though this is just a pure legal lookup.",
+      "expected_with_skill": "Classifies the prompt as a pure legal lookup, routes through the narrow law or interpretation tools, answers directly from the retrieved material, and does not force the two-part answer shape."
+    },
+    {
+      "id": "real-world-two-part-answer",
+      "title": "Real-world question should separate legal rule from practical treatment",
+      "prompt": "육아휴직 끝나고 복직시키긴 하는데 사실상 한직으로 보내려는 상황 같아. 법적으로는 뭐가 원칙이고, 실제 분쟁에서는 어떻게 보이는지도 같이 설명해줘.",
+      "expected_without_skill": "Gives only a blended answer, summarizes the statute without separating principle from practice, or drifts into unsupported practical advice.",
+      "expected_with_skill": "Classifies the prompt as a real-world situation, retrieves the governing law plus directly relevant precedent, interpretation, appeal, or tribunal material when available, and separates the response into `General legal answer` and `Practical answer`."
+    },
+    {
+      "id": "real-world-hold-back-without-direct-support",
+      "title": "Real-world question without directly relevant support should not invent practice",
+      "prompt": "동네 체육시설 운영 계약에 이런 특약이 있으면 실제 소송에서 무조건 무효라고 봐도 돼? 직접 맞는 판례가 없을 수도 있는데 현실적으로도 같이 말해줘.",
+      "expected_without_skill": "Guesses how the court would probably react, presents a practical outcome as if certain, or fills the answer with unsupported litigation strategy.",
+      "expected_with_skill": "Classifies this as a real-world situation, gives a `General legal answer` from the governing contract or civil-law rules, looks for directly relevant precedent or interpretation support, and if that support is missing it explicitly holds back the `Practical answer` instead of guessing."
     }
   ]
 }
