@@ -13,6 +13,7 @@
 - Updated README and AGENTS routing docs for the new skill.
 - Added static compliance and scenario coverage tests.
 - Linked the work to GitHub issue `#7` and branch `feature/7-jy-waterfall-portability`.
+- Created PR `#8` for merge review.
 
 ## Evidence
 
@@ -23,10 +24,10 @@
 
 ## Remaining Work
 
-- Create or update the PR for review.
 - Keep issue `#7` open for future ideas discovered while using the skill.
 
 ## Follow-up Records
 
 - Order: `mydocs/orders/20260422T1317-order-jy-waterfall-skill.md`
 - Issue: https://github.com/jy1655/codex-local-plugins/issues/7
+- PR: https://github.com/jy1655/codex-local-plugins/pull/8
