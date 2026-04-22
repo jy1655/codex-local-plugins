@@ -63,6 +63,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-executing-plans",
             "jy-receiving-review",
             "jy-ship",
+            "jy-waterfall",
             "jy-verification-before-completion",
         ]
         for skill_name in mode_aware_skills:
@@ -171,6 +172,22 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("gitignored", text)
         self.assertIn("git check-ignore", text)
         self.assertIn("## Mode-Aware Behavior", text)
+
+    def test_waterfall_documents_project_record_and_safety_gates(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-waterfall" / "SKILL.md")
+        self.assertIn("2-3 hours", text)
+        self.assertIn("YYYYMMDDTHHMM", text)
+        self.assertIn("explicit approval", text)
+        self.assertIn("must not create GitHub issues", text)
+        self.assertIn("must not create milestones", text)
+        self.assertIn("must not create branches", text)
+        self.assertIn("secret", text)
+        self.assertIn("private repo", text)
+        self.assertIn("gitignored", text)
+        self.assertIn("mydocs/", text)
+        self.assertIn("jy-writing-plans", text)
+        self.assertIn("jy-executing-plans", text)
+        self.assertIn("jy-verification-before-completion", text)
 
     def test_receiving_review_documents_verification_before_changes_and_pushback(self) -> None:
         text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-receiving-review" / "SKILL.md")

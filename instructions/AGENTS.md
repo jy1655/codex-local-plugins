@@ -32,6 +32,7 @@ This machine is managed by the portable Codex environment sync repo.
 - If the user already has a plan and wants decision gaps closed before implementation, prefer `jy-plan-review`.
 - If the user has approved requirements and now needs a detailed implementation plan, prefer `jy-writing-plans`.
 - If the user wants an isolated feature branch or worktree before implementation, prefer `jy-worktrees`.
+- If the user wants `mydocs/`, durable project records, waterfall-style task orders, or a multi-hour project ledger, prefer `jy-waterfall`.
 - If the correct planning path is not obvious, route through `jy-autoplan` instead of choosing ad hoc.
 - If the user shipped changes and now needs docs, instructions, or skill verification artifacts synced, prefer `jy-document-release`.
 - If the user wants to ship a ready branch, push verified changes, or create/update a PR/MR, prefer `jy-ship`.
