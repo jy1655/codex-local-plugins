@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Waterfall"
+  short_description: "Create approval-gated project records across orders, plans, results, feedback, and troubleshooting"
+  default_prompt: "Use $jy-waterfall to decide whether this task needs a durable project record and to create approval-gated waterfall notes."

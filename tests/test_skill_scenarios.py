@@ -24,6 +24,7 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
             "jy-executing-plans",
             "jy-receiving-review",
             "jy-ship",
+            "jy-waterfall",
             "jy-verification-before-completion",
         ]:
             with self.subTest(skill=skill_name):
@@ -79,6 +80,7 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
             "jy-executing-plans",
             "jy-receiving-review",
             "jy-ship",
+            "jy-waterfall",
             "jy-verification-before-completion",
         ]
         for skill_name in mode_aware_skills:
@@ -112,6 +114,19 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
         self.assertIn("For a pure legal lookup, did it avoid forcing the general legal answer / practical answer split", result_template)
         self.assertIn("Did it separate the general legal answer from the practical answer", result_template)
         self.assertIn("Did it hold back the practical answer when directly relevant support was missing", result_template)
+
+    def test_waterfall_pressure_pack_covers_approval_time_and_secret_gates(self) -> None:
+        scenario_file = SCENARIO_ROOT / "jy-waterfall" / "pressure-scenarios.json"
+        text = scenario_file.read_text(encoding="utf-8")
+
+        self.assertIn("explicit approval", text)
+        self.assertIn("must not run `gh issue create`", text)
+        self.assertIn("YYYYMMDDTHHMM", text)
+        self.assertIn("2-3 hours", text)
+        self.assertIn("secret", text)
+        self.assertIn("private repo", text)
+        self.assertIn("gitignored", text)
+        self.assertIn("Plan Mode", text)
 
     def test_output_template_skill_packs_track_response_language(self) -> None:
         for skill_name in [

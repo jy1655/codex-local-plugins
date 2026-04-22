@@ -36,7 +36,7 @@ First-party skill authoring happens in `plugins/jy-env-core/skills/`. That direc
 the source of truth for both local development and the installed Codex skill surface.
 The current first-party workflow pack covers planning, plan authoring, isolated worktree
 setup, debugging, test-first implementation, plan execution, review feedback handling,
-shipping, and verification disciplines.
+waterfall-style project records, shipping, and verification disciplines.
 
 ## First-Party Skill Catalog
 
@@ -50,6 +50,7 @@ invocation stays compact while the intended use stays explicit.
 - `jy-plan-review` takes an existing plan or outline and closes decision gaps before implementation starts.
 - `jy-writing-plans` turns approved requirements into a decision-complete implementation plan saved under `docs/superpowers/plans/`.
 - `jy-worktrees` starts isolated feature work in `.worktrees/` after verifying that the directory is safe to use.
+- `jy-waterfall` creates approval-gated project records for work expected to last 2-3 hours or more, with timestamped orders, plans, results, feedback, and troubleshooting notes.
 
 ### Execution
 
