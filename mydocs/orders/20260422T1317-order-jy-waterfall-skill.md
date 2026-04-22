@@ -1,32 +1,32 @@
-# Waterfall Order
+# Waterfall 작업 지시
 
 - Timestamp: 20260422T1317 KST
-- Task: Establish a durable waterfall record for the first-party `jy-waterfall` skill work in this repository.
+- Task: 이 repo에서 first-party `jy-waterfall` 스킬 작업을 위한 durable waterfall record를 수립한다.
 - Record root: `mydocs/`
-- Sensitivity decision: Public-safe for this personal repository. Do not place secrets, credentials, private customer data, or raw internal URLs in committed records.
-- GitHub linkage: Issue `#7` and branch `feature/7-jy-waterfall-portability` are linked. No milestone is used.
-- Expected duration: Multi-session or review-heavy first-party skill work.
-- Next skill: `jy-writing-plans` if implementation planning is missing; `jy-verification-before-completion` before claiming the skill work is complete.
+- Sensitivity decision: 이 개인 repo에는 공개해도 안전한 기록으로 둔다. secret, credential, private customer data, raw internal URL은 committed record에 넣지 않는다.
+- GitHub linkage: Issue `#7`과 branch `feature/7-jy-waterfall-portability`가 연결되어 있다. milestone은 사용하지 않는다.
+- Expected duration: 여러 세션 또는 review-heavy first-party skill 작업.
+- Next skill: 구현 계획이 부족하면 `jy-writing-plans`, 완료를 주장하기 전에는 `jy-verification-before-completion`.
 
-## Goal
+## 목표
 
-Keep a repo-visible project record for the `jy-waterfall` skill rollout so orders, plans, execution notes, feedback, verification, and troubleshooting can remain readable after the chat ends.
+`jy-waterfall` 스킬 rollout을 repo-visible project record로 남긴다. 채팅이 끝난 뒤에도 order, plan, execution note, feedback, verification, troubleshooting 흐름을 다시 읽고 이어갈 수 있어야 한다.
 
-## Scope
+## 범위
 
-- Use `mydocs/` as the committed waterfall record root.
-- Track the current first-party skill work around `plugins/jy-env-core/skills/jy-waterfall/`.
-- Keep GitHub issue, milestone, and branch mutations approval-gated.
-- Preserve existing working tree changes without reverting unrelated edits.
+- `mydocs/`를 committed waterfall record root로 사용한다.
+- 현재 first-party skill 작업 대상은 `plugins/jy-env-core/skills/jy-waterfall/`이다.
+- GitHub issue, milestone, branch 변경은 approval gate를 유지한다.
+- 관련 없는 기존 working tree 변경을 되돌리지 않는다.
 
-## Decisions Needed
+## 필요한 결정
 
-- Whether this task needs a detailed implementation plan record under `mydocs/plans/`.
-- Use GitHub issue `#7` for ongoing ideas, usage notes, and portability improvements.
-- Which verification gate should be run before closing the work.
+- 이 작업에 `mydocs/plans/` 아래의 상세 implementation plan record가 필요한지 판단한다.
+- 향후 아이디어, 사용 메모, 이식성 개선은 GitHub issue `#7`에 기록한다.
+- 작업을 닫기 전에 어떤 verification gate를 실행할지 정한다.
 
-## Handoff
+## 인계
 
-Continue on branch `feature/7-jy-waterfall-portability`. Use `jy-writing-plans` when the next step is a detailed execution plan, or `jy-verification-before-completion` when the implementation is ready to be checked.
+branch `feature/7-jy-waterfall-portability`에서 이어간다. 다음 단계가 상세 execution plan이면 `jy-writing-plans`를 사용하고, 구현 검증 단계에서는 `jy-verification-before-completion`을 사용한다.
 
-Linked issue: https://github.com/jy1655/codex-local-plugins/issues/7
+연결된 issue: https://github.com/jy1655/codex-local-plugins/issues/7

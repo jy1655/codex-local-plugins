@@ -1,33 +1,33 @@
-# Waterfall Execution Result
+# Waterfall 실행 결과
 
 - Timestamp: 20260422T1323 KST
-- Task: Ship `jy-waterfall` as a first-party skill in `jy-env-core`.
-- Plan: Local issue-linked branch workflow on `feature/7-jy-waterfall-portability`.
+- Task: `jy-env-core` 안에 `jy-waterfall`을 first-party skill로 ship한다.
+- Plan: `feature/7-jy-waterfall-portability`에서 issue-linked branch workflow로 진행한다.
 - Verification: `git diff --check`; `python3 -m pytest`.
-- Review: Local five-angle ship review across goal fit, QA, code/document pattern consistency, security, and repository context.
+- Review: 목표 적합성, QA, code/document pattern consistency, security, repository context 관점의 local five-angle ship review.
 
-## Completed
+## 완료
 
-- Added the first-party `jy-waterfall` skill.
-- Added the `jy-waterfall` pressure scenario verification pack.
-- Updated README and AGENTS routing docs for the new skill.
-- Added static compliance and scenario coverage tests.
-- Linked the work to GitHub issue `#7` and branch `feature/7-jy-waterfall-portability`.
-- Created PR `#8` for merge review.
+- first-party `jy-waterfall` skill을 추가했다.
+- `jy-waterfall` pressure scenario verification pack을 추가했다.
+- 새 skill에 맞춰 README와 AGENTS routing docs를 갱신했다.
+- static compliance test와 scenario coverage test를 추가했다.
+- 작업을 GitHub issue `#7`과 branch `feature/7-jy-waterfall-portability`에 연결했다.
+- merge review용 PR `#8`을 만들었다.
 
-## Evidence
+## 근거
 
-- `python3 -m pytest` passed 64 tests.
-- `git diff --check` passed.
-- `skill-tests/first-party/jy-waterfall/pressure-scenarios.json` parsed with `python3 -m json.tool`.
-- Secret scan found only documentation examples and policy text, not committed credentials.
+- `python3 -m pytest`에서 64개 테스트가 통과했다.
+- `git diff --check`가 통과했다.
+- `skill-tests/first-party/jy-waterfall/pressure-scenarios.json`이 `python3 -m json.tool`로 파싱됐다.
+- secret scan 결과 committed credential은 없고 documentation example과 policy text만 확인됐다.
 
-## Remaining Work
+## 남은 작업
 
-- Keep issue `#7` open for future ideas discovered while using the skill.
+- skill을 사용하면서 발견한 향후 아이디어는 issue `#7`에 계속 기록한다.
 
-## Follow-up Records
+## 후속 기록
 
-- Order: `mydocs/orders/20260422T1317-order-jy-waterfall-skill.md`
+- 작업 지시: `mydocs/orders/20260422T1317-order-jy-waterfall-skill.md`
 - Issue: https://github.com/jy1655/codex-local-plugins/issues/7
 - PR: https://github.com/jy1655/codex-local-plugins/pull/8
