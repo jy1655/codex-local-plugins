@@ -4,8 +4,9 @@ This machine is managed by the portable Codex environment sync repo.
 
 ## Environment Rules
 
-- Treat `~/plugins`, `~/.agents/skills/`, and `~/.agents/plugins/marketplace.json` as the source-owned install surface.
+- Treat `~/plugins`, `~/.agents/skills/`, `~/.agents/plugins/marketplace.json`, and `~/.codex/hooks.json` as the source-owned install surface.
 - Do not edit `~/.codex/plugins/cache` directly.
+- Do not hand-edit repo-managed hook entries in `~/.codex/hooks.json`; change `hooks/` in this repo and run apply so user hooks are preserved.
 - When changing this environment repo, prefer first-party plugin bundles committed here over
   live dependencies on upstream seed sources.
 - Treat `plugins/jy-env-core/skills/` as the first-party skill source of truth.
@@ -53,6 +54,12 @@ This machine is managed by the portable Codex environment sync repo.
 - If the user wants to clean AI-generated code smells from files, prefer `jy-slop-remover`.
 - If the user wants the current branch pushed and a PR/MR created after fresh gates pass, prefer `jy-ship`.
 - Execution skills are mode-aware: if the user is in Plan Mode, tell them to press `Shift+Tab` and re-run in Default mode.
+
+## Necessity Gate
+
+- Before defining a new task, skill, file, audit cycle, TODO/open issue/follow-up item, or speculative cleanup that the user did not explicitly request, classify it as `user-directed`, `reproducible`, or `evidenced`.
+- Reject speculative padding such as broad cleanup, manufactured follow-up sections, and extra audit loops when there is no concrete problem evidence.
+- If a final response keeps a follow-up/TODO/open issue section, include a concise `[necessity-gate]` block explaining the basis and decision.
 
 ## Advisory and Research Skill Routing
 

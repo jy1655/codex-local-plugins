@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
+from copy import deepcopy
 import hashlib
 import json
 import shutil
 import subprocess
 import time
 
-from .manifest import InstructionSpec, Manifest, PluginSpec, load_manifest
+from .manifest import HookSpec, InstructionSpec, Manifest, PluginSpec, load_manifest
 from .platforms import ManagedPaths, resolve_target_path
 
 
@@ -33,6 +34,7 @@ class ApplyReport:
     plugins: list[ApplyItem] = field(default_factory=list)
     skills: list[ApplyItem] = field(default_factory=list)
     instructions: list[ApplyItem] = field(default_factory=list)
+    hooks: list[ApplyItem] = field(default_factory=list)
     marketplace_action: str = "skipped"
     state_path: Path | None = None
     managed_repo: Path | None = None
@@ -74,12 +76,13 @@ def hash_path(path: Path) -> str:
 
 def load_state(path: Path) -> dict:
     if not path.exists():
-        return {"plugins": {}, "skills": {}, "instructions": {}, "last_apply": None}
+        return {"plugins": {}, "skills": {}, "instructions": {}, "hooks": {}, "last_apply": None}
 
     state = json.loads(path.read_text(encoding="utf-8"))
     state.setdefault("plugins", {})
     state.setdefault("skills", {})
     state.setdefault("instructions", {})
+    state.setdefault("hooks", {})
     state.setdefault("last_apply", None)
     return state
 
@@ -199,6 +202,20 @@ def _instruction_state(
     }
 
 
+def _hook_state(
+    source: Path,
+    destination: Path,
+    desired_hash: str,
+    managed_hooks: dict,
+) -> dict:
+    return {
+        "hash": desired_hash,
+        "source": str(source),
+        "target": str(destination),
+        "managed_hooks": managed_hooks,
+    }
+
+
 def _skill_state(
     destination: Path,
     mode: str,
@@ -244,6 +261,133 @@ def _remove_managed_instruction(name: str, state: dict) -> ApplyItem:
     state["instructions"].pop(name, None)
     detail = "removed stale managed instruction" if existed else "cleared stale managed instruction state"
     action = "removed" if existed else "skipped"
+    return ApplyItem(name, destination, action, detail)
+
+
+def _hook_marker(name: str) -> str:
+    return f"[codex-env-sync:{name}]"
+
+
+def _canonical_json(value: object) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"))
+
+
+def _load_hooks_document(path: Path) -> dict:
+    if not path.exists():
+        return {"hooks": {}}
+
+    data = _load_json_object(path)
+    hooks = data.setdefault("hooks", {})
+    if not isinstance(hooks, dict):
+        raise ValueError(f"Expected hooks object in {path}")
+    return data
+
+
+def _ensure_managed_marker(document: dict, name: str) -> dict:
+    marker = _hook_marker(name)
+    managed = deepcopy(document)
+    for groups in managed.get("hooks", {}).values():
+        if not isinstance(groups, list):
+            continue
+        for group in groups:
+            for handler in group.get("hooks", []):
+                if handler.get("type") != "command":
+                    continue
+                command = handler.get("command")
+                if not isinstance(command, str) or marker in command:
+                    continue
+                handler["command"] = f"{command} # {marker}"
+    return managed
+
+
+def _previous_managed_handler_keys(previous_managed_hooks: dict | None) -> set[str]:
+    keys: set[str] = set()
+    if not isinstance(previous_managed_hooks, dict):
+        return keys
+    for groups in previous_managed_hooks.get("hooks", {}).values():
+        if not isinstance(groups, list):
+            continue
+        for group in groups:
+            for handler in group.get("hooks", []):
+                keys.add(_canonical_json(handler))
+    return keys
+
+
+def _handler_is_managed(handler: dict, name: str, previous_keys: set[str]) -> bool:
+    command = handler.get("command")
+    if isinstance(command, str) and _hook_marker(name) in command:
+        return True
+    return _canonical_json(handler) in previous_keys
+
+
+def _strip_managed_hooks(current: dict, name: str, previous_managed_hooks: dict | None) -> dict:
+    stripped = deepcopy(current)
+    previous_keys = _previous_managed_handler_keys(previous_managed_hooks)
+    hooks = stripped.setdefault("hooks", {})
+
+    for event_name in list(hooks):
+        groups = hooks[event_name]
+        if not isinstance(groups, list):
+            continue
+
+        kept_groups = []
+        for group in groups:
+            handlers = group.get("hooks", [])
+            if not isinstance(handlers, list):
+                kept_groups.append(group)
+                continue
+
+            kept_handlers = [
+                handler
+                for handler in handlers
+                if not (isinstance(handler, dict) and _handler_is_managed(handler, name, previous_keys))
+            ]
+            if kept_handlers:
+                next_group = dict(group)
+                next_group["hooks"] = kept_handlers
+                kept_groups.append(next_group)
+
+        if kept_groups:
+            hooks[event_name] = kept_groups
+        else:
+            hooks.pop(event_name)
+
+    return stripped
+
+
+def _merge_managed_hooks(current: dict, managed: dict, name: str, previous_managed_hooks: dict | None) -> dict:
+    merged = _strip_managed_hooks(current, name, previous_managed_hooks)
+    hooks = merged.setdefault("hooks", {})
+    for event_name, groups in managed.get("hooks", {}).items():
+        if not isinstance(groups, list) or not groups:
+            continue
+        hooks.setdefault(event_name, []).extend(deepcopy(groups))
+    return merged
+
+
+def _hooks_text(document: dict) -> str:
+    return json.dumps(document, indent=2, sort_keys=False) + "\n"
+
+
+def _remove_managed_hook(name: str, state: dict) -> ApplyItem:
+    previous = state["hooks"].get(name, {})
+    destination = Path(previous["target"]) if previous.get("target") else Path(name)
+    previous_managed_hooks = previous.get("managed_hooks")
+
+    if not destination.exists():
+        state["hooks"].pop(name, None)
+        return ApplyItem(name, destination, "skipped", "cleared stale managed hook state")
+
+    current = _load_hooks_document(destination)
+    desired = _strip_managed_hooks(current, name, previous_managed_hooks)
+    action = "skipped"
+    detail = "cleared stale managed hook state"
+    if _canonical_json(current) != _canonical_json(desired):
+        destination.write_text(_hooks_text(desired), encoding="utf-8")
+        action = "removed"
+        detail = "removed stale managed hook entries"
+
+    state["hooks"].pop(name, None)
     return ApplyItem(name, destination, action, detail)
 
 
@@ -422,6 +566,46 @@ def _apply_instruction(
     raise ValueError(f"Unsupported instruction install mode for v1: {mode}")
 
 
+def _apply_hook(
+    hook: HookSpec,
+    repo_root: Path,
+    paths: ManagedPaths,
+    state: dict,
+) -> ApplyItem:
+    source = repo_root / hook.source
+    destination = resolve_target_path(paths.home, hook.target)
+    if paths.os_name == "windows":
+        state["hooks"].pop(hook.name, None)
+        return ApplyItem(hook.name, destination, "skipped", "hooks are disabled on windows")
+
+    desired_hash = hash_path(source)
+    previous = state["hooks"].get(hook.name, {})
+    source_document = _load_hooks_document(source)
+    managed_hooks = _ensure_managed_marker(source_document, hook.name)
+    current_document = _load_hooks_document(destination)
+    desired_document = _merge_managed_hooks(
+        current_document,
+        managed_hooks,
+        hook.name,
+        previous.get("managed_hooks"),
+    )
+
+    current_text = destination.read_text(encoding="utf-8") if destination.exists() else ""
+    desired_text = _hooks_text(desired_document)
+    if (
+        current_text == desired_text
+        and previous.get("hash") == desired_hash
+        and previous.get("target") == str(destination)
+    ):
+        state["hooks"][hook.name] = _hook_state(source, destination, desired_hash, managed_hooks)
+        return ApplyItem(hook.name, destination, "skipped", "managed hook entries unchanged")
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(desired_text, encoding="utf-8")
+    state["hooks"][hook.name] = _hook_state(source, destination, desired_hash, managed_hooks)
+    return ApplyItem(hook.name, destination, "applied", "merged managed hook entries")
+
+
 def _managed_marketplace_entry(plugin_name: str, category: str) -> dict:
     return {
         "name": plugin_name,
@@ -504,6 +688,11 @@ def apply_environment(repo_root: str | Path, home: str | Path | None = None, os_
     for instruction_name in sorted(stale_instruction_names):
         report.instructions.append(_remove_managed_instruction(instruction_name, state))
 
+    current_hook_names = {hook.name for hook in manifest.hooks}
+    stale_hook_names = set(state["hooks"]) - current_hook_names
+    for hook_name in sorted(stale_hook_names):
+        report.hooks.append(_remove_managed_hook(hook_name, state))
+
     for plugin in manifest.plugins:
         report.plugins.append(_apply_plugin(plugin, repo_path, paths, manifest, state))
         skill_item = _apply_plugin_skills(plugin, paths, state)
@@ -514,6 +703,9 @@ def apply_environment(repo_root: str | Path, home: str | Path | None = None, os_
 
     for instruction in manifest.instructions:
         report.instructions.append(_apply_instruction(instruction, repo_path, paths, manifest, state))
+
+    for hook in manifest.hooks:
+        report.hooks.append(_apply_hook(hook, repo_path, paths, state))
 
     state["last_apply"] = int(time.time())
     save_state(paths.state_path, state)

@@ -14,14 +14,16 @@ def write_fixture_repo(
     root: Path,
     plugin_install_mode: str = "copy",
     instruction_install_mode: str = "copy",
+    include_hooks: bool = False,
 ) -> None:
     (root / "plugins" / "jy-env-core" / ".codex-plugin").mkdir(parents=True, exist_ok=True)
     (root / "plugins" / "jy-env-core" / "skills" / "jy-env-sync-admin").mkdir(parents=True, exist_ok=True)
     (root / "instructions").mkdir(parents=True, exist_ok=True)
+    if include_hooks:
+        (root / "hooks").mkdir(parents=True, exist_ok=True)
 
-    (root / "codex-env.toml").write_text(
-        textwrap.dedent(
-            """
+    manifest_text = textwrap.dedent(
+        """
             schema_version = 1
             name = "fixture"
 
@@ -36,7 +38,20 @@ def write_fixture_repo(
             target = ".codex/AGENTS.md"
             install_mode = "{instruction_install_mode}"
             """
-        ).format(
+    )
+    if include_hooks:
+        manifest_text += textwrap.dedent(
+            """
+
+            [[hooks]]
+            name = "necessity-gate"
+            source = "hooks/necessity-gate.json"
+            target = ".codex/hooks.json"
+            """
+        )
+
+    (root / "codex-env.toml").write_text(
+        manifest_text.format(
             plugin_install_mode=plugin_install_mode,
             instruction_install_mode=instruction_install_mode,
         ).strip()
@@ -65,6 +80,40 @@ def write_fixture_repo(
     )
     (root / "plugins" / "jy-env-core" / "payload.txt").write_text("fixture\n", encoding="utf-8")
     (root / "instructions" / "AGENTS.md").write_text("# fixture\n", encoding="utf-8")
+    if include_hooks:
+        (root / "hooks" / "necessity-gate.json").write_text(
+            json.dumps(
+                {
+                    "hooks": {
+                        "UserPromptSubmit": [
+                            {
+                                "hooks": [
+                                    {
+                                        "type": "command",
+                                        "command": "python3 ~/plugins/jy-env-core/hooks/necessity_gate.py user-prompt-submit",
+                                        "statusMessage": "Checking necessity gate",
+                                    }
+                                ]
+                            }
+                        ],
+                        "Stop": [
+                            {
+                                "hooks": [
+                                    {
+                                        "type": "command",
+                                        "command": "python3 ~/plugins/jy-env-core/hooks/necessity_gate.py stop",
+                                        "statusMessage": "Checking final response scope",
+                                    }
+                                ]
+                            }
+                        ],
+                    }
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
 
 
 def supports_symlinks() -> bool:
@@ -264,6 +313,107 @@ class ApplyEnvironmentTests(unittest.TestCase):
             self.assertEqual(report.instructions[0].action, "applied")
             self.assertEqual(installed_payload.read_text(encoding="utf-8"), "fixture\n")
             self.assertEqual(installed_agents.read_text(encoding="utf-8"), "# fixture\n")
+
+    def test_apply_merges_managed_hooks_without_replacing_user_hooks(self) -> None:
+        with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
+            repo_root = Path(repo_dir)
+            home_root = Path(home_dir)
+            write_fixture_repo(repo_root, include_hooks=True)
+
+            hooks_path = home_root / ".codex" / "hooks.json"
+            hooks_path.parent.mkdir(parents=True, exist_ok=True)
+            hooks_path.write_text(
+                json.dumps(
+                    {
+                        "hooks": {
+                            "UserPromptSubmit": [
+                                {
+                                    "hooks": [
+                                        {
+                                            "type": "command",
+                                            "command": "printf user-hook",
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            report = apply_environment(repo_root, home=home_root, os_name="linux")
+
+            data = json.loads(hooks_path.read_text(encoding="utf-8"))
+            user_prompt_commands = [
+                hook["command"]
+                for group in data["hooks"]["UserPromptSubmit"]
+                for hook in group["hooks"]
+                if hook["type"] == "command"
+            ]
+            stop_commands = [
+                hook["command"]
+                for group in data["hooks"]["Stop"]
+                for hook in group["hooks"]
+                if hook["type"] == "command"
+            ]
+
+            self.assertEqual(report.hooks[0].action, "applied")
+            self.assertIn("printf user-hook", user_prompt_commands)
+            self.assertTrue(any("[codex-env-sync:necessity-gate]" in command for command in user_prompt_commands))
+            self.assertTrue(any("[codex-env-sync:necessity-gate]" in command for command in stop_commands))
+
+            second_report = apply_environment(repo_root, home=home_root, os_name="linux")
+            self.assertEqual(second_report.hooks[0].action, "skipped")
+
+    def test_apply_removes_managed_hooks_when_manifest_entry_is_removed(self) -> None:
+        with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
+            repo_root = Path(repo_dir)
+            home_root = Path(home_dir)
+            write_fixture_repo(repo_root, include_hooks=True)
+
+            hooks_path = home_root / ".codex" / "hooks.json"
+            hooks_path.parent.mkdir(parents=True, exist_ok=True)
+            hooks_path.write_text(
+                json.dumps(
+                    {
+                        "hooks": {
+                            "Stop": [
+                                {
+                                    "hooks": [
+                                        {
+                                            "type": "command",
+                                            "command": "printf user-stop-hook",
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            apply_environment(repo_root, home=home_root, os_name="linux")
+            write_fixture_repo(repo_root, include_hooks=False)
+
+            report = apply_environment(repo_root, home=home_root, os_name="linux")
+
+            data = json.loads(hooks_path.read_text(encoding="utf-8"))
+            commands = [
+                hook["command"]
+                for groups in data["hooks"].values()
+                for group in groups
+                for hook in group["hooks"]
+                if hook["type"] == "command"
+            ]
+            self.assertEqual(report.hooks[0].action, "removed")
+            self.assertIn("printf user-stop-hook", commands)
+            self.assertFalse(any("[codex-env-sync:necessity-gate]" in command for command in commands))
 
     def test_apply_removes_entries_no_longer_present_in_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:

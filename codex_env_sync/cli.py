@@ -51,6 +51,10 @@ def _render_report(report: ApplyReport) -> str:
     for item in report.instructions:
         lines.append(f"  - {item.name}: {item.action} ({item.detail}) -> {item.destination}")
 
+    lines.append("hooks:")
+    for item in report.hooks:
+        lines.append(f"  - {item.name}: {item.action} ({item.detail}) -> {item.destination}")
+
     lines.append("next_step: start a fresh Codex session to pick up plugin and instruction changes")
     return "\n".join(lines)
 
@@ -91,6 +95,9 @@ def command_inspect(args: argparse.Namespace) -> int:
             f"  - {instruction.name}: {instruction.source} -> {instruction.target} "
             f"({manifest.instruction_mode_for(paths.os_name, instruction)})"
         )
+    lines.append("hooks:")
+    for hook in manifest.hooks:
+        lines.append(f"  - {hook.name}: {hook.source} -> {hook.target}")
     print("\n".join(lines))
     return 0
 

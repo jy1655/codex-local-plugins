@@ -32,6 +32,7 @@ class RepoBundleTests(unittest.TestCase):
         text = agents_path.read_text(encoding="utf-8")
 
         self.assertIn("~/.agents/skills/", text)
+        self.assertIn("~/.codex/hooks.json", text)
         self.assertIn("source-owned install surface", text)
 
     def test_global_agents_instructions_include_user_language_response_rule(self) -> None:
@@ -85,6 +86,17 @@ class RepoBundleTests(unittest.TestCase):
         server = data["mcpServers"]["korean-law"]
         self.assertEqual(server["command"], "npx")
         self.assertEqual(server["args"], ["-y", "korean-law-mcp"])
+
+    def test_repo_includes_necessity_gate_hook_bundle(self) -> None:
+        repo_root = Path(__file__).resolve().parents[1]
+        manifest_text = (repo_root / "codex-env.toml").read_text(encoding="utf-8")
+        hook_source = json.loads((repo_root / "hooks" / "necessity-gate.json").read_text(encoding="utf-8"))
+
+        self.assertIn("[[hooks]]", manifest_text)
+        self.assertIn("necessity-gate", manifest_text)
+        self.assertTrue((repo_root / "plugins" / "jy-env-core" / "hooks" / "necessity_gate.py").exists())
+        self.assertIn("UserPromptSubmit", hook_source["hooks"])
+        self.assertIn("Stop", hook_source["hooks"])
 
     def test_codex_env_core_bundle_includes_writing_skills(self) -> None:
         skill_root = Path(__file__).resolve().parents[1] / "plugins" / "jy-env-core" / "skills" / "jy-writing-skills"

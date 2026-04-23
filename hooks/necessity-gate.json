@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/plugins/jy-env-core/hooks/necessity_gate.py\" user-prompt-submit",
+            "statusMessage": "Checking necessity gate"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/plugins/jy-env-core/hooks/necessity_gate.py\" stop",
+            "statusMessage": "Checking final response scope",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
