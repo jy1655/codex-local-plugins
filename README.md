@@ -11,6 +11,7 @@ Codex behave the same way everywhere:
 - first-party local plugin bundles
 - plugin marketplace entries
 - generated global instruction artifacts
+- managed Codex hook entries
 - first-party Codex skills authored directly inside the installed plugin bundle
 
 The install surface is intentionally small:
@@ -19,6 +20,7 @@ The install surface is intentionally small:
 - skill discovery links are installed into `~/.agents/skills/`
 - marketplace is written to `~/.agents/plugins/marketplace.json`
 - instructions are installed into `~/.codex/...`
+- managed hook entries are merged into `~/.codex/hooks.json`
 - Codex runtime cache under `~/.codex/plugins/cache` is left alone
 
 The current manifest uses symlinks on macOS and Linux so a later `git pull` updates the
@@ -37,6 +39,10 @@ the source of truth for both local development and the installed Codex skill sur
 The current first-party workflow pack covers planning, plan authoring, isolated worktree
 setup, debugging, test-first implementation, plan execution, review feedback handling,
 waterfall-style project records, shipping, and verification disciplines.
+
+Managed hooks live under `hooks/` and are merged into `~/.codex/hooks.json` by `apply`.
+The merge preserves user-owned hook entries and removes only repo-managed entries marked
+with `codex-env-sync`.
 
 ## First-Party Skill Catalog
 
@@ -155,10 +161,12 @@ installed Codex surface immediately.
 ## Layout
 
 ```text
-codex-env.toml                 # Minimal manifest: plugins + instructions + platform overrides
+codex-env.toml                 # Minimal manifest: plugins + instructions + hooks + platform overrides
 codex_env_sync/                # Apply engine and CLI
 plugins/                       # First-party plugin bundles that get installed into ~/plugins
 plugins/jy-env-core/skills/ # First-party Codex skills, authoring source and install source
+plugins/jy-env-core/hooks/  # First-party hook scripts installed with the plugin bundle
+hooks/                         # Repo-owned hook definitions merged into ~/.codex/hooks.json
 instructions/                  # Generated instruction artifacts
 references/                    # Local authoring references used while building first-party skills
 .codex/checkpoints/            # Repo-local ignored checkpoint notes created by jy-checkpoint
@@ -176,6 +184,7 @@ skill-tests/                   # First-party skill verification packs (baseline 
 - Raw seed sources normally stay local and are not committed here.
 - Curated authoring references that we actively use to build first-party skills may be vendored under `references/`.
 - First-party Codex skills are authored directly in `plugins/jy-env-core/skills/`.
+- Repo-managed hook behavior is authored in `hooks/` plus `plugins/jy-env-core/hooks/`; do not edit generated `~/.codex/hooks.json` entries directly.
 - This repo does not keep vendored upstream runtimes as part of the maintained execution surface.
 - Repo-local checkpoint notes belong under `.codex/checkpoints/` and stay gitignored.
 - What gets committed here is the first-party result after customization.

@@ -28,6 +28,11 @@ class ManifestTests(unittest.TestCase):
                     source = "instructions/AGENTS.md"
                     target = ".codex/AGENTS.md"
 
+                    [[hooks]]
+                    name = "necessity-gate"
+                    source = "hooks/necessity-gate.json"
+                    target = ".codex/hooks.json"
+
                     [platform_overrides.windows]
                     plugin_install_mode = "copy"
                     """
@@ -43,6 +48,9 @@ class ManifestTests(unittest.TestCase):
         self.assertEqual(len(manifest.plugins), 1)
         self.assertEqual(manifest.plugins[0].name, "core")
         self.assertEqual(manifest.instructions[0].target, ".codex/AGENTS.md")
+        self.assertEqual(len(manifest.hooks), 1)
+        self.assertEqual(manifest.hooks[0].name, "necessity-gate")
+        self.assertEqual(manifest.hooks[0].target, ".codex/hooks.json")
         self.assertEqual(manifest.plugin_mode_for("windows", manifest.plugins[0]), "copy")
 
 

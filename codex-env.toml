@@ -12,6 +12,11 @@ source = "instructions/AGENTS.md"
 target = ".codex/AGENTS.md"
 install_mode = "symlink"
 
+[[hooks]]
+name = "necessity-gate"
+source = "hooks/necessity-gate.json"
+target = ".codex/hooks.json"
+
 [platform_overrides.windows]
 plugin_install_mode = "copy"
 instruction_install_mode = "copy"
