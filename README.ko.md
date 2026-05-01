@@ -144,13 +144,13 @@ Windows PowerShell:
 이 repo가 정의하는 환경을 점검하려면:
 
 ```bash
-python3 -m codex_env_sync.cli inspect --repo-root .
+python -m codex_env_sync.cli inspect --repo-root .
 ```
 
 현재 checkout을 홈 디렉터리에 적용하려면:
 
 ```bash
-python3 -m codex_env_sync.cli apply --repo-root .
+python -m codex_env_sync.cli apply --repo-root .
 ```
 
 macOS와 Linux에서는 이 명령이 repo-managed plugin bundle, skill discovery surface,
