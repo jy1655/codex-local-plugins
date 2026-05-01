@@ -300,6 +300,32 @@ def _ensure_managed_marker(document: dict, name: str) -> dict:
     return managed
 
 
+def _windows_hook_command(command: str) -> str:
+    body, separator, marker = command.partition(" # ")
+    if body.startswith("python3 "):
+        body = f"python {body[len('python3 '):]}"
+    return f"{body}{separator}{marker}"
+
+
+def _prepare_managed_hooks_for_platform(document: dict, name: str, os_name: str) -> dict:
+    managed = _ensure_managed_marker(document, name)
+    if os_name != "windows":
+        return managed
+
+    windows_managed = deepcopy(managed)
+    for groups in windows_managed.get("hooks", {}).values():
+        if not isinstance(groups, list):
+            continue
+        for group in groups:
+            for handler in group.get("hooks", []):
+                if handler.get("type") != "command":
+                    continue
+                command = handler.get("command")
+                if isinstance(command, str):
+                    handler["command"] = _windows_hook_command(command)
+    return windows_managed
+
+
 def _previous_managed_handler_keys(previous_managed_hooks: dict | None) -> set[str]:
     keys: set[str] = set()
     if not isinstance(previous_managed_hooks, dict):
@@ -574,14 +600,11 @@ def _apply_hook(
 ) -> ApplyItem:
     source = repo_root / hook.source
     destination = resolve_target_path(paths.home, hook.target)
-    if paths.os_name == "windows":
-        state["hooks"].pop(hook.name, None)
-        return ApplyItem(hook.name, destination, "skipped", "hooks are disabled on windows")
 
     desired_hash = hash_path(source)
     previous = state["hooks"].get(hook.name, {})
     source_document = _load_hooks_document(source)
-    managed_hooks = _ensure_managed_marker(source_document, hook.name)
+    managed_hooks = _prepare_managed_hooks_for_platform(source_document, hook.name, paths.os_name)
     current_document = _load_hooks_document(destination)
     desired_document = _merge_managed_hooks(
         current_document,

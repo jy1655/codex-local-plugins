@@ -145,13 +145,13 @@ Windows PowerShell:
 Inspect the environment defined by this repo:
 
 ```bash
-python3 -m codex_env_sync.cli inspect --repo-root .
+python -m codex_env_sync.cli inspect --repo-root .
 ```
 
 Apply the local checkout into your home directory:
 
 ```bash
-python3 -m codex_env_sync.cli apply --repo-root .
+python -m codex_env_sync.cli apply --repo-root .
 ```
 
 On macOS and Linux, that creates symlinks for the repo-managed plugin bundle, skill

@@ -368,6 +368,33 @@ class ApplyEnvironmentTests(unittest.TestCase):
             second_report = apply_environment(repo_root, home=home_root, os_name="linux")
             self.assertEqual(second_report.hooks[0].action, "skipped")
 
+    def test_apply_merges_managed_hooks_on_windows_with_windows_python_command(self) -> None:
+        with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
+            repo_root = Path(repo_dir)
+            home_root = Path(home_dir)
+            write_fixture_repo(repo_root, include_hooks=True)
+
+            report = apply_environment(repo_root, home=home_root, os_name="windows")
+
+            hooks_path = home_root / ".codex" / "hooks.json"
+            data = json.loads(hooks_path.read_text(encoding="utf-8"))
+            commands = [
+                hook["command"]
+                for groups in data["hooks"].values()
+                for group in groups
+                for hook in group["hooks"]
+                if hook["type"] == "command"
+            ]
+
+            self.assertEqual(report.hooks[0].action, "applied")
+            self.assertTrue(commands)
+            self.assertTrue(all(command.startswith("python ") for command in commands))
+            self.assertFalse(any(command.startswith("python3 ") for command in commands))
+            self.assertTrue(all("[codex-env-sync:necessity-gate]" in command for command in commands))
+
+            second_report = apply_environment(repo_root, home=home_root, os_name="windows")
+            self.assertEqual(second_report.hooks[0].action, "skipped")
+
     def test_apply_removes_managed_hooks_when_manifest_entry_is_removed(self) -> None:
         with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
             repo_root = Path(repo_dir)
