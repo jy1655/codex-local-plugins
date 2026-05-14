@@ -36,9 +36,10 @@ first-party `jy-checkpoint` skill이 사용합니다.
 
 first-party skill authoring은 `plugins/jy-env-core/skills/`에서 이뤄집니다. 이 디렉터리는
 로컬 개발과 설치된 Codex skill 표면 모두의 source of truth입니다.
-현재 first-party workflow pack은 planning, 구현 계획 작성, isolated worktree 준비,
-debugging, test-first implementation, plan execution, review feedback handling,
-waterfall-style project record, shipping, verification discipline을 다룹니다.
+현재 first-party workflow pack은 planning, decision interview, 구현 계획 작성,
+isolated worktree 준비, debugging, test-first implementation, change-scope
+guardrail, plan execution, review feedback handling, waterfall-style project
+record, shipping, verification discipline을 다룹니다.
 
 관리되는 hook은 `hooks/` 아래에 두고, `apply`가 `~/.codex/hooks.json`에 병합합니다.
 병합은 사용자가 직접 둔 hook entry를 보존하고, `codex-env-sync` marker가 붙은
@@ -51,8 +52,9 @@ repo-managed entry만 추가·제거합니다.
 
 ### Planning
 
-- `jy-autoplan`은 현재 요청에 맞는 planning 경로를 고르고, 사용자가 먼저 선택하지 않아도 `jy-framing`, `jy-plan-review`, `jy-writing-plans`, `jy-executing-plans`로 라우팅합니다.
+- `jy-autoplan`은 현재 요청에 맞는 planning 경로를 고르고, 사용자가 먼저 선택하지 않아도 `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans`, `jy-executing-plans`로 라우팅합니다.
 - `jy-framing`는 모호한 feature 또는 product idea를 더 선명한 problem brief, 제약 조건 목록, 다음 planning step으로 정리합니다.
+- `jy-grill-me`는 구현 전에 plan 또는 feature direction을 한 번에 하나의 질문으로 압박 검토하는 decision interview를 진행합니다.
 - `jy-plan-review`는 이미 있는 plan 또는 outline을 받아 구현 전에 decision gap을 닫습니다.
 - `jy-writing-plans`는 승인된 요구사항을 `docs/superpowers/plans/` 아래의 decision-complete implementation plan으로 바꿉니다.
 - `jy-worktrees`는 `.worktrees/`를 기본값으로 삼아 안전한 isolated feature workspace를 준비합니다.
@@ -62,6 +64,7 @@ repo-managed entry만 추가·제거합니다.
 
 - `jy-executing-plans`는 이미 작성된 plan을 현재 세션에서 task-by-task로 실행하고 TDD, verification, review gate를 함께 유지합니다.
 - `jy-debugging`은 버그를 patch하기 전에 reproduction, hypothesis test, root-cause verification을 강제합니다.
+- `jy-change-guardrails`는 non-trivial code change에서 assumption을 드러내고, smallest valid change를 강제하며, unrelated cleanup으로 diff가 번지는 일을 막습니다.
 - `jy-test-driven`는 failing test first를 강제하고 구현을 red-green-refactor loop 안에 묶습니다.
 - `jy-verification-before-completion`은 fresh verification command와 결과가 없으면 success claim을 막습니다.
 - `jy-review-work`는 handoff 또는 merge 전에 완료된 구현을 multi-angle review 방식으로 검토합니다.

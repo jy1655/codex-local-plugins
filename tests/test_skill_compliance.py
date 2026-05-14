@@ -51,6 +51,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-framing",
             "jy-plan-review",
             "jy-autoplan",
+            "jy-grill-me",
             "jy-writing-plans",
             "jy-worktrees",
             "jy-checkpoint",
@@ -79,11 +80,13 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-autoplan" / "SKILL.md")
         self.assertIn("## Routing Matrix", text)
         self.assertIn("Idea-stage", text)
+        self.assertIn("Decision-interview-stage", text)
         self.assertIn("Plan-stage", text)
         self.assertIn("Task-plan-stage", text)
         self.assertIn("Execution-stage", text)
         self.assertIn("Execution-ready", text)
         self.assertIn("planning pack not applicable", text)
+        self.assertIn("jy-grill-me", text)
         self.assertIn("jy-writing-plans", text)
         self.assertIn("jy-executing-plans", text)
 
@@ -118,6 +121,29 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("minimal fix", text)
         self.assertIn("shotgun", text)
         self.assertIn("## Debug Loop", text)
+
+    def test_change_guardrails_documents_assumptions_scope_and_verification(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-change-guardrails" / "SKILL.md")
+        self.assertIn("assumptions", text)
+        self.assertIn("interpretations", text)
+        self.assertIn("smallest valid change", text)
+        self.assertIn("edit boundary", text)
+        self.assertIn("## Mode-Aware Behavior", text)
+        self.assertIn("Shift+Tab", text)
+        self.assertIn("jy-test-driven", text)
+        self.assertIn("jy-debugging", text)
+        self.assertIn("jy-verification-before-completion", text)
+
+    def test_grill_me_documents_one_question_decision_interview(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-grill-me" / "SKILL.md")
+        self.assertIn("one question", text)
+        self.assertIn("recommended answer", text)
+        self.assertIn("shared understanding", text)
+        self.assertIn("codebase", text)
+        self.assertIn("jy-codebase-explore", text)
+        self.assertIn("Do not modify code", text)
+        self.assertIn("## Mode-Aware Behavior", text)
+        self.assertIn("Shift+Tab", text)
 
     def test_test_driven_development_documents_red_green_refactor(self) -> None:
         text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-test-driven" / "SKILL.md")
@@ -197,6 +223,18 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("unclear", text)
         self.assertIn("## Mode-Aware Behavior", text)
 
+    def test_review_work_respects_subagent_permission_boundary(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-review-work" / "SKILL.md")
+        agent_text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-review-work" / "agents" / "openai.yaml")
+        scenario_text = read_text(REPO_ROOT / "skill-tests" / "first-party" / "jy-review-work" / "pressure-scenarios.json")
+
+        self.assertIn("Do not auto-spawn subagents", text)
+        self.assertIn("five review lenses", text)
+        self.assertIn("explicitly asks for sub-agents", text)
+        self.assertIn("does not auto-spawn subagents", scenario_text)
+        self.assertNotIn("5-agent", agent_text)
+        self.assertNotIn("run_in_background", scenario_text)
+
     def test_writing_skills_documents_english_first_authoring_policy(self) -> None:
         text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-writing-skills" / "SKILL.md")
         self.assertIn("English-first", text)
@@ -259,6 +297,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         """Advisory skills should state they do not modify code."""
         advisory_skills = [
             "jy-consult",
+            "jy-grill-me",
         ]
         for skill_name in advisory_skills:
             skill_path = FIRST_PARTY_SKILL_ROOT / skill_name / "SKILL.md"

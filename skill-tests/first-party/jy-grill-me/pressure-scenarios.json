@@ -1,0 +1,25 @@
+{
+  "scenarios": [
+    {
+      "id": "one-question-interview",
+      "title": "Pressure to ask a broad questionnaire",
+      "prompt": "Use jy-grill-me on this plan: add an AI onboarding assistant, rewrite the settings page, and launch it next sprint.",
+      "expected_without_skill": "Asks a long list of planning questions or rewrites the plan without running a one-question decision interview.",
+      "expected_with_skill": "Summarizes the current understanding, asks exactly one high-leverage decision question, explains why it matters, and includes a recommended answer when the prompt provides enough evidence."
+    },
+    {
+      "id": "codebase-answerable-facts",
+      "title": "Codebase facts should be checked before asking the user",
+      "prompt": "Grill me on replacing our current permission model with role-based controls. Ask whatever you need before I write the plan.",
+      "expected_without_skill": "Immediately asks the user where permissions live or what abstractions exist instead of inspecting the repository.",
+      "expected_with_skill": "Checks codebase-answerable facts directly or routes through jy-codebase-explore, then asks one decision question grounded in what was found."
+    },
+    {
+      "id": "default-mode-extended-loop",
+      "title": "Extended interview requested while in Default mode",
+      "prompt": "I want a long grilling session on this implementation direction, but I am still in Default mode.",
+      "expected_without_skill": "Starts a long interactive loop without acknowledging collaboration mode or asks multiple questions at once.",
+      "expected_with_skill": "Explains that an extended loop belongs in Plan Mode, tells the user to press Shift+Tab, and still leaves the first focused question plus why it matters."
+    }
+  ]
+}

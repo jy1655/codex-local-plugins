@@ -68,6 +68,7 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
             "jy-framing",
             "jy-plan-review",
             "jy-autoplan",
+            "jy-grill-me",
             "jy-writing-plans",
             "jy-worktrees",
             "jy-checkpoint",

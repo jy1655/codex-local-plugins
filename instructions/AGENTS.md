@@ -30,6 +30,7 @@ This machine is managed by the portable Codex environment sync repo.
 
 - If the user is still shaping a feature, product direction, or scope, prefer `jy-autoplan` first.
 - If the user clearly needs idea narrowing or a product brief, prefer `jy-framing`.
+- If the user asks to be grilled, pressure-test a plan, or stress-test decisions one question at a time, prefer `jy-grill-me`.
 - If the user already has a plan and wants decision gaps closed before implementation, prefer `jy-plan-review`.
 - If the user has approved requirements and now needs a detailed implementation plan, prefer `jy-writing-plans`.
 - If the user wants an isolated feature branch or worktree before implementation, prefer `jy-worktrees`.

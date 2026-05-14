@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Grill Me"
+  short_description: "Pressure-test a plan through a one-question decision interview"
+  default_prompt: "Use $jy-grill-me to challenge the current plan one decision at a time."
