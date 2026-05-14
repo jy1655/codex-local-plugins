@@ -57,6 +57,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-checkpoint",
             "jy-document-release",
             "jy-intent-gate",
+            "jy-review-all",
             "jy-review-work",
             "jy-loop",
             "jy-debugging",
@@ -231,9 +232,36 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("Do not auto-spawn subagents", text)
         self.assertIn("five review lenses", text)
         self.assertIn("explicitly asks for sub-agents", text)
+        self.assertIn("Do not push", text)
+        self.assertIn("jy-ship", text)
+        self.assertIn("jy-review-all", text)
         self.assertIn("does not auto-spawn subagents", scenario_text)
         self.assertNotIn("5-agent", agent_text)
         self.assertNotIn("run_in_background", scenario_text)
+
+    def test_review_all_documents_whole_project_audit_boundaries(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-review-all" / "SKILL.md")
+        self.assertIn("whole-project audit", text)
+        self.assertIn("architecture", text)
+        self.assertIn("module depth", text)
+        self.assertIn("testability", text)
+        self.assertIn("documentation gaps", text)
+        self.assertIn("maintainability", text)
+        self.assertIn("evidence", text)
+        self.assertIn("prioritized", text)
+        self.assertIn("Do not modify code", text)
+        self.assertIn("Do not create", text)
+        self.assertIn("jy-codebase-explore", text)
+        self.assertIn("jy-review-work", text)
+        self.assertIn("jy-grill-me", text)
+
+    def test_ship_documents_review_work_as_gate_not_duplicate_scope(self) -> None:
+        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-ship" / "SKILL.md")
+        self.assertIn("review gate", text)
+        self.assertIn("non-trivial implementation changes", text)
+        self.assertIn("docs-only", text)
+        self.assertIn("already-reviewed", text)
+        self.assertIn("jy-review-all", text)
 
     def test_writing_skills_documents_english_first_authoring_policy(self) -> None:
         text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-writing-skills" / "SKILL.md")
@@ -298,6 +326,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         advisory_skills = [
             "jy-consult",
             "jy-grill-me",
+            "jy-review-all",
         ]
         for skill_name in advisory_skills:
             skill_path = FIRST_PARTY_SKILL_ROOT / skill_name / "SKILL.md"

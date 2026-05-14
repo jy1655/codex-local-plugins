@@ -65,6 +65,7 @@ This machine is managed by the portable Codex environment sync repo.
 ## Advisory and Research Skill Routing
 
 - If the user faces architecture decisions, repeated failures, or security/performance concerns, prefer `jy-consult`.
+- If the user wants a whole-project audit, full repo review, architecture health check, or maintainability scan, prefer `jy-review-all`.
 - If the user needs Korean law, ordinance, precedent, annex, amendment history, or procedure search through the installed `korean-law` MCP server, prefer `jy-korean-law-search`.
 - If the user needs evidence-based answers about external libraries or packages, prefer `jy-library-research`.
 - If the user needs multi-angle codebase exploration across modules, prefer `jy-codebase-explore`.

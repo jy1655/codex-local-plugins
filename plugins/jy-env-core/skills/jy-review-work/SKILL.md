@@ -25,6 +25,9 @@ in Default mode, and the skill cannot switch Plan Mode by itself.
 
 Do not use it when the change is tiny, config-only, or docs-only.
 
+Do not use it for a whole-project audit; use `jy-review-all`. Do not push, create PRs, or
+perform release closeout; if review passes and the user wants to ship, hand off to `jy-ship`.
+
 ## Quick Reference
 
 | Step | Action |
@@ -111,6 +114,8 @@ If any single reviewer fails, the overall result is FAIL. List the concrete foll
 - Treating one code-review pass as enough when QA, security, goal, and context checks are still missing
 - Failing to include enough file context for read-only lenses
 - Overusing the workflow for tiny changes
+- Using it for a whole-project audit instead of `jy-review-all`
 - Treating "mostly passed" as success when one reviewer failed
+- Pushing, creating PRs, or performing release closeout instead of handing off to `jy-ship`
 - Skipping context gathering before review execution
 - Auto-spawning subagents when the user did not explicitly ask for delegated agent work

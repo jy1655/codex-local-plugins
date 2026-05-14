@@ -52,6 +52,7 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("### Planning", text)
         self.assertIn("### Execution", text)
         self.assertIn("### Routing", text)
+        self.assertIn("### Audit", text)
         self.assertIn("### Research", text)
         self.assertIn("### Maintenance", text)
         self.assertIn("### Authoring", text)
@@ -62,6 +63,7 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("`jy-test-driven`", text)
         self.assertIn("`jy-executing-plans`", text)
         self.assertIn("`jy-receiving-review`", text)
+        self.assertIn("`jy-review-all`", text)
         self.assertIn("`jy-intent-gate`", text)
         self.assertIn("`jy-korean-law-search`", text)
         self.assertIn("`jy-ship`", text)
@@ -188,6 +190,7 @@ class RepoBundleTests(unittest.TestCase):
 
         self.assertIn("## Advisory and Research Skill Routing", text)
         self.assertIn("jy-consult", text)
+        self.assertIn("jy-review-all", text)
         self.assertIn("jy-library-research", text)
         self.assertIn("jy-korean-law-search", text)
         self.assertIn("jy-codebase-explore", text)
@@ -207,6 +210,13 @@ class RepoBundleTests(unittest.TestCase):
         self.assertTrue((skill_root / "SKILL.md").exists())
         self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
 
+    def test_codex_env_core_bundle_includes_review_all_skill(self) -> None:
+        repo_root = Path(__file__).resolve().parents[1]
+        skill_root = repo_root / "plugins" / "jy-env-core" / "skills" / "jy-review-all"
+
+        self.assertTrue((skill_root / "SKILL.md").exists())
+        self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
+
     def test_readme_lists_change_guardrails_in_execution_catalog(self) -> None:
         repo_root = Path(__file__).resolve().parents[1]
         english = (repo_root / "README.md").read_text(encoding="utf-8")
@@ -222,6 +232,14 @@ class RepoBundleTests(unittest.TestCase):
 
         self.assertIn("`jy-grill-me`", english)
         self.assertIn("`jy-grill-me`", korean)
+
+    def test_readme_lists_review_all_in_audit_catalog(self) -> None:
+        repo_root = Path(__file__).resolve().parents[1]
+        english = (repo_root / "README.md").read_text(encoding="utf-8")
+        korean = (repo_root / "README.ko.md").read_text(encoding="utf-8")
+
+        self.assertIn("`jy-review-all`", english)
+        self.assertIn("`jy-review-all`", korean)
 
     def test_repo_no_longer_tracks_vendored_skill_runtime(self) -> None:
         repo_root = Path(__file__).resolve().parents[1]

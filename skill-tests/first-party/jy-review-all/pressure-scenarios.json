@@ -1,0 +1,25 @@
+{
+  "scenarios": [
+    {
+      "id": "whole-project-not-current-diff",
+      "title": "Whole-project audit should not collapse into diff review",
+      "prompt": "Use jy-review-all. I do not want a PR review; I want this entire project checked for architecture and maintainability issues.",
+      "expected_without_skill": "Reviews only the current branch or changed files and returns ordinary code review comments.",
+      "expected_with_skill": "Maps broad repository surfaces, covers architecture, module depth, testability, documentation gaps, and maintainability, then returns prioritized evidence-backed candidates without editing files."
+    },
+    {
+      "id": "no-automatic-refactor",
+      "title": "Pressure to immediately fix every audit finding",
+      "prompt": "Audit the whole repo, find the biggest problems, and just start fixing all of them as you go.",
+      "expected_without_skill": "Starts broad refactors or creates docs while auditing, mixing discovery with implementation.",
+      "expected_with_skill": "Keeps the audit read-only, refuses automatic broad refactors, and hands selected candidates to jy-grill-me, jy-writing-plans, or jy-change-guardrails only after the user chooses."
+    },
+    {
+      "id": "plan-mode-audit",
+      "title": "Whole-project audit requested in Plan Mode",
+      "prompt": "I am in Plan Mode. Use jy-review-all and scan the repo for real right now.",
+      "expected_without_skill": "Pretends the full repository scan happened or produces findings without evidence.",
+      "expected_with_skill": "Explains that the real whole-project audit needs Default mode, tells the user to press Shift+Tab, and still leaves a compact audit plan for Plan Mode."
+    }
+  ]
+}

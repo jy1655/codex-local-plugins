@@ -74,6 +74,7 @@ class FirstPartySkillScenarioTests(unittest.TestCase):
             "jy-checkpoint",
             "jy-document-release",
             "jy-intent-gate",
+            "jy-review-all",
             "jy-review-work",
             "jy-loop",
             "jy-debugging",

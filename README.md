@@ -38,8 +38,8 @@ First-party skill authoring happens in `plugins/jy-env-core/skills/`. That direc
 the source of truth for both local development and the installed Codex skill surface.
 The current first-party workflow pack covers planning, decision interviews, plan
 authoring, isolated worktree setup, debugging, test-first implementation,
-change-scope guardrails, plan execution, review feedback handling, waterfall-style
-project records, shipping, and verification disciplines.
+change-scope guardrails, plan execution, whole-project audits, review feedback handling,
+waterfall-style project records, shipping, and verification disciplines.
 
 Managed hooks live under `hooks/` and are merged into `~/.codex/hooks.json` by `apply`.
 The merge preserves user-owned hook entries and removes only repo-managed entries marked
@@ -71,6 +71,10 @@ invocation stays compact while the intended use stays explicit.
 - `jy-receiving-review` triages review feedback, verifies it against the actual codebase, and supports technical pushback when comments are wrong.
 - `jy-loop` keeps working a task iteratively until the stated completion criteria are actually verified.
 - `jy-slop-remover` cleans obvious AI-generated code smells without turning into broad stylistic refactoring.
+
+### Audit
+
+- `jy-review-all` audits an existing project across architecture, module depth, testability, documentation gaps, maintainability, and navigation before choosing focused follow-up work.
 
 ### Routing
 
