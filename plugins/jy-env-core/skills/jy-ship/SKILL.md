@@ -52,6 +52,9 @@ Do not use it when:
 ## Review And Verification Gate
 
 - Multi-file implementation should close a review gate through `jy-review-work` first
+- Use `jy-review-work` only as the review gate for non-trivial implementation changes
+- Do not run the full review gate for docs-only, config-only, or already-reviewed changes unless risk justifies it
+- Do not use `jy-review-all` as a ship gate; it is for broad whole-project audits before focused work is selected
 - Completion claims, passing tests, and ship readiness must be backed by fresh verification
   evidence using `jy-verification-before-completion`
 - Do not rely on earlier test memory, an `old CI run`, or an agent success report to justify
@@ -120,6 +123,8 @@ Do not use it when:
 
 - Pushing before confirming the base branch
 - Claiming ship readiness without review or fresh verification
+- Running `jy-review-all` as if it were a release gate
+- Running the full `jy-review-work` gate for docs-only, config-only, or already-reviewed low-risk changes
 - Auto-creating `VERSION` or `CHANGELOG` in a repo that does not use them
 - Using force push to hide process problems
 - Claiming PR/MR creation without a real URL

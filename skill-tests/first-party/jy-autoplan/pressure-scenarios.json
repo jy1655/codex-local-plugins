@@ -15,6 +15,13 @@
       "expected_with_skill": "Detects that a plan already exists, routes to `jy-plan-review`, and returns a single revised-plan oriented outcome."
     },
     {
+      "id": "pressure-test-routes-to-grill-me",
+      "title": "Pressure-test request routes to grill-me",
+      "prompt": "Autoplan this. I have a direction for role-based onboarding, but I want you to grill me one question at a time before we lock the plan.",
+      "expected_without_skill": "Treats the request as a normal plan review and rewrites the plan instead of running a decision interview.",
+      "expected_with_skill": "Detects the decision-interview stage, routes to `jy-grill-me`, and returns the first focused question plus mode-aware guidance when needed."
+    },
+    {
       "id": "default-mode-autoplan-routing",
       "title": "Autoplan should acknowledge mode before interactive planning",
       "prompt": "Autoplan this in Default mode. I want you to choose the right planning path and keep going.",

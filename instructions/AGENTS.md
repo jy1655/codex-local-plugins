@@ -30,6 +30,7 @@ This machine is managed by the portable Codex environment sync repo.
 
 - If the user is still shaping a feature, product direction, or scope, prefer `jy-autoplan` first.
 - If the user clearly needs idea narrowing or a product brief, prefer `jy-framing`.
+- If the user asks to be grilled, pressure-test a plan, or stress-test decisions one question at a time, prefer `jy-grill-me`.
 - If the user already has a plan and wants decision gaps closed before implementation, prefer `jy-plan-review`.
 - If the user has approved requirements and now needs a detailed implementation plan, prefer `jy-writing-plans`.
 - If the user wants an isolated feature branch or worktree before implementation, prefer `jy-worktrees`.
@@ -64,6 +65,7 @@ This machine is managed by the portable Codex environment sync repo.
 ## Advisory and Research Skill Routing
 
 - If the user faces architecture decisions, repeated failures, or security/performance concerns, prefer `jy-consult`.
+- If the user wants a whole-project audit, full repo review, architecture health check, or maintainability scan, prefer `jy-review-all`.
 - If the user needs Korean law, ordinance, precedent, annex, amendment history, or procedure search through the installed `korean-law` MCP server, prefer `jy-korean-law-search`.
 - If the user needs evidence-based answers about external libraries or packages, prefer `jy-library-research`.
 - If the user needs multi-angle codebase exploration across modules, prefer `jy-codebase-explore`.

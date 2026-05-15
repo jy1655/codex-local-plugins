@@ -8,8 +8,8 @@ description: Use when the user wants the Codex planning pack to decide the next 
 ## Overview
 
 Act as the planning-pack orchestrator. Decide whether the current request belongs to brief
-framing, plan review, taskized implementation planning, or written-plan execution, then
-choose the right `jy-*` path automatically.
+framing, decision interviewing, plan review, taskized implementation planning, or written-plan
+execution, then choose the right `jy-*` path automatically.
 
 This skill can select the right planning route, but it cannot switch Codex into Plan Mode
 by itself. If a mode change is needed, tell the user to use `Shift+Tab`.
@@ -30,8 +30,8 @@ Do not use it when:
 | Step | Action |
 |------|--------|
 | 0. Mode check | Detect Default or Plan |
-| 1. Judge maturity | Decide idea / plan / task-plan / execution stage |
-| 2. Pick route | Choose `jy-framing`, `jy-plan-review`, `jy-writing-plans`, or `jy-executing-plans` |
+| 1. Judge maturity | Decide idea / interview / plan / task-plan / execution stage |
+| 2. Pick route | Choose `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans`, or `jy-executing-plans` |
 | 3. Consolidate result | Return one brief, review result, task-plan preview, or execution handoff |
 | 4. Leave next step | Make the next action obvious |
 
@@ -53,7 +53,23 @@ Output:
 
 - compact brief draft or a Plan Mode framing handoff
 
-### 2. Plan-stage
+### 2. Decision-interview-stage
+
+Signals:
+
+- "grill me", "pressure-test this", "stress-test this plan", or "ask hard questions"
+- a plan or direction exists but the user wants one-question-at-a-time challenge
+- the bottleneck is hidden assumptions and shared understanding, not a rewritten plan yet
+
+Route:
+
+- `jy-grill-me`
+
+Output:
+
+- first decision question, recommended answer when possible, or a Plan Mode grill-me handoff
+
+### 3. Plan-stage
 
 Signals:
 
@@ -69,7 +85,7 @@ Output:
 
 - compact review summary or a Plan Mode plan-review handoff
 
-### 3. Task-plan-stage
+### 4. Task-plan-stage
 
 Signals:
 
@@ -85,7 +101,7 @@ Output:
 
 - compact task-plan preview or a Plan Mode writing-plans handoff
 
-### 4. Execution-stage
+### 5. Execution-stage
 
 Signals:
 
@@ -101,7 +117,7 @@ Output:
 
 - compact execution handoff or the Default mode next step
 
-### 5. Execution-ready
+### 6. Execution-ready
 
 Signals:
 
@@ -120,8 +136,9 @@ Output:
 
 ## Routing Rules
 
-- If the user explicitly named `jy-framing`, `jy-plan-review`, `jy-writing-plans`, or `jy-executing-plans`, do not override it
+- If the user explicitly named `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans`, or `jy-executing-plans`, do not override it
 - idea-stage -> `jy-framing`
+- decision-interview-stage -> `jy-grill-me`
 - plan-stage -> `jy-plan-review`
 - task-plan-stage -> `jy-writing-plans`
 - execution-stage -> `jy-executing-plans`
@@ -134,6 +151,7 @@ Output:
 Examples:
 
 - "review the plan" -> plan-stage
+- "grill me on this plan" -> decision-interview-stage
 - "write the implementation plan" -> task-plan-stage
 - "execute this plan" -> execution-stage
 - "review my implementation" -> execution-ready
@@ -151,12 +169,13 @@ Examples:
 ### If current collaboration mode is Default
 
 - Do not stop at classification alone
-- If the request is idea-stage or plan-stage:
+- If the request is idea-stage, decision-interview-stage, or plan-stage:
   - choose the route
   - then say:
     - "This belongs in Plan Mode. Press `Shift+Tab`, switch to Plan Mode, then run `/{skill-name}` again."
 - Still leave the smallest useful result:
   - compact brief draft for idea-stage
+  - first grill-me question for decision-interview-stage
   - compact review summary for plan-stage
 - If the request is task-plan-stage:
   - route to Plan Mode for `/jy-writing-plans`
@@ -172,6 +191,7 @@ Examples:
 ### If current collaboration mode is Plan
 
 - For idea-stage, continue with the `jy-framing` behavior
+- For decision-interview-stage, continue with the `jy-grill-me` behavior
 - For plan-stage, continue with the `jy-plan-review` behavior
 - For task-plan-stage, continue with the `jy-writing-plans` behavior
 - Use `<proposed_plan>` when the downstream skill would do so
@@ -185,7 +205,7 @@ Examples:
 
 1. Check the current collaboration mode
 2. Check whether the user already named a specific planning skill
-3. Classify the request as `idea-stage / plan-stage / task-plan-stage / execution-stage / execution-ready`
+3. Classify the request as `idea-stage / decision-interview-stage / plan-stage / task-plan-stage / execution-stage / execution-ready`
 4. Write a one-line reason
 5. Choose the route or mark `planning pack not applicable`
 6. Produce the mode-appropriate result

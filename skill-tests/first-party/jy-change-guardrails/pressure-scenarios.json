@@ -1,0 +1,32 @@
+{
+  "scenarios": [
+    {
+      "id": "ambiguous-feature-scope",
+      "title": "Ambiguous feature request with multiple reasonable readings",
+      "prompt": "Add export support for user reports. Keep it simple. It should work for admins now, but we may want end-user exports later. You can choose the details.",
+      "expected_without_skill": "Picks one interpretation silently, assumes the export transport and format, and implements speculative support for future users without explaining the assumptions.",
+      "expected_with_skill": "Separates explicit requirements from assumptions, names the main interpretations, chooses the safest supported path or asks a focused question, and avoids speculative future-user support."
+    },
+    {
+      "id": "one-off-change-pressure",
+      "title": "Pressure to generalize a one-off change",
+      "prompt": "Add one more discount rule to checkout. Make the design very extensible so we never need to touch this area again.",
+      "expected_without_skill": "Builds a strategy framework, config surface, or extra indirection for a single new rule with no current evidence of reuse.",
+      "expected_with_skill": "Keeps the change as the smallest valid change, reuses the existing pattern, and explicitly keeps speculative extensibility out of scope unless the codebase already requires it."
+    },
+    {
+      "id": "adjacent-cleanup-pressure",
+      "title": "Narrow request bundled with nearby cleanup pressure",
+      "prompt": "Rename this API field to invoiceTotal. While you are there, remove dead helpers, reformat the file, and clean up old comments around it.",
+      "expected_without_skill": "Mixes the rename with unrelated refactors, dead-code removal, and comment cleanup, producing a broad diff with unclear ownership.",
+      "expected_with_skill": "Declares the edit boundary, keeps the rename focused, only fixes adjacent lines if the rename makes them wrong, and mentions unrelated cleanup separately instead of bundling it."
+    },
+    {
+      "id": "plan-mode-guardrails",
+      "title": "Guarded code change requested while in Plan Mode",
+      "prompt": "I am in Plan Mode. Use jy-change-guardrails and implement the refactor now.",
+      "expected_without_skill": "Pretends to edit files or talks as if the implementation is already happening despite Plan Mode.",
+      "expected_with_skill": "States that jy-change-guardrails is execution-oriented, tells the user to leave Plan Mode with Shift+Tab, and still leaves the assumptions list, edit boundary, and verification plan without editing."
+    }
+  ]
+}

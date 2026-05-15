@@ -36,8 +36,9 @@ They are part of this repo for maintenance work, not part of the installed Codex
 
 First-party skill authoring happens in `plugins/jy-env-core/skills/`. That directory is
 the source of truth for both local development and the installed Codex skill surface.
-The current first-party workflow pack covers planning, plan authoring, isolated worktree
-setup, debugging, test-first implementation, plan execution, review feedback handling,
+The current first-party workflow pack covers planning, decision interviews, plan
+authoring, isolated worktree setup, debugging, test-first implementation,
+change-scope guardrails, plan execution, whole-project audits, review feedback handling,
 waterfall-style project records, shipping, and verification disciplines.
 
 Managed hooks live under `hooks/` and are merged into `~/.codex/hooks.json` by `apply`.
@@ -51,8 +52,9 @@ invocation stays compact while the intended use stays explicit.
 
 ### Planning
 
-- `jy-autoplan` chooses the right planning path for the current request and routes to `jy-framing`, `jy-plan-review`, `jy-writing-plans`, or `jy-executing-plans` without making the user decide first.
+- `jy-autoplan` chooses the right planning path for the current request and routes to `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans`, or `jy-executing-plans` without making the user decide first.
 - `jy-framing` turns a vague feature or product idea into a sharper problem brief, constraints list, and next planning step.
+- `jy-grill-me` pressure-tests a plan or feature direction through a one-question-at-a-time decision interview before implementation.
 - `jy-plan-review` takes an existing plan or outline and closes decision gaps before implementation starts.
 - `jy-writing-plans` turns approved requirements into a decision-complete implementation plan saved under `docs/superpowers/plans/`.
 - `jy-worktrees` starts isolated feature work in `.worktrees/` after verifying that the directory is safe to use.
@@ -62,12 +64,17 @@ invocation stays compact while the intended use stays explicit.
 
 - `jy-executing-plans` runs a written plan task-by-task in the current session and keeps execution tied to TDD, verification, and review gates.
 - `jy-debugging` forces reproduction, hypothesis testing, and root-cause verification before patching a bug.
+- `jy-change-guardrails` keeps non-trivial code changes honest by surfacing assumptions, forcing the smallest valid change, and blocking unrelated cleanup.
 - `jy-test-driven` enforces a failing test first and keeps implementation inside a red-green-refactor loop.
 - `jy-verification-before-completion` blocks success claims until fresh verification commands and results exist.
 - `jy-review-work` runs a structured multi-angle review pass on completed implementation before handoff or merge.
 - `jy-receiving-review` triages review feedback, verifies it against the actual codebase, and supports technical pushback when comments are wrong.
 - `jy-loop` keeps working a task iteratively until the stated completion criteria are actually verified.
 - `jy-slop-remover` cleans obvious AI-generated code smells without turning into broad stylistic refactoring.
+
+### Audit
+
+- `jy-review-all` audits an existing project across architecture, module depth, testability, documentation gaps, maintainability, and navigation before choosing focused follow-up work.
 
 ### Routing
 

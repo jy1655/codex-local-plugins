@@ -9,13 +9,13 @@
 
 - Review approach used:
 - Number of review angles covered:
-- Were sub-agents launched in parallel?
+- How many review lenses were covered?
 - Failure observed:
 
 ## With Skill
 
-- Were all 5 agents launched in parallel?
-- Did read-only agents receive diff + file contents?
+- Were all 5 review lenses covered?
+- Were subagents avoided unless explicitly authorized?
 - Was context (goal, constraints, diff) collected first?
 - Final judgment format (PASS/FAIL table)?
 - Did any FAIL result correctly trigger overall FAIL?

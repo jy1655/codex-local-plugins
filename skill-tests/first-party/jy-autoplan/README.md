@@ -12,7 +12,7 @@ Run order:
 Passing behavior:
 
 - correctly classifies planning maturity
-- distinguishes `idea-stage`, `plan-stage`, and `execution-ready`
+- distinguishes `idea-stage`, `decision-interview-stage`, `plan-stage`, and `execution-ready`
 - routes to the right Codex planning skill
 - returns one combined result instead of fragmented advice
 - states the next step clearly

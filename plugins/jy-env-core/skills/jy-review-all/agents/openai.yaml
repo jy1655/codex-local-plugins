@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Review All"
+  short_description: "Whole-project audit for architecture, testability, docs, and maintainability"
+  default_prompt: "Use $jy-review-all to audit the whole project and return prioritized evidence-backed improvement candidates."
