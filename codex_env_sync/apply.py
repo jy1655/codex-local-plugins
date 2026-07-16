@@ -8,15 +8,13 @@ import json
 import shutil
 import subprocess
 import time
+import uuid
 
-from .manifest import HookSpec, InstructionSpec, Manifest, PluginSpec, load_manifest
+from .manifest import InstructionSpec, Manifest, PluginSpec, load_manifest
 from .platforms import ManagedPaths, resolve_target_path
 
 
 MANIFEST_NAME = "codex-env.toml"
-LEGACY_PLUGIN_OVERLAY_NAMES = {
-    "jy-env-core": ["codex-env-core"],
-}
 
 
 @dataclass
@@ -88,7 +86,7 @@ def load_state(path: Path) -> dict:
 
 
 def save_state(path: Path, state: dict) -> None:
-    path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    write_text_atomic(path, json.dumps(state, indent=2, sort_keys=True) + "\n")
 
 
 def replace_path(destination: Path) -> None:
@@ -100,15 +98,44 @@ def replace_path(destination: Path) -> None:
 
 
 def copy_directory(source: Path, destination: Path) -> None:
-    replace_path(destination)
-    shutil.copytree(source, destination)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    staging = destination.parent / f".{destination.name}.tmp-{uuid.uuid4().hex}"
+    backup = destination.parent / f".{destination.name}.old-{uuid.uuid4().hex}"
+    shutil.copytree(source, staging)
+    had_destination = destination.exists() or destination.is_symlink()
+    try:
+        if had_destination:
+            destination.rename(backup)
+        staging.rename(destination)
+    except Exception:
+        if not destination.exists() and backup.exists():
+            backup.rename(destination)
+        raise
+    finally:
+        if staging.exists():
+            replace_path(staging)
+    if backup.exists() or backup.is_symlink():
+        replace_path(backup)
 
 
 def copy_file(source: Path, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
-    if destination.exists():
+    staging = destination.parent / f".{destination.name}.tmp-{uuid.uuid4().hex}"
+    shutil.copy2(source, staging)
+    if destination.is_dir() and not destination.is_symlink():
         replace_path(destination)
-    shutil.copy2(source, destination)
+    staging.replace(destination)
+
+
+def write_text_atomic(destination: Path, text: str) -> None:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    staging = destination.parent / f".{destination.name}.tmp-{uuid.uuid4().hex}"
+    try:
+        staging.write_text(text, encoding="utf-8")
+        staging.replace(destination)
+    finally:
+        if staging.exists():
+            staging.unlink()
 
 
 def symlink_path(source: Path, destination: Path) -> None:
@@ -132,40 +159,6 @@ def _load_json_object(path: Path) -> dict:
     return data
 
 
-def _deep_merge(base: dict, overlay: dict) -> dict:
-    merged = dict(base)
-    for key, value in overlay.items():
-        if isinstance(value, dict) and isinstance(merged.get(key), dict):
-            merged[key] = _deep_merge(merged[key], value)
-            continue
-        merged[key] = value
-    return merged
-
-
-def merge_plugin_mcp_overlay(plugin_dir: Path, overlay_path: Path) -> None:
-    target_path = plugin_dir / ".mcp.json"
-    base = {"mcpServers": {}}
-    if target_path.exists():
-        base = _load_json_object(target_path)
-
-    overlay = _load_json_object(overlay_path)
-    merged = _deep_merge(base, overlay)
-    target_path.write_text(json.dumps(merged, indent=2, sort_keys=False) + "\n", encoding="utf-8")
-
-
-def resolve_plugin_overlay_path(plugin_name: str, paths: ManagedPaths) -> tuple[Path | None, str | None]:
-    preferred = paths.local_plugin_overlay_root / f"{plugin_name}.mcp.json"
-    if preferred.exists():
-        return preferred, "local mcp overlay"
-
-    for legacy_name in LEGACY_PLUGIN_OVERLAY_NAMES.get(plugin_name, []):
-        candidate = paths.local_plugin_overlay_root / f"{legacy_name}.mcp.json"
-        if candidate.exists():
-            return candidate, "legacy local mcp overlay fallback"
-
-    return None, None
-
-
 def _existing_copy_hash(path: Path) -> str | None:
     if not path.exists() or path.is_symlink():
         return None
@@ -176,19 +169,18 @@ def _plugin_state(
     source: Path,
     mode: str,
     desired_hash: str,
-    overlay_hash: str | None,
     installed_hash: str | None = None,
 ) -> dict:
     return {
         "hash": desired_hash,
         "mode": mode,
-        "overlay_hash": overlay_hash,
         "installed_hash": installed_hash,
         "source": str(source),
     }
 
 
 def _instruction_state(
+    source: Path,
     destination: Path,
     mode: str,
     desired_hash: str,
@@ -198,25 +190,13 @@ def _instruction_state(
         "hash": desired_hash,
         "mode": mode,
         "installed_hash": installed_hash,
-        "target": str(destination),
-    }
-
-
-def _hook_state(
-    source: Path,
-    destination: Path,
-    desired_hash: str,
-    managed_hooks: dict,
-) -> dict:
-    return {
-        "hash": desired_hash,
         "source": str(source),
         "target": str(destination),
-        "managed_hooks": managed_hooks,
     }
 
 
 def _skill_state(
+    source: Path,
     destination: Path,
     mode: str,
     desired_hash: str,
@@ -226,6 +206,7 @@ def _skill_state(
         "hash": desired_hash,
         "mode": mode,
         "installed_hash": installed_hash,
+        "source": str(source),
         "target": str(destination),
     }
 
@@ -283,49 +264,6 @@ def _load_hooks_document(path: Path) -> dict:
     return data
 
 
-def _ensure_managed_marker(document: dict, name: str) -> dict:
-    marker = _hook_marker(name)
-    managed = deepcopy(document)
-    for groups in managed.get("hooks", {}).values():
-        if not isinstance(groups, list):
-            continue
-        for group in groups:
-            for handler in group.get("hooks", []):
-                if handler.get("type") != "command":
-                    continue
-                command = handler.get("command")
-                if not isinstance(command, str) or marker in command:
-                    continue
-                handler["command"] = f"{command} # {marker}"
-    return managed
-
-
-def _windows_hook_command(command: str) -> str:
-    body, separator, marker = command.partition(" # ")
-    if body.startswith("python3 "):
-        body = f"python {body[len('python3 '):]}"
-    return f"{body}{separator}{marker}"
-
-
-def _prepare_managed_hooks_for_platform(document: dict, name: str, os_name: str) -> dict:
-    managed = _ensure_managed_marker(document, name)
-    if os_name != "windows":
-        return managed
-
-    windows_managed = deepcopy(managed)
-    for groups in windows_managed.get("hooks", {}).values():
-        if not isinstance(groups, list):
-            continue
-        for group in groups:
-            for handler in group.get("hooks", []):
-                if handler.get("type") != "command":
-                    continue
-                command = handler.get("command")
-                if isinstance(command, str):
-                    handler["command"] = _windows_hook_command(command)
-    return windows_managed
-
-
 def _previous_managed_handler_keys(previous_managed_hooks: dict | None) -> set[str]:
     keys: set[str] = set()
     if not isinstance(previous_managed_hooks, dict):
@@ -381,16 +319,6 @@ def _strip_managed_hooks(current: dict, name: str, previous_managed_hooks: dict 
     return stripped
 
 
-def _merge_managed_hooks(current: dict, managed: dict, name: str, previous_managed_hooks: dict | None) -> dict:
-    merged = _strip_managed_hooks(current, name, previous_managed_hooks)
-    hooks = merged.setdefault("hooks", {})
-    for event_name, groups in managed.get("hooks", {}).items():
-        if not isinstance(groups, list) or not groups:
-            continue
-        hooks.setdefault(event_name, []).extend(deepcopy(groups))
-    return merged
-
-
 def _hooks_text(document: dict) -> str:
     return json.dumps(document, indent=2, sort_keys=False) + "\n"
 
@@ -409,7 +337,7 @@ def _remove_managed_hook(name: str, state: dict) -> ApplyItem:
     action = "skipped"
     detail = "cleared stale managed hook state"
     if _canonical_json(current) != _canonical_json(desired):
-        destination.write_text(_hooks_text(desired), encoding="utf-8")
+        write_text_atomic(destination, _hooks_text(desired))
         action = "removed"
         detail = "removed stale managed hook entries"
 
@@ -423,14 +351,13 @@ def _apply_plugin(
     paths: ManagedPaths,
     manifest: Manifest,
     state: dict,
+    mode_override: str | None = None,
 ) -> ApplyItem:
     source = repo_root / plugin.source
     destination = paths.plugin_root / plugin.name
-    overlay_path, overlay_detail = resolve_plugin_overlay_path(plugin.name, paths)
     desired_hash = hash_path(source)
-    overlay_hash = hash_path(overlay_path) if overlay_path is not None else None
     previous = state["plugins"].get(plugin.name, {})
-    mode = manifest.plugin_mode_for(paths.os_name, plugin)
+    mode = mode_override or manifest.plugin_mode_for(paths.os_name, plugin)
 
     if mode == "copy":
         installed_hash = _existing_copy_hash(destination)
@@ -439,58 +366,23 @@ def _apply_plugin(
             and not destination.is_symlink()
             and previous.get("mode") == "copy"
             and previous.get("hash") == desired_hash
-            and previous.get("overlay_hash") == overlay_hash
             and previous.get("installed_hash") == installed_hash
         ):
-            state["plugins"][plugin.name] = _plugin_state(source, "copy", desired_hash, overlay_hash, installed_hash)
+            state["plugins"][plugin.name] = _plugin_state(source, "copy", desired_hash, installed_hash)
             return ApplyItem(plugin.name, destination, "skipped", "content unchanged")
 
         copy_directory(source, destination)
-        detail = "copied plugin bundle"
-        if overlay_path is not None:
-            merge_plugin_mcp_overlay(destination, overlay_path)
-            detail = f"copied plugin bundle + merged {overlay_detail}"
-
         installed_hash = hash_path(destination)
-        state["plugins"][plugin.name] = _plugin_state(source, "copy", desired_hash, overlay_hash, installed_hash)
-        return ApplyItem(plugin.name, destination, "applied", detail)
+        state["plugins"][plugin.name] = _plugin_state(source, "copy", desired_hash, installed_hash)
+        return ApplyItem(plugin.name, destination, "applied", "copied plugin bundle")
 
     if mode == "symlink":
-        if overlay_path is not None:
-            installed_hash = _existing_copy_hash(destination)
-            if (
-                destination.exists()
-                and not destination.is_symlink()
-                and previous.get("mode") == "copy"
-                and previous.get("hash") == desired_hash
-                and previous.get("overlay_hash") == overlay_hash
-                and previous.get("installed_hash") == installed_hash
-            ):
-                state["plugins"][plugin.name] = _plugin_state(source, "copy", desired_hash, overlay_hash, installed_hash)
-                return ApplyItem(
-                    plugin.name,
-                    destination,
-                    "skipped",
-                    f"content unchanged (symlink fallback due to {overlay_detail})",
-                )
-
-            copy_directory(source, destination)
-            merge_plugin_mcp_overlay(destination, overlay_path)
-            installed_hash = hash_path(destination)
-            state["plugins"][plugin.name] = _plugin_state(source, "copy", desired_hash, overlay_hash, installed_hash)
-            return ApplyItem(
-                plugin.name,
-                destination,
-                "applied",
-                f"copied plugin bundle + merged {overlay_detail} (symlink fallback due to local overlay)",
-            )
-
         if is_symlink_to(destination, source):
-            state["plugins"][plugin.name] = _plugin_state(source, "symlink", desired_hash, overlay_hash)
+            state["plugins"][plugin.name] = _plugin_state(source, "symlink", desired_hash)
             return ApplyItem(plugin.name, destination, "skipped", "symlink unchanged")
 
         symlink_path(source, destination)
-        state["plugins"][plugin.name] = _plugin_state(source, "symlink", desired_hash, overlay_hash)
+        state["plugins"][plugin.name] = _plugin_state(source, "symlink", desired_hash)
         return ApplyItem(plugin.name, destination, "applied", "symlinked plugin bundle")
 
     raise ValueError(f"Unsupported plugin install mode for v1: {mode}")
@@ -513,6 +405,7 @@ def _apply_plugin_skills(
     plugin: PluginSpec,
     paths: ManagedPaths,
     state: dict,
+    mode_override: str | None = None,
 ) -> ApplyItem | None:
     plugin_root = paths.plugin_root / plugin.name
     source = _plugin_skills_source(plugin_root)
@@ -524,7 +417,8 @@ def _apply_plugin_skills(
     desired_hash = hash_path(source)
     previous = state["skills"].get(plugin.name, {})
 
-    if paths.os_name == "windows":
+    mode = mode_override or ("copy" if paths.os_name == "windows" else "symlink")
+    if mode == "copy":
         installed_hash = _existing_copy_hash(destination)
         if (
             destination.exists()
@@ -533,20 +427,20 @@ def _apply_plugin_skills(
             and previous.get("hash") == desired_hash
             and previous.get("installed_hash") == installed_hash
         ):
-            state["skills"][plugin.name] = _skill_state(destination, "copy", desired_hash, installed_hash)
+            state["skills"][plugin.name] = _skill_state(source, destination, "copy", desired_hash, installed_hash)
             return ApplyItem(plugin.name, destination, "skipped", "skill content unchanged")
 
         copy_directory(source, destination)
         installed_hash = hash_path(destination)
-        state["skills"][plugin.name] = _skill_state(destination, "copy", desired_hash, installed_hash)
+        state["skills"][plugin.name] = _skill_state(source, destination, "copy", desired_hash, installed_hash)
         return ApplyItem(plugin.name, destination, "applied", "copied skill directory")
 
     if is_symlink_to(destination, source):
-        state["skills"][plugin.name] = _skill_state(destination, "symlink", desired_hash)
+        state["skills"][plugin.name] = _skill_state(source, destination, "symlink", desired_hash)
         return ApplyItem(plugin.name, destination, "skipped", "skill symlink unchanged")
 
     symlink_path(source, destination)
-    state["skills"][plugin.name] = _skill_state(destination, "symlink", desired_hash)
+    state["skills"][plugin.name] = _skill_state(source, destination, "symlink", desired_hash)
     return ApplyItem(plugin.name, destination, "applied", "symlinked skill directory")
 
 
@@ -556,12 +450,13 @@ def _apply_instruction(
     paths: ManagedPaths,
     manifest: Manifest,
     state: dict,
+    mode_override: str | None = None,
 ) -> ApplyItem:
     source = repo_root / instruction.source
     destination = resolve_target_path(paths.home, instruction.target)
     desired_hash = hash_path(source)
     previous = state["instructions"].get(instruction.name, {})
-    mode = manifest.instruction_mode_for(paths.os_name, instruction)
+    mode = mode_override or manifest.instruction_mode_for(paths.os_name, instruction)
 
     if mode == "copy":
         installed_hash = _existing_copy_hash(destination)
@@ -572,61 +467,32 @@ def _apply_instruction(
             and previous.get("hash") == desired_hash
             and previous.get("installed_hash") == installed_hash
         ):
-            state["instructions"][instruction.name] = _instruction_state(destination, "copy", desired_hash, installed_hash)
+            state["instructions"][instruction.name] = _instruction_state(
+                source, destination, "copy", desired_hash, installed_hash
+            )
             return ApplyItem(instruction.name, destination, "skipped", "content unchanged")
 
         copy_file(source, destination)
         installed_hash = hash_path(destination)
-        state["instructions"][instruction.name] = _instruction_state(destination, "copy", desired_hash, installed_hash)
+        state["instructions"][instruction.name] = _instruction_state(
+            source, destination, "copy", desired_hash, installed_hash
+        )
         return ApplyItem(instruction.name, destination, "applied", "copied instruction artifact")
 
     if mode == "symlink":
         if is_symlink_to(destination, source):
-            state["instructions"][instruction.name] = _instruction_state(destination, "symlink", desired_hash)
+            state["instructions"][instruction.name] = _instruction_state(
+                source, destination, "symlink", desired_hash
+            )
             return ApplyItem(instruction.name, destination, "skipped", "symlink unchanged")
 
         symlink_path(source, destination)
-        state["instructions"][instruction.name] = _instruction_state(destination, "symlink", desired_hash)
+        state["instructions"][instruction.name] = _instruction_state(
+            source, destination, "symlink", desired_hash
+        )
         return ApplyItem(instruction.name, destination, "applied", "symlinked instruction artifact")
 
     raise ValueError(f"Unsupported instruction install mode for v1: {mode}")
-
-
-def _apply_hook(
-    hook: HookSpec,
-    repo_root: Path,
-    paths: ManagedPaths,
-    state: dict,
-) -> ApplyItem:
-    source = repo_root / hook.source
-    destination = resolve_target_path(paths.home, hook.target)
-
-    desired_hash = hash_path(source)
-    previous = state["hooks"].get(hook.name, {})
-    source_document = _load_hooks_document(source)
-    managed_hooks = _prepare_managed_hooks_for_platform(source_document, hook.name, paths.os_name)
-    current_document = _load_hooks_document(destination)
-    desired_document = _merge_managed_hooks(
-        current_document,
-        managed_hooks,
-        hook.name,
-        previous.get("managed_hooks"),
-    )
-
-    current_text = destination.read_text(encoding="utf-8") if destination.exists() else ""
-    desired_text = _hooks_text(desired_document)
-    if (
-        current_text == desired_text
-        and previous.get("hash") == desired_hash
-        and previous.get("target") == str(destination)
-    ):
-        state["hooks"][hook.name] = _hook_state(source, destination, desired_hash, managed_hooks)
-        return ApplyItem(hook.name, destination, "skipped", "managed hook entries unchanged")
-
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(desired_text, encoding="utf-8")
-    state["hooks"][hook.name] = _hook_state(source, destination, desired_hash, managed_hooks)
-    return ApplyItem(hook.name, destination, "applied", "merged managed hook entries")
 
 
 def _managed_marketplace_entry(plugin_name: str, category: str) -> dict:
@@ -686,18 +552,117 @@ def write_marketplace(
     if current_text == desired_text:
         return "skipped"
 
-    paths.marketplace_path.parent.mkdir(parents=True, exist_ok=True)
-    paths.marketplace_path.write_text(desired_text, encoding="utf-8")
+    write_text_atomic(paths.marketplace_path, desired_text)
     return "applied"
 
 
-def apply_environment(repo_root: str | Path, home: str | Path | None = None, os_name: str | None = None) -> ApplyReport:
+def _require_unique_names(items: list, label: str) -> None:
+    names = [item.name for item in items]
+    duplicates = sorted({name for name in names if names.count(name) > 1})
+    if duplicates:
+        raise ValueError(f"Duplicate {label} names: {', '.join(duplicates)}")
+
+
+def _repo_source(repo_root: Path, relative: str, label: str) -> Path:
+    source = (repo_root / relative).resolve()
+    if not source.is_relative_to(repo_root):
+        raise ValueError(f"{label} source escapes repo root: {relative}")
+    return source
+
+
+def _managed_path_matches_state(destination: Path, previous: dict) -> bool:
+    if not destination.exists() and not destination.is_symlink():
+        return True
+
+    mode = previous.get("mode")
+    if mode == "copy":
+        expected_hash = previous.get("installed_hash")
+        return isinstance(expected_hash, str) and _existing_copy_hash(destination) == expected_hash
+    if mode == "symlink":
+        expected_source = previous.get("source")
+        return isinstance(expected_source, str) and is_symlink_to(destination, Path(expected_source))
+    return False
+
+
+def _validate_stale_managed_paths(manifest: Manifest, paths: ManagedPaths, state: dict) -> None:
+    current_plugin_names = {plugin.name for plugin in manifest.plugins}
+    stale_plugin_names = set(state["plugins"]) - current_plugin_names
+    for plugin_name in sorted(stale_plugin_names):
+        destination = paths.plugin_root / plugin_name
+        if not _managed_path_matches_state(destination, state["plugins"].get(plugin_name, {})):
+            raise ValueError(f"Refusing to remove modified managed plugin: {destination}")
+
+        skill_destination = paths.skills_root / plugin_name
+        if not _managed_path_matches_state(skill_destination, state["skills"].get(plugin_name, {})):
+            raise ValueError(f"Refusing to remove modified managed skill surface: {skill_destination}")
+
+    current_instruction_names = {instruction.name for instruction in manifest.instructions}
+    stale_instruction_names = set(state["instructions"]) - current_instruction_names
+    for instruction_name in sorted(stale_instruction_names):
+        previous = state["instructions"].get(instruction_name, {})
+        destination = Path(previous["target"]) if previous.get("target") else Path(instruction_name)
+        if not _managed_path_matches_state(destination, previous):
+            raise ValueError(f"Refusing to remove modified managed instruction: {destination}")
+
+
+def validate_environment(
+    repo_root: Path,
+    manifest: Manifest,
+    paths: ManagedPaths,
+    state: dict,
+    snapshot: bool = False,
+) -> None:
+    _require_unique_names(manifest.plugins, "plugin")
+    _require_unique_names(manifest.instructions, "instruction")
+
+    for plugin in manifest.plugins:
+        source = _repo_source(repo_root, plugin.source, "Plugin")
+        if not source.is_dir():
+            raise ValueError(f"Plugin source does not exist or is not a directory: {source}")
+        mode = "copy" if snapshot else manifest.plugin_mode_for(paths.os_name, plugin)
+        if mode not in {"copy", "symlink"}:
+            raise ValueError(f"Unsupported plugin install mode for v1: {mode}")
+
+        plugin_manifest_path = source / ".codex-plugin" / "plugin.json"
+        if not plugin_manifest_path.is_file():
+            raise ValueError(f"Plugin manifest does not exist: {plugin_manifest_path}")
+        plugin_manifest = _load_json_object(plugin_manifest_path)
+        skills_relative = plugin_manifest.get("skills")
+        if isinstance(skills_relative, str) and skills_relative:
+            skills_source = (source / skills_relative).resolve()
+            if not skills_source.is_relative_to(source) or not skills_source.is_dir():
+                raise ValueError(f"Plugin skills source does not exist or escapes plugin root: {skills_source}")
+
+    for instruction in manifest.instructions:
+        source = _repo_source(repo_root, instruction.source, "Instruction")
+        if not source.is_file():
+            raise ValueError(f"Instruction source does not exist or is not a file: {source}")
+        mode = "copy" if snapshot else manifest.instruction_mode_for(paths.os_name, instruction)
+        if mode not in {"copy", "symlink"}:
+            raise ValueError(f"Unsupported instruction install mode for v1: {mode}")
+
+    if paths.marketplace_path.exists():
+        marketplace = _load_json_object(paths.marketplace_path)
+        plugins = marketplace.get("plugins", [])
+        if not isinstance(plugins, list):
+            raise ValueError(f"Expected plugins list in {paths.marketplace_path}")
+
+    _validate_stale_managed_paths(manifest, paths, state)
+
+
+def apply_environment(
+    repo_root: str | Path,
+    home: str | Path | None = None,
+    os_name: str | None = None,
+    snapshot: bool = False,
+) -> ApplyReport:
     repo_path = Path(repo_root).resolve()
     manifest = load_manifest(repo_path / MANIFEST_NAME)
     paths = ManagedPaths.for_platform(os_name=os_name, home=home)
+    state = load_state(paths.state_path)
+    validate_environment(repo_path, manifest, paths, state, snapshot=snapshot)
     paths.ensure_parent_dirs()
 
-    state = load_state(paths.state_path)
     report = ApplyReport(repo_root=repo_path, os_name=paths.os_name, state_path=paths.state_path)
     current_plugin_names = {plugin.name for plugin in manifest.plugins}
     previous_plugin_names = set(state["plugins"])
@@ -711,24 +676,23 @@ def apply_environment(repo_root: str | Path, home: str | Path | None = None, os_
     for instruction_name in sorted(stale_instruction_names):
         report.instructions.append(_remove_managed_instruction(instruction_name, state))
 
-    current_hook_names = {hook.name for hook in manifest.hooks}
-    stale_hook_names = set(state["hooks"]) - current_hook_names
-    for hook_name in sorted(stale_hook_names):
+    for hook_name in sorted(state["hooks"]):
         report.hooks.append(_remove_managed_hook(hook_name, state))
 
     for plugin in manifest.plugins:
-        report.plugins.append(_apply_plugin(plugin, repo_path, paths, manifest, state))
-        skill_item = _apply_plugin_skills(plugin, paths, state)
+        mode_override = "copy" if snapshot else None
+        report.plugins.append(_apply_plugin(plugin, repo_path, paths, manifest, state, mode_override=mode_override))
+        skill_item = _apply_plugin_skills(plugin, paths, state, mode_override=mode_override)
         if skill_item is not None:
             report.skills.append(skill_item)
 
     report.marketplace_action = write_marketplace(repo_path, manifest, paths, stale_managed_names=stale_plugin_names)
 
     for instruction in manifest.instructions:
-        report.instructions.append(_apply_instruction(instruction, repo_path, paths, manifest, state))
-
-    for hook in manifest.hooks:
-        report.hooks.append(_apply_hook(hook, repo_path, paths, state))
+        mode_override = "copy" if snapshot else None
+        report.instructions.append(
+            _apply_instruction(instruction, repo_path, paths, manifest, state, mode_override=mode_override)
+        )
 
     state["last_apply"] = int(time.time())
     save_state(paths.state_path, state)
@@ -754,6 +718,6 @@ def bootstrap_environment(git_url: str, home: str | Path | None = None, os_name:
     paths = ManagedPaths.for_platform(os_name=os_name, home=home)
     paths.ensure_parent_dirs()
     repo_path = clone_or_update_repo(git_url, paths)
-    report = apply_environment(repo_path, home=paths.home, os_name=paths.os_name)
+    report = apply_environment(repo_path, home=paths.home, os_name=paths.os_name, snapshot=True)
     report.managed_repo = repo_path
     return report

@@ -7,126 +7,92 @@ description: Use when the user wants to "ship", "deploy", "push to main", or cre
 
 ## Overview
 
-This is the repo-native workflow for taking the current branch through a safe push and
-PR/MR closeout. The core rule is simple: do not skip
-`base branch safety -> review -> fresh verification -> push -> PR/MR -> docs sync`.
+Close a ready branch in this order:
 
-This skill does not depend on gstack hidden runtime, telemetry, self-update flows, or
-local sidecar state. It uses only the real git surface and first-party skills that exist
-in this repo.
+`base safety -> change surface -> docs sync -> risk-proportionate review -> final fresh verification -> commit/push -> PR/MR`
+
+Documentation is part of the candidate that gets verified and pushed, not a post-push
+follow-up.
 
 ## When to Use
 
-- "ship it", "push this branch", "make the PR", "prepare this for merge"
-- Implementation is complete and the work needs to be pushed and closed out through a PR/MR
-- Review, verification, and docs sync all need to happen before handoff
+- The user asks to ship, push, deploy, or create/update a PR/MR.
+- Implementation is complete enough for a release candidate.
 
-Do not use it when:
-
-- Implementation or debugging is still incomplete
-- The user only wants planning, not actual git work
-- The task is only documentation sync (`jy-document-release`)
+Do not use it for unfinished debugging or planning-only requests.
 
 ## Quick Reference
 
-| Step | Action | Stop Condition |
-|------|--------|----------------|
-| 0. Mode check | Execute in Default, preview only in Plan | If in Plan Mode, route with `Shift+Tab` |
-| 1. Detect base branch | Use remote and CLI metadata to find the target branch | Stop if the current branch is the base branch |
-| 2. Gather ship surface | Check `git status`, diff, and commit log | Stop if the change surface cannot be explained |
-| 3. Review + verify | Use `jy-review-work` and `jy-verification-before-completion` for fresh gates | Stop on review FAIL or verification FAIL |
-| 4. Commit + push | Commit the required changes and use normal `git push` | `Never force push` |
-| 5. PR/MR | Create or update the PR/MR with `gh`/`glab` when available | Do not claim creation without a URL |
-| 6. Docs sync | Use `jy-document-release` when docs are affected | Do not leave docs drift unresolved |
+| Step | Action | Stop condition |
+|---|---|---|
+| 1. Base | Detect current and target base branches | current branch is base |
+| 2. Surface | Explain status, diff, and commits | scope is unclear |
+| 3. Docs | Run the `jy-document-release` decision | doc drift remains |
+| 4. Review | Review in proportion to risk | actionable failure |
+| 5. Verify | Run fresh checks on the final candidate | any required check fails |
+| 6. Publish | Commit, normal push, create/update PR/MR | no authority or remote |
 
-## Base Branch Gate
+## Base Branch And Scope Gate
 
-- Find the current branch and the base branch first
-- Detect the base branch in this order:
-  - GitHub: `gh pr view` or `gh repo view`
-  - GitLab: `glab mr view` or the project default branch lookup
-  - Common fallback: `origin/HEAD`
-- If the current branch is the base branch, abort the ship workflow
-- Even if the user says "ship directly from main", do not do it without a feature branch
-
-## Review And Verification Gate
-
-- Multi-file implementation should close a review gate through `jy-review-work` first
-- Use `jy-review-work` only as the review gate for non-trivial implementation changes
-- Do not run the full review gate for docs-only, config-only, or already-reviewed changes unless risk justifies it
-- Do not use `jy-review-all` as a ship gate; it is for broad whole-project audits before focused work is selected
-- Completion claims, passing tests, and ship readiness must be backed by fresh verification
-  evidence using `jy-verification-before-completion`
-- Do not rely on earlier test memory, an `old CI run`, or an agent success report to justify
-  push or PR/MR creation
-- If review or verification fails, stop the workflow and report that state directly
-
-## Release File Rules
-
-- Only handle release bookkeeping files such as `VERSION`, `CHANGELOG`, or `TODOS.md` if
-  they already exist in the repo
-- Do not invent `VERSION` or `CHANGELOG` files that the repo does not have
-- In repos like this one, a shipping summary plus verification results and PR/MR body is enough
-
-## Push And PR/MR Rules
-
-- If the worktree is dirty, stage and commit only the current ship surface
-- Keep the commit message within what can be safely inferred from the diff and user goal
-- If you cannot responsibly name the change, ask the user for a commit summary instead of
-  inventing one
-- Push with normal `git push` or `git push -u origin <branch>`
-- `Never force push`
-- If `gh` or `glab` exists, update an existing PR/MR or create a new one
-- If no CLI exists, leave the branch name, remote, compare URL, or manual PR next step
-- If there is no URL, do not claim that the PR was created
+- Detect the base from an existing PR/MR, repository metadata, or `origin/HEAD`.
+- Stop if the current branch is the base branch.
+- Inspect `git status`, the full diff, and relevant commit history.
+- Preserve unrelated dirty changes and stage only the user-authorized ship surface.
 
 ## Documentation Sync
 
-- If the shipped changes touch README, instructions, skill docs, or verification assets,
-  run `jy-document-release` as the follow-up docs path
-- Do not skip the `jy-document-release` decision when the diff clearly affects docs
-- If docs state is still unclear, do not report ship complete; leave `Docs: blocked`
-- If docs sync creates a new commit, push the same branch again and update the PR/MR body
-- If docs changes are not needed, state that explicitly and end there
+- Decide whether the diff affects README, AGENTS, skill docs, commands, or manual pressure
+  scenarios before review and verification.
+- Do not skip the `jy-document-release` decision when those contracts changed.
+- Apply required docs first so the final checks cover the exact commit candidate.
+- Do not invent `VERSION` or `CHANGELOG` unless those files already exist and are part of
+  the repository's release process.
+
+## Final Review And Verification Gate
+
+- Use `jy-review-work` as the review gate for non-trivial implementation changes.
+- Skip a full review for docs-only, config-only, or already-reviewed low-risk changes unless
+  new evidence raises the risk.
+- Do not use `jy-review-all` as a ship gate; it is a whole-project audit.
+- Run `jy-verification-before-completion` once after docs and review fixes are settled.
+- Reject test memory, a stale CI result, or an earlier agent report as evidence for the
+  final candidate.
+- Stop on unresolved review findings or failed required checks.
+
+## Commit, Push, And PR/MR
+
+- Commit only the explained change surface with an evidence-based message.
+- Push with normal `git push` or `git push -u origin <branch>`.
+- `Never force push`.
+- Create or update the PR/MR with the available repository tool.
+- Do not claim a PR/MR exists without a real URL.
+- If publication is unavailable, provide the branch and exact manual action.
 
 ## Mode-Aware Behavior
 
 ### If current collaboration mode is Default
 
-- This is the normal execution mode for the skill
-- Perform base branch detection, fresh verification, commit, push, PR/MR creation, and docs sync for real
+Perform the authorized ship workflow for real.
 
 ### If current collaboration mode is Plan
 
-- Do not perform real git writes, pushes, or PR/MR creation
-- Route like this:
-  - "This is an execution-oriented ship workflow. Leave Plan Mode with `Shift+Tab`, then run `/jy-ship` again."
-- Still leave a compact ship checklist preview:
-  - how to confirm the base branch
-  - which review and verification commands are required
-  - which stop conditions block PR/MR creation
-- Do not pretend that a push or PR/MR was already done while still in Plan Mode
+Do not commit, push, or create a PR/MR. Tell the user to leave Plan mode with `Shift+Tab`
+and re-run `jy-ship` in Default mode; provide only a checklist preview.
 
 ## Output Template
 
-- Render the headings and short status phrases in the user's language unless the user explicitly asks for English.
-- Keep the structure stable even when the labels are localized.
+Render labels in the user's language unless English was requested.
 
-- `Base Branch:` detected target branch
-- `Review Gate:` PASS/FAIL with evidence
-- `Verification Gate:` command run plus result
-- `Push:` pushed / already up to date / blocked
-- `PR/MR:` created / updated / manual action required
-- `Docs:` synced / no changes needed / blocked
+- `Base Branch:` detected target
+- `Docs:` synced / not affected / blocked
+- `Review Gate:` PASS / FAIL / proportionally skipped
+- `Verification Gate:` fresh command and result
+- `Push:` pushed / unchanged / blocked
+- `PR/MR:` URL / updated / manual action
 
 ## Common Mistakes
 
-- Pushing before confirming the base branch
-- Claiming ship readiness without review or fresh verification
-- Running `jy-review-all` as if it were a release gate
-- Running the full `jy-review-work` gate for docs-only, config-only, or already-reviewed low-risk changes
-- Auto-creating `VERSION` or `CHANGELOG` in a repo that does not use them
-- Using force push to hide process problems
-- Claiming PR/MR creation without a real URL
-- Skipping `jy-document-release` when docs are affected
-- Acting as if Plan Mode can perform the real ship workflow
+- Pushing documentation changes after the supposedly final verification
+- Running duplicate review and verification gates after every small step
+- Using force push to bypass branch state
+- Claiming publication without a real remote result

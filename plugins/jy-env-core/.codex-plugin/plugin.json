@@ -1,37 +1,32 @@
 {
   "name": "jy-env-core",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260716062231",
   "description": "JY first-party skill bundle for the portable Codex environment defined by this repo.",
   "author": {
-    "name": "jy",
-    "email": "jy@example.invalid",
-    "url": "https://github.com/jy"
+    "name": "JaeYoung Hwang",
+    "url": "https://github.com/jy1655"
   },
-  "homepage": "https://github.com/jy/codex-env-sync",
-  "repository": "https://github.com/jy/codex-env-sync",
+  "homepage": "https://github.com/jy1655/codex-local-plugins",
+  "repository": "https://github.com/jy1655/codex-local-plugins",
   "license": "MIT",
   "keywords": [
     "codex",
     "skills",
-    "mcp",
     "bootstrap"
   ],
   "skills": "./skills/",
-  "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "JY Env Core",
     "shortDescription": "JY first-party skill bundle for this portable Codex environment",
-    "longDescription": "Packages JY first-party skills and MCP bundle definitions used by the portable Codex environment sync repo.",
-    "developerName": "jy",
+    "longDescription": "Packages JY first-party skills and maintenance workflows used by the portable Codex environment sync repo.",
+    "developerName": "JaeYoung Hwang",
     "category": "Productivity",
     "capabilities": [
       "Interactive",
       "Read",
       "Write"
     ],
-    "websiteURL": "https://github.com/jy/codex-env-sync",
-    "privacyPolicyURL": "https://openai.com/policies/privacy-policy/",
-    "termsOfServiceURL": "https://openai.com/policies/terms-of-use/",
+    "websiteURL": "https://github.com/jy1655/codex-local-plugins",
     "defaultPrompt": [
       "Inspect the portable Codex environment repo and explain what will be installed.",
       "Apply the environment from the current repo checkout into my home directory.",

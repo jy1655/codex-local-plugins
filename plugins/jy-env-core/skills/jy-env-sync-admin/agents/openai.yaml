@@ -1,4 +1,4 @@
 interface:
   display_name: "JY Env Sync Admin"
-  short_description: "Inspect and apply this Codex environment"
-  default_prompt: "Use $jy-env-sync-admin to inspect or apply the Codex environment defined in this repo."
+  short_description: "Inspect or install this Codex environment in live or snapshot mode"
+  default_prompt: "Use $jy-env-sync-admin to validate and apply the Codex environment defined in this repo."

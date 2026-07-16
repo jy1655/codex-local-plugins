@@ -26,12 +26,13 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
                 self.assertIsNotNone(match)
                 self.assertTrue(match.group(1).strip().startswith("Use when"))
 
-    def test_first_party_skills_include_quick_reference_and_common_mistakes(self) -> None:
+    def test_first_party_skill_frontmatter_name_matches_directory(self) -> None:
         for skill_path in first_party_skill_paths():
             with self.subTest(skill=skill_path.parent.name):
                 text = read_text(skill_path)
-                self.assertIn("## Quick Reference", text)
-                self.assertIn("## Common Mistakes", text)
+                match = re.search(r"^name:\s*(.+)$", text, re.MULTILINE)
+                self.assertIsNotNone(match)
+                self.assertEqual(match.group(1).strip(), skill_path.parent.name)
 
     def test_large_first_party_skills_include_a_table_of_contents(self) -> None:
         for skill_path in first_party_skill_paths():
@@ -56,10 +57,8 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-worktrees",
             "jy-checkpoint",
             "jy-document-release",
-            "jy-intent-gate",
             "jy-review-all",
             "jy-review-work",
-            "jy-loop",
             "jy-debugging",
             "jy-test-driven",
             "jy-executing-plans",
@@ -111,9 +110,9 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("skill behavior change -> skill doc + scenario pack", text)
         self.assertIn("install surface change -> README + AGENTS", text)
         self.assertIn("routing change -> AGENTS + related skill doc", text)
-        self.assertIn("## Full Consistency Audit", text)
-        self.assertIn("full consistency audit", text)
-        self.assertIn("plugins/jy-env-core/skills/*/SKILL.md", text)
+        self.assertIn("## Risk-Scoped Consistency Check", text)
+        self.assertIn("affected documentation surface", text)
+        self.assertNotIn("full consistency audit", text)
 
     def test_systematic_debugging_documents_reproduce_hypothesize_and_verify(self) -> None:
         text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-debugging" / "SKILL.md")
@@ -142,6 +141,11 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("shared understanding", text)
         self.assertIn("codebase", text)
         self.assertIn("jy-codebase-explore", text)
+        self.assertIn("domain language", text)
+        self.assertIn("CONTEXT.md", text)
+        self.assertIn("glossary", text)
+        self.assertIn("ADR", text)
+        self.assertIn("explicitly asks", text)
         self.assertIn("Do not modify code", text)
         self.assertIn("## Mode-Aware Behavior", text)
         self.assertIn("Shift+Tab", text)
@@ -170,9 +174,10 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("Never force push", text)
         self.assertIn("VERSION", text)
         self.assertIn("CHANGELOG", text)
-        self.assertIn("old CI run", text)
-        self.assertIn("If docs sync creates a new commit, push the same branch again", text)
+        self.assertIn("stale CI result", text)
         self.assertIn("Do not skip the `jy-document-release` decision", text)
+        self.assertLess(text.index("## Documentation Sync"), text.index("## Final Review And Verification Gate"))
+        self.assertLess(text.index("## Final Review And Verification Gate"), text.index("## Commit, Push, And PR/MR"))
 
     def test_writing_plans_documents_plan_doc_contract_and_placeholder_bans(self) -> None:
         text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-writing-plans" / "SKILL.md")
@@ -190,6 +195,8 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("jy-verification-before-completion", text)
         self.assertIn("jy-review-work", text)
         self.assertIn("does not auto-spawn subagents", text)
+        self.assertIn("one final fresh verification", text)
+        self.assertIn("risk-proportionate review", text)
         self.assertIn("## Mode-Aware Behavior", text)
 
     def test_worktrees_documents_directory_policy_and_ignore_verification(self) -> None:
@@ -302,7 +309,6 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         execution_skills = [
             "jy-slop-remover",
             "jy-review-work",
-            "jy-loop",
             "jy-document-release",
             "jy-checkpoint",
             "jy-debugging",
@@ -353,36 +359,17 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
                     "evidence" in text or "permalink" in text or "sources" in text or "links" in text,
                     f"{skill_name} is research-oriented but does not require evidence/sources")
 
-    def test_korean_law_search_documents_two_part_answers_for_real_world_questions(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-korean-law-search" / "SKILL.md")
-
-        self.assertIn("pure legal lookup", text)
-        self.assertIn("real-world situation", text)
-        self.assertIn("## Answer Shape", text)
-        self.assertIn("General legal answer", text)
-        self.assertIn("Practical answer", text)
-        self.assertIn("precedent", text)
-        self.assertIn("interpretation", text)
-        self.assertIn("If you do not find directly relevant", text)
-        self.assertIn("Do not fill the practical answer", text)
-
     def test_cross_skill_references_point_to_existing_skills(self) -> None:
         """Skills that reference other skills by name should reference existing ones."""
         existing_skill_names = {p.parent.name for p in first_party_skill_paths()}
-        # Pattern: backtick-quoted skill names like `jy-consult`
-        ref_pattern = re.compile(r"`([\w-]+)`")
-        known_non_skill_refs = {
-            "run_in_background", "run_in_background=true", "Shift+Tab",
-            "PASS", "FAIL", "PASS/FAIL", "Save", "List", "Resume",
-            "inspect", "apply", "bootstrap", "git", "python3",
-        }
+        ref_pattern = re.compile(r"`(jy-[\w-]+)`")
+        unknown_refs: dict[str, list[str]] = {}
         for skill_path in first_party_skill_paths():
             text = read_text(skill_path)
-            refs = ref_pattern.findall(text)
-            for ref in refs:
-                if ref in existing_skill_names and ref != skill_path.parent.name:
-                    # This is a cross-reference to another skill - it exists, so it's valid
-                    pass
+            missing = sorted(set(ref_pattern.findall(text)) - existing_skill_names)
+            if missing:
+                unknown_refs[skill_path.parent.name] = missing
+        self.assertEqual(unknown_refs, {})
 
 
 if __name__ == "__main__":

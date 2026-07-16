@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 import json
+import os
+import shutil
 import subprocess
 import tempfile
 import textwrap
@@ -42,7 +44,6 @@ def write_bootstrap_repo(root: Path) -> None:
                 "version": "0.1.0",
                 "description": "fixture",
                 "skills": "./skills/",
-                "mcpServers": "./.mcp.json",
                 "interface": {"category": "Productivity"},
             },
             indent=2,
@@ -50,7 +51,6 @@ def write_bootstrap_repo(root: Path) -> None:
         + "\n",
         encoding="utf-8",
     )
-    (root / "plugins" / "jy-env-core" / ".mcp.json").write_text('{"mcpServers":{}}\n', encoding="utf-8")
     (root / "plugins" / "jy-env-core" / "skills" / "jy-env-sync-admin" / "SKILL.md").write_text(
         "---\nname: jy-env-sync-admin\ndescription: fixture\n---\n",
         encoding="utf-8",
@@ -96,6 +96,9 @@ class BootstrapSmokeTests(unittest.TestCase):
                     self.assertTrue((Path(home_dir) / ".agents" / "skills" / "jy-env-core" / "jy-env-sync-admin" / "SKILL.md").exists())
                     self.assertTrue((Path(home_dir) / ".codex" / "AGENTS.md").exists())
                     self.assertTrue((Path(home_dir) / ".agents" / "plugins" / "marketplace.json").exists())
+                    self.assertFalse((Path(home_dir) / "plugins" / "jy-env-core").is_symlink())
+                    self.assertFalse((Path(home_dir) / ".agents" / "skills" / "jy-env-core").is_symlink())
+                    self.assertFalse((Path(home_dir) / ".codex" / "AGENTS.md").is_symlink())
 
     def test_clone_or_update_repo_separates_same_basename_sources(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -117,6 +120,40 @@ class BootstrapSmokeTests(unittest.TestCase):
             self.assertNotEqual(cached_a, cached_b)
             self.assertEqual((cached_a / "README.md").read_text(encoding="utf-8"), "repo-a\n")
             self.assertEqual((cached_b / "README.md").read_text(encoding="utf-8"), "repo-b\n")
+
+    @unittest.skipUnless(shutil.which("bash"), "bash is not available")
+    def test_posix_bootstrap_script_installs_a_snapshot(self) -> None:
+        with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
+            repo_root = Path(repo_dir)
+            write_bootstrap_repo(repo_root)
+            source_package = Path(__file__).resolve().parents[1] / "codex_env_sync"
+            shutil.copytree(
+                source_package,
+                repo_root / "codex_env_sync",
+                ignore=shutil.ignore_patterns("__pycache__"),
+            )
+            git_repo = make_local_git_repo(repo_root)
+            script = Path(__file__).resolve().parents[1] / "scripts" / "bootstrap.sh"
+            env = os.environ.copy()
+            env["HOME"] = home_dir
+
+            result = subprocess.run(
+                ["bash", str(script), str(git_repo)],
+                check=False,
+                env=env,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+
+            home_root = Path(home_dir)
+            self.assertFalse((home_root / "plugins" / "jy-env-core").is_symlink())
+            self.assertFalse((home_root / ".agents" / "skills" / "jy-env-core").is_symlink())
+            self.assertFalse((home_root / ".codex" / "AGENTS.md").is_symlink())
+
+    def test_powershell_bootstrap_does_not_persist_a_temporary_pythonpath(self) -> None:
+        script = Path(__file__).resolve().parents[1] / "scripts" / "bootstrap.ps1"
+        self.assertNotIn("$env:PYTHONPATH =", script.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

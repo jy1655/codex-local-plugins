@@ -23,4 +23,7 @@ cleanup() {
 trap cleanup EXIT
 
 git clone --depth 1 "$GIT_URL" "$TMPDIR/repo"
-PYTHONPATH="$TMPDIR/repo" "$PYTHON" -m codex_env_sync.cli bootstrap "$GIT_URL"
+(
+  cd "$TMPDIR/repo"
+  "$PYTHON" -m codex_env_sync.cli apply --repo-root . --snapshot
+)

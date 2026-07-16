@@ -24,7 +24,6 @@ class ManagedPaths:
     marketplace_path: Path
     repo_cache_root: Path
     state_path: Path
-    local_plugin_overlay_root: Path
 
     @classmethod
     def for_platform(cls, os_name: str | None = None, home: str | Path | None = None) -> "ManagedPaths":
@@ -39,7 +38,6 @@ class ManagedPaths:
             marketplace_path=resolved_home / ".agents" / "plugins" / "marketplace.json",
             repo_cache_root=resolved_home / ".codex-env-sync" / "repos",
             state_path=resolved_home / ".codex-env-sync" / "state.json",
-            local_plugin_overlay_root=resolved_home / ".codex-env-sync" / "local" / "plugins",
         )
 
     def ensure_parent_dirs(self) -> None:
@@ -49,7 +47,6 @@ class ManagedPaths:
         self.marketplace_path.parent.mkdir(parents=True, exist_ok=True)
         self.repo_cache_root.mkdir(parents=True, exist_ok=True)
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
-        self.local_plugin_overlay_root.mkdir(parents=True, exist_ok=True)
 
 
 def resolve_target_path(home: Path, target: str) -> Path:

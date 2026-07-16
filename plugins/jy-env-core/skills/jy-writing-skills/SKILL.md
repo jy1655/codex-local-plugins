@@ -5,414 +5,107 @@ description: Use when creating a new skill, revising an existing skill, or verif
 
 # JY Writing Skills
 
-## Table of Contents
-
-- Overview
-- Quick Reference
-- What Counts as a Skill
-- TDD Mapping for Skill Writing
-- When to Write a Skill
-- Skill Types
-- Directory Layout
-- `SKILL.md` Structure
-- Authoring Language Policy
-- Claude Search Optimization
-- The Iron Law
-- Testing Strategy
-- Red Flags
-- Common Mistakes
-- RED-GREEN-REFACTOR Cycle
-- Skill Writing Checklist
-- When to Use Flowcharts
-- Code Examples
-- STOP Before Moving On
-- Discovery Workflow
-- Summary
-
 ## Overview
 
-Skill authoring is TDD applied to process documentation. Write the test case first
-(pressure scenarios), watch the baseline failure, write the skill, verify it, then close
-the loopholes.
+Author small, discoverable first-party skills whose instructions are proportional to their
+risk. Use static checks for structure, manual pressure scenarios for behavior, and fresh
+deployment checks for the installed surface. Do not manufacture a behavioral test cycle for
+a wording-only edit.
 
-Core principle: if you did not watch an agent fail without the skill, you do not know
-whether the skill teaches the right behavior.
+## Authoring Language
 
-Required background: understand `jy-test-driven` first. That skill defines the
-RED-GREEN-REFACTOR cycle this guide builds on.
+- Use English-first wording for the core `SKILL.md` and `agents/openai.yaml` because these
+  are model-facing instructions.
+- Korean and other languages are valid for user-facing examples or an explicitly justified
+  locale-specific skill.
+- Respond in the user's language. English-first authoring is not an output-language rule.
 
-## Quick Reference
+## Skill Shape
 
-| Phase | Must Be True | Failure Signal |
-|-------|--------------|----------------|
-| RED | You observed the baseline failure without the skill | You wrote docs before pressure scenarios |
-| GREEN | You wrote the smallest document that blocks that failure | You only added checklists and examples |
-| REFACTOR | You blocked the new rationalization paths too | You stopped after one passing run |
-| Ship | You verified references, agents, and tests together | You edited only `SKILL.md` |
+Every skill needs:
 
-## What Counts as a Skill
+- YAML frontmatter with a directory-matching `name`;
+- a third-person `description` beginning with `Use when` and describing triggers;
+- only the workflow, boundaries, and examples needed to change agent behavior;
+- `agents/openai.yaml` when the plugin surface expects it.
 
-A skill is a reusable guide for a proven technique, pattern, or tool. It is not a narrative
-about one past session.
+Sections such as Quick Reference, Common Mistakes, or a flowchart are optional. Add them
+only when they materially improve a non-trivial workflow.
 
-In this repo, first-party workflow skills include items such as `jy-writing-plans`,
-`jy-executing-plans`, `jy-worktrees`, and `jy-receiving-review`.
+## Risk Tiers
 
-## TDD Mapping for Skill Writing
+### Tier 1: metadata or wording
 
-| TDD Concept | Skill Writing Equivalent |
-|-------------|--------------------------|
-| Test case | pressure scenario, often with sub-agents |
-| Production code | `SKILL.md` and supporting references |
-| RED failure | agent violates the rule without the skill |
-| GREEN success | agent follows the rule with the skill |
-| REFACTOR | keep compliance while closing loopholes |
+Examples: typo, clearer sentence, display metadata, non-behavioral link fix.
 
-## When to Write a Skill
+- inspect the local context;
+- edit narrowly;
+- run targeted schema, link, or compliance checks;
+- do not require a manual pressure run unless the trigger or behavior changed.
 
-Write a skill when:
+### Tier 2: trigger or workflow behavior
 
-- the technique is not obvious
-- it is reused across projects
-- the pattern is broad rather than project-specific
-- other people will benefit from reusing it
+Examples: description trigger, routing decision, mode behavior, output contract.
 
-Do not write a skill when:
+- define the failure the change should prevent;
+- update the matching `pressure-scenarios.json` input;
+- run relevant static tests;
+- manually run the scenario when behavioral confidence is required, and record the actual
+  model/configuration externally.
 
-- it is a one-off solution
-- a good standard already exists elsewhere
-- it is a project-specific rule that belongs in `CLAUDE.md` or repo instructions
-- the constraint can be enforced mechanically with regex, lint, or automation
+### Tier 3: safety or irreversible action
 
-## Skill Types
+Examples: git publication, destructive operations, external messages, secret handling.
 
-- Technique: a concrete method with steps to follow
-- Pattern: a way of thinking about a class of problems
-- Reference: API docs, syntax guidance, or tool manuals
+- use adversarial pressure cases and explicit stop conditions;
+- test likely rationalizations and permission boundaries;
+- require fresh, task-specific verification before deployment.
 
-## Directory Layout
+The files in `skill-tests/first-party/` are manual inputs. Their presence proves schema
+coverage only, not that an evaluation passed.
 
-```text
-skills/
-  skill-name/
-    SKILL.md
-    supporting-file.*
-```
+## Workflow
 
-Keep the namespace flat so every skill remains searchable.
+1. Confirm the requested skill or change is necessary and belongs in this plugin.
+2. Inspect the nearest existing skill, plugin conventions, and current tests.
+3. Classify the change as Tier 1, 2, or 3.
+4. Write the smallest instruction that closes the evidenced gap.
+5. Update `agents/openai.yaml`, routing docs, or pressure scenarios only when their contract
+   changed.
+6. Run proportional static checks.
+7. For Tier 2 or 3, run manual pressure evaluation when the user or release risk requires
+   behavioral evidence; never imply it ran when it did not.
+8. Apply the repo and start a fresh Codex session when deployment visibility matters.
 
-Move content out of `SKILL.md` when it is:
+## Pressure Scenario Guidance
 
-- large reference material (100+ lines)
-- reusable tooling such as scripts, templates, or utilities
+Each manual scenario should name one realistic pressure, a likely failure without the
+skill, and observable expected behavior with it. Avoid vague success language.
 
-Keep content inline when it is:
+See [skill-testing-guide.md](references/skill-testing-guide.md) for scenario design. For
+high-pressure rule skills, use [bulletproofing-skills.md](references/bulletproofing-skills.md)
+and [cso-detailed.md](references/cso-detailed.md) selectively. These references do not turn
+every edit into a mandatory baseline experiment.
 
-- core principles
-- short code patterns
-- anything small enough to be scanned quickly
+## Visual Workflows
 
-## `SKILL.md` Structure
+Use a diagram only when branching or state transitions are hard to understand in prose.
+Follow [graphviz-conventions.dot](references/graphviz-conventions.dot) for repo-native DOT
+style; do not add a renderer runtime merely to document a simple sequence.
 
-Frontmatter:
+## Deployment Check
 
-- required: `name`, `description`
-- `name`: lowercase letters, numbers, hyphens only
-- `description`: third-person, starts with `Use when...`, includes triggers only
-
-Preferred body structure:
-
-- Overview
-- When to Use
-- Core Pattern when relevant
-- Quick Reference
-- Implementation or supporting references
-- Common Mistakes
-
-## Authoring Language Policy
-
-The default is simple:
-
-- core `SKILL.md` content is `English-first`
-- `agents/openai.yaml` fields such as `display_name`, `short_description`, and `default_prompt` follow the same rule
-- supporting references should also be English-first when the model is likely to read them directly
-
-Why:
-
-- skills are model-facing documents first
-- search, trigger matching, cross-skill reuse, and provider portability are more stable in English
-- mixed language in core workflow docs increases maintenance drift
-
-Allowed exceptions:
-
-- user-facing README files, human-facing Korean operating notes, and result templates may be bilingual or `Korean`
-- repo-specific notes written mainly for humans may remain Korean
-- but the core workflow instruction should not default to Korean without a specific reason
-
-`English-first` is an authoring rule, not an `output-language rule`.
-
-- the final user-facing response should follow the user's language by default
-- if the user asks for English or switches languages, follow that request
-- if a skill has an `Output Template`, its labels and short status phrases should be rendered in the user's language at runtime
-- keep literal tokens such as commands, paths, and code identifiers exact
-
-## Claude Search Optimization
-
-Claude Search Optimization (CSO) matters because the description controls whether the skill
-gets loaded at all.
-
-### Description field
-
-The description has only two jobs:
-
-1. state the trigger conditions clearly
-2. avoid summarizing the workflow
-
-If the description summarizes the workflow, the agent may follow the description instead of
-reading the body.
-
-Good:
-
-- "Use when executing a written implementation plan in the current session"
-- "Use when starting a feature or bug fix before implementation"
-
-Bad:
-
-- "Use for TDD: write tests first, fail, implement, refactor"
-- "Use for async testing"
-
-### Keyword coverage
-
-Use the terms Claude is likely to search for:
-
-- error messages such as `timeout exceeded` or `ENOTEMPTY`
-- symptoms such as `flaky`, `hanging`, or `race condition`
-- synonyms such as `cleanup`, `teardown`, or `pollution`
-- real tool names, commands, and library names
-
-### Token efficiency
-
-Frequently loaded skills compete with the rest of the context window.
-
-Rough goals:
-
-- getting-started workflows: under 150 words
-- frequently loaded skills: under 200 words
-- most other skills: under 500 words
-
-Techniques:
-
-- move long details into references
-- cross-reference another skill instead of repeating it
-- keep examples short
-- remove repetition
-
-### Cross-skill references
-
-Use a plain skill-name reference such as:
-
-```markdown
-Required background: `jy-test-driven`
-```
-
-Do not use `@` file links that force-load large files too early.
-
-## The Iron Law
-
-```text
-Do not write or revise a skill without a failing test first.
-```
-
-That rule applies to both new skills and edits to existing skills.
-
-No exceptions:
-
-- not for a small addition
-- not for a new section
-- not for a doc-only update
-- do not keep untested changes "as reference"
-- do not "adapt while testing"
-
-## Testing Strategy
-
-For rule-enforcement skills:
-
-- comprehension questions
-- pressure scenarios
-- compound pressure: time + sunk cost + fatigue
-
-For technique skills:
-
-- application scenarios
-- edge-case variations
-
-For pattern skills:
-
-- recognition scenarios
-- application scenarios
-- negative examples where the pattern should not be used
-
-For reference skills:
-
-- search scenarios
-- apply-what-you-found scenarios
-
-Detailed guidance lives in `references/skill-testing-guide.md`.
-
-For loophole-closing patterns such as pressure scenarios, anti-rationalization tables, STOP
-gates, and repeated injection, see `references/bulletproofing-skills.md`.
-
-For CSO examples and counterexamples, see `references/cso-detailed.md`.
-
-## Red Flags
-
-```markdown
-- code written before the test
-- "I already tested it manually"
-- "writing the test after the code reaches the same goal"
-- "I followed the spirit"
-- "this is different because..."
-
-All mean the same thing: delete the code and restart with TDD.
-```
+- run the relevant unit tests and `git diff --check`;
+- run `python3 -m codex_env_sync.cli inspect --repo-root .`;
+- for this local development repo, run normal `apply` so the live symlink surface updates;
+- for a detached install, use `apply --snapshot` or bootstrap;
+- start a fresh Codex session if discovery metadata changed.
 
 ## Common Mistakes
 
-- putting workflow summaries into frontmatter descriptions so the agent never reads the body
-- omitting scan-friendly sections like `Quick Reference` and `Common Mistakes`
-- copying stale or nonexistent skill names
-- assuming the document is obviously correct without seeing the baseline failure
-- failing to say when a supporting file should be read
-- breaking the English-first rule for core workflow docs without a specific reason
-- treating English-first authoring as permission to force English user-facing output
-
-## RED-GREEN-REFACTOR Cycle
-
-RED:
-
-- run the pressure scenario without the skill
-- capture what the agent does, what excuses it uses, and what pressure triggers the violation
-
-GREEN:
-
-- write the smallest skill that counters those exact excuses
-- rerun the same scenario with the skill and confirm compliance
-
-REFACTOR:
-
-- look for new excuses
-- add explicit counters
-- retest until no useful loopholes remain
-
-## Skill Writing Checklist
-
-### RED
-
-- write pressure scenarios
-- use 3+ combined pressures for rule skills
-- run the scenario without the skill
-- record baseline behavior and rationalizations
-
-### GREEN
-
-- keep the name lowercase plus hyphens
-- define `name` and `description`
-- start the description with `Use when...`
-- keep the core `SKILL.md` and agent prompt surface English-first
-- keep user-facing output aligned with the user's language
-- include search keywords
-- state the core principle clearly
-- address the specific RED failures
-- define output-language behavior for any `Output Template`
-- include either inline examples or a targeted file reference
-- rerun the scenario with the skill
-
-### REFACTOR
-
-- capture new rationalizations from testing
-- add explicit counters
-- maintain a rationalization table if useful
-- add a Red Flags list
-- retest until the loopholes are closed
-
-### Quality checks
-
-- use a flowchart only when the decision is not obvious
-- include a Quick Reference table
-- include a Common Mistakes section
-- avoid narrative storytelling
-- keep supporting files for tools or large references only
-
-### Ship
-
-- commit the skill changes
-- consider contributing broadly useful guidance upstream only after the first-party version is stable
-
-## When to Use Flowcharts
-
-Use a flowchart when:
-
-- a decision point is not obvious
-- a process has early stop conditions
-- the skill needs a real A-vs-B decision
-
-Do not use a flowchart for:
-
-- pure reference material
-- code examples
-- linear instructions
-- meaningless labels such as `step1` or `helper2`
-
-See `references/graphviz-conventions.dot` for style rules.
-
-## Code Examples
-
-One strong example beats many average ones.
-
-Choose the most relevant language:
-
-- testing techniques -> TypeScript or JavaScript
-- systems debugging -> Shell or Python
-- data handling -> Python
-
-A good example is:
-
-- complete and runnable
-- commented only where the WHY matters
-- grounded in a real scenario
-- clear about the pattern being taught
-
-Avoid:
-
-- 5+ language versions
-- fill-in-the-blank templates
-- contrived examples
-
-## STOP Before Moving On
-
-After writing a skill, stop and finish the deployment loop before starting the next one.
-
-Do not:
-
-- batch multiple untested skills
-- move on before validating the current one
-- skip tests because batching feels efficient
-
-Shipping an untested skill is the same quality failure as shipping untested code.
-
-## Discovery Workflow
-
-How future Claude instances find a skill:
-
-1. a problem appears
-2. the skill description matches
-3. the Overview confirms relevance
-4. the Quick Reference gives the pattern
-5. examples or references load only when needed
-
-Optimize for that flow. Put searchable information early.
-
-## Summary
-
-Skill authoring is TDD for process documentation. Same Iron Law, same cycle, same quality
-bar. If you would use TDD for code, use it for skills too.
+- Encoding usage instructions in the description instead of trigger conditions
+- Adding boilerplate sections that do not affect decisions
+- Treating scenario JSON as evidence of an executed evaluation
+- Requiring a no-skill baseline for a typo or metadata-only change
+- Copying stale namespaces or third-party runtime assumptions
+- Editing generated plugin cache instead of the first-party source

@@ -5,7 +5,7 @@
       "title": "Skill changes should update both docs and verification assets",
       "prompt": "We just changed a first-party skill's behavior and trigger conditions. Sync the release docs so future maintainers and tests reflect the shipped behavior.",
       "expected_without_skill": "Touches only the obvious skill file or README, but forgets the matching scenario pack or static verification rules.",
-      "expected_with_skill": "Updates the affected skill docs, checks whether README or AGENTS routing changed, syncs the matching `skill-tests/first-party/...` artifact set, and still performs a full existing-doc consistency pass."
+      "expected_with_skill": "Updates the affected skill doc and manual pressure scenarios, then checks README or AGENTS only when the skill's public routing or catalog contract changed."
     },
     {
       "id": "do-not-invent-missing-release-files",
@@ -22,11 +22,11 @@
       "expected_with_skill": "Treats the change as an install-surface update and syncs both `README.md` and `instructions/AGENTS.md` together."
     },
     {
-      "id": "recover-older-doc-drift-during-current-pass",
-      "title": "Current docs pass should also recover older drift",
-      "prompt": "We changed one skill today, but I suspect earlier doc updates were skipped. Do a release-docs pass that catches stale wording anywhere in the existing docs surface.",
-      "expected_without_skill": "Only patches the directly changed files from today's diff and leaves older stale docs untouched.",
-      "expected_with_skill": "Uses the current diff as a starting point, then audits the full existing doc surface for matching paths, commands, mode rules, and routing language so older drift gets corrected too."
+      "id": "evidenced-cross-doc-match",
+      "title": "Changed literals should be checked where they are actually repeated",
+      "prompt": "The install command changed. Sync affected docs, but do not turn this into a broad prose audit.",
+      "expected_without_skill": "Either updates one obvious file and misses the same command elsewhere, or rewrites unrelated documentation without evidence.",
+      "expected_with_skill": "Searches for the exact changed command, updates only matching existing docs, and stops when the affected documentation surface is consistent."
     },
     {
       "id": "plan-mode-preview-only",
