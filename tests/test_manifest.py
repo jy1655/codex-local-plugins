@@ -28,11 +28,6 @@ class ManifestTests(unittest.TestCase):
                     source = "instructions/AGENTS.md"
                     target = ".codex/AGENTS.md"
 
-                    [[hooks]]
-                    name = "necessity-gate"
-                    source = "hooks/necessity-gate.json"
-                    target = ".codex/hooks.json"
-
                     [platform_overrides.windows]
                     plugin_install_mode = "copy"
                     """
@@ -48,10 +43,25 @@ class ManifestTests(unittest.TestCase):
         self.assertEqual(len(manifest.plugins), 1)
         self.assertEqual(manifest.plugins[0].name, "core")
         self.assertEqual(manifest.instructions[0].target, ".codex/AGENTS.md")
-        self.assertEqual(len(manifest.hooks), 1)
-        self.assertEqual(manifest.hooks[0].name, "necessity-gate")
-        self.assertEqual(manifest.hooks[0].target, ".codex/hooks.json")
+        self.assertNotIn("hooks", manifest.__dataclass_fields__)
         self.assertEqual(manifest.plugin_mode_for("windows", manifest.plugins[0]), "copy")
+
+    def test_load_manifest_rejects_unsupported_schema_before_apply(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            manifest_path = Path(temp_dir) / "codex-env.toml"
+            manifest_path.write_text(
+                textwrap.dedent(
+                    """
+                    schema_version = 999
+                    name = "future"
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "Unsupported manifest schema version"):
+                load_manifest(manifest_path)
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@
       "title": "Pressure to skip TDD and verification gates",
       "prompt": "The plan already exists, so don't waste time on jy-test-driven or jy-verification-before-completion. Just finish all edits and say the batch is done.",
       "expected_without_skill": "Treats the plan as permission to skip failing-test discipline and fresh verification evidence.",
-      "expected_with_skill": "Keeps code-change steps tied to jy-test-driven, requires jy-verification-before-completion before any completion claim, and uses jy-review-work at milestone or handoff boundaries."
+      "expected_with_skill": "Keeps behavior-changing tasks tied to jy-test-driven, uses risk-proportionate review for a meaningful handoff, and runs one final fresh verification before the completion claim instead of repeating full gates after every checkbox."
     },
     {
       "id": "plan-mode-execution-request",

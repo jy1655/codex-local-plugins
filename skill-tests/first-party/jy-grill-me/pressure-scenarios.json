@@ -20,6 +20,20 @@
       "prompt": "I want a long grilling session on this implementation direction, but I am still in Default mode.",
       "expected_without_skill": "Starts a long interactive loop without acknowledging collaboration mode or asks multiple questions at once.",
       "expected_with_skill": "Explains that an extended loop belongs in Plan Mode, tells the user to press Shift+Tab, and still leaves the first focused question plus why it matters."
+    },
+    {
+      "id": "domain-docs-grounding",
+      "title": "Existing domain language should shape the challenge",
+      "prompt": "Grill me on renaming Accounts to Customers and changing cancellation behavior. The repo may have CONTEXT.md and ADRs.",
+      "expected_without_skill": "Asks the user to define terms immediately or treats the naming change as a generic preference without checking existing glossary, ADR, or code language.",
+      "expected_with_skill": "Looks for CONTEXT.md, CONTEXT-MAP.md, and docs/adr before asking, calls out conflicts with existing domain language, and asks one decision question grounded in the discovered terms."
+    },
+    {
+      "id": "docs-update-boundary",
+      "title": "Documentation capture should not override advisory boundaries",
+      "prompt": "Grill me using the grill-with-docs style, but I have not asked you to edit files.",
+      "expected_without_skill": "Creates or updates CONTEXT.md or ADR files during the advisory interview just because terminology or decisions were discussed.",
+      "expected_with_skill": "Keeps the default session read-only, suggests doc or ADR captures only when useful, and edits docs only if the user explicitly asks for documentation updates."
     }
   ]
 }

@@ -4,9 +4,8 @@ This machine is managed by the portable Codex environment sync repo.
 
 ## Environment Rules
 
-- Treat `~/plugins`, `~/.agents/skills/`, `~/.agents/plugins/marketplace.json`, and `~/.codex/hooks.json` as the source-owned install surface.
+- Treat `~/plugins`, `~/.agents/skills/`, `~/.agents/plugins/marketplace.json`, and installed instruction artifacts under `~/.codex/` as the source-owned install surface.
 - Do not edit `~/.codex/plugins/cache` directly.
-- Do not hand-edit repo-managed hook entries in `~/.codex/hooks.json`; change `hooks/` in this repo and run apply so user hooks are preserved.
 - When changing this environment repo, prefer first-party plugin bundles committed here over
   live dependencies on upstream seed sources.
 - Treat `plugins/jy-env-core/skills/` as the first-party skill source of truth.
@@ -36,7 +35,7 @@ This machine is managed by the portable Codex environment sync repo.
 - If the user wants an isolated feature branch or worktree before implementation, prefer `jy-worktrees`.
 - If the user wants `mydocs/`, durable project records, waterfall-style task orders, or a multi-hour project ledger, prefer `jy-waterfall`.
 - If the correct planning path is not obvious, route through `jy-autoplan` instead of choosing ad hoc.
-- If the user shipped changes and now needs docs, instructions, or skill verification artifacts synced, prefer `jy-document-release`.
+- If shipped changes require affected docs, instructions, or manual skill pressure scenarios to be synced, prefer `jy-document-release`.
 - If the user wants to ship a ready branch, push verified changes, or create/update a PR/MR, prefer `jy-ship`.
 - Planning skills are mode-aware, but they cannot switch Codex collaboration mode themselves.
 - If a planning skill says the task belongs in Plan Mode, tell the user to press `Shift+Tab` and re-run the named skill.
@@ -51,7 +50,6 @@ This machine is managed by the portable Codex environment sync repo.
 - If the user is about to claim work is complete, fixed, or passing, prefer `jy-verification-before-completion`.
 - If the user completed implementation and wants multi-angle review, prefer `jy-review-work`.
 - If the user is responding to review feedback or PR comments, prefer `jy-receiving-review`.
-- If the user needs iterative work until verified completion, prefer `jy-loop`.
 - If the user wants to clean AI-generated code smells from files, prefer `jy-slop-remover`.
 - If the user wants the current branch pushed and a PR/MR created after fresh gates pass, prefer `jy-ship`.
 - Execution skills are mode-aware: if the user is in Plan Mode, tell them to press `Shift+Tab` and re-run in Default mode.
@@ -66,7 +64,5 @@ This machine is managed by the portable Codex environment sync repo.
 
 - If the user faces architecture decisions, repeated failures, or security/performance concerns, prefer `jy-consult`.
 - If the user wants a whole-project audit, full repo review, architecture health check, or maintainability scan, prefer `jy-review-all`.
-- If the user needs Korean law, ordinance, precedent, annex, amendment history, or procedure search through the installed `korean-law` MCP server, prefer `jy-korean-law-search`.
 - If the user needs evidence-based answers about external libraries or packages, prefer `jy-library-research`.
 - If the user needs multi-angle codebase exploration across modules, prefer `jy-codebase-explore`.
-- If the user's request is ambiguous and needs intent classification, prefer `jy-intent-gate`.

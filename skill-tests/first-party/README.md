@@ -1,16 +1,24 @@
-# First-Party Skill Verification Packs
+# First-Party Skill Pressure Scenarios
 
-This directory contains local, repeatable verification assets for the first-party skills
-shipped in `plugins/jy-env-core/skills/`.
+This directory stores manual evaluation inputs for the first-party skills under
+`plugins/jy-env-core/skills/`. Each skill has one `pressure-scenarios.json` file.
 
-Each skill pack includes:
+These files are not proof that an agent run passed. CI validates only their presence and
+schema. Record behavioral results outside this tree only when the scenarios were actually
+run against a named model and configuration.
 
-- `README.md` for scope and execution notes
-- `baseline.md` for the RED state without the skill
-- `pressure-scenarios.json` for concrete pressure scenarios
-- `result-template.md` for recording the observed outcome
+## Manual Schema
 
-Run the static checks with:
+Each JSON document contains one top-level `scenarios` array with at least two objects.
+Every scenario has exactly these non-empty string fields:
+
+- `id`: stable identifier within the skill
+- `title`: short description of the pressure case
+- `prompt`: input to run manually
+- `expected_without_skill`: likely failure mode
+- `expected_with_skill`: behavior the skill should produce
+
+Validate the assets with:
 
 ```bash
 python3 -m unittest tests.test_skill_scenarios -v

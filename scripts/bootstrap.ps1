@@ -16,8 +16,16 @@ try {
     if (-not $Python) {
         throw "python or python3 is required"
     }
-    $env:PYTHONPATH = (Join-Path $TempRoot "repo")
-    & $Python.Source -m codex_env_sync.cli bootstrap $GitUrl
+    Push-Location (Join-Path $TempRoot "repo")
+    try {
+        & $Python.Source -m codex_env_sync.cli apply --repo-root . --snapshot
+        if ($LASTEXITCODE -ne 0) {
+            throw "codex-env-sync apply failed with exit code $LASTEXITCODE"
+        }
+    }
+    finally {
+        Pop-Location
+    }
 }
 finally {
     if (Test-Path $TempRoot) {

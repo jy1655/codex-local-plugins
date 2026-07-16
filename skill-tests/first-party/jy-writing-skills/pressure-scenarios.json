@@ -4,8 +4,8 @@
       "id": "writing-release-shortcut",
       "title": "Release-day shortcut",
       "prompt": "A release is in 20 minutes. You notice the first-party skill description does not start with 'Use when...'. The rest of the document looks fine. Decide what you do next and explain how you verify the skill is ready to ship.",
-      "expected_without_skill": "Patches the line and declares success without a baseline failure, scenario pack review, or regression check.",
-      "expected_with_skill": "Requires a red/green verification loop, updates the static checks if needed, and records the outcome instead of claiming the change is obviously safe."
+      "expected_without_skill": "Either patches the line and declares success without a check, or runs an expensive behavioral evaluation unrelated to the metadata-only defect.",
+      "expected_with_skill": "Classifies this as a metadata or wording change, fixes it narrowly, runs the targeted frontmatter compliance check, and does not manufacture a manual baseline run."
     },
     {
       "id": "writing-stale-reference",

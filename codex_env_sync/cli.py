@@ -4,7 +4,14 @@ import argparse
 from pathlib import Path
 import sys
 
-from .apply import MANIFEST_NAME, ApplyReport, apply_environment, bootstrap_environment
+from .apply import (
+    MANIFEST_NAME,
+    ApplyReport,
+    apply_environment,
+    bootstrap_environment,
+    load_state,
+    validate_environment,
+)
 from .manifest import load_manifest
 from .platforms import ManagedPaths
 
@@ -22,6 +29,11 @@ def build_parser() -> argparse.ArgumentParser:
     apply_cmd.add_argument("--repo-root", default=".", help="Path to the environment repo checkout")
     apply_cmd.add_argument("--home", help="Override the target home directory for testing")
     apply_cmd.add_argument("--os-name", choices=["darwin", "linux", "windows"], help="Override detected platform")
+    apply_cmd.add_argument(
+        "--snapshot",
+        action="store_true",
+        help="Copy a stable snapshot instead of linking the checkout",
+    )
 
     inspect = subparsers.add_parser("inspect", help="Show resolved paths and manifest contents")
     inspect.add_argument("--repo-root", default=".", help="Path to the environment repo checkout")
@@ -66,7 +78,7 @@ def command_bootstrap(args: argparse.Namespace) -> int:
 
 
 def command_apply(args: argparse.Namespace) -> int:
-    report = apply_environment(args.repo_root, home=args.home, os_name=args.os_name)
+    report = apply_environment(args.repo_root, home=args.home, os_name=args.os_name, snapshot=args.snapshot)
     print(_render_report(report))
     return 0
 
@@ -75,13 +87,14 @@ def command_inspect(args: argparse.Namespace) -> int:
     repo_root = Path(args.repo_root).resolve()
     manifest = load_manifest(repo_root / MANIFEST_NAME)
     paths = ManagedPaths.for_platform(os_name=args.os_name, home=args.home)
+    state = load_state(paths.state_path)
+    validate_environment(repo_root, manifest, paths, state)
     lines = [
         f"repo: {repo_root}",
         f"os: {paths.os_name}",
         f"home: {paths.home}",
         f"plugin_root: {paths.plugin_root}",
         f"skills_root: {paths.skills_root}",
-        f"local_plugin_overlay_root: {paths.local_plugin_overlay_root}",
         f"marketplace_path: {paths.marketplace_path}",
         f"codex_home: {paths.codex_home}",
         f"state_path: {paths.state_path}",
@@ -95,9 +108,6 @@ def command_inspect(args: argparse.Namespace) -> int:
             f"  - {instruction.name}: {instruction.source} -> {instruction.target} "
             f"({manifest.instruction_mode_for(paths.os_name, instruction)})"
         )
-    lines.append("hooks:")
-    for hook in manifest.hooks:
-        lines.append(f"  - {hook.name}: {hook.source} -> {hook.target}")
     print("\n".join(lines))
     return 0
 

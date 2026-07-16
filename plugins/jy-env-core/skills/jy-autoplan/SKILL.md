@@ -7,228 +7,92 @@ description: Use when the user wants the Codex planning pack to decide the next 
 
 ## Overview
 
-Act as the planning-pack orchestrator. Decide whether the current request belongs to brief
-framing, decision interviewing, plan review, taskized implementation planning, or written-plan
-execution, then choose the right `jy-*` path automatically.
+Classify planning maturity once, select the matching first-party skill, and return one
+useful result. This skill routes work; it cannot change collaboration mode by itself.
 
-This skill can select the right planning route, but it cannot switch Codex into Plan Mode
-by itself. If a mode change is needed, tell the user to use `Shift+Tab`.
-
-## When to Use
-
-- "autoplan", "run the whole planning flow", "pick the right planning step for me"
-- The user did not explicitly separate framing, plan review, and implementation planning
-- One consolidated planning result is needed
-
-Do not use it when:
-
-- The user already named a specific planning skill
-- The request is already clearly an implementation-only request
+Do not use it when the user named a specific planning skill or the request is already
+straightforward implementation work.
 
 ## Quick Reference
 
-| Step | Action |
-|------|--------|
-| 0. Mode check | Detect Default or Plan |
-| 1. Judge maturity | Decide idea / interview / plan / task-plan / execution stage |
-| 2. Pick route | Choose `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans`, or `jy-executing-plans` |
-| 3. Consolidate result | Return one brief, review result, task-plan preview, or execution handoff |
-| 4. Leave next step | Make the next action obvious |
+| Maturity | Route |
+|---|---|
+| Idea-stage | `jy-framing` |
+| Decision-interview-stage | `jy-grill-me` |
+| Plan-stage | `jy-plan-review` |
+| Task-plan-stage | `jy-writing-plans` |
+| Execution-stage | `jy-executing-plans` |
+| Execution-ready | planning pack not applicable |
 
 ## Routing Matrix
 
-### 1. Idea-stage
+### Idea-stage
 
-Signals:
+The user, problem, outcome, or constraints are still unclear. Route to `jy-framing`.
 
-- "Is this worth building?", "Where should I start?", "Is this the right direction?"
-- the target user, problem, or success criteria are still blurry
-- the task needs problem definition before implementation planning
+### Decision-interview-stage
 
-Route:
+A direction exists and the user wants one-question-at-a-time pressure testing. Route to
+`jy-grill-me`.
 
-- `jy-framing`
+### Plan-stage
 
-Output:
+A proposal or plan exists, but important decisions are unresolved. Route to
+`jy-plan-review`.
 
-- compact brief draft or a Plan Mode framing handoff
+### Task-plan-stage
 
-### 2. Decision-interview-stage
+Requirements are approved, but an implementer-ready task breakdown is missing. Route to
+`jy-writing-plans`.
 
-Signals:
+### Execution-stage
 
-- "grill me", "pressure-test this", "stress-test this plan", or "ask hard questions"
-- a plan or direction exists but the user wants one-question-at-a-time challenge
-- the bottleneck is hidden assumptions and shared understanding, not a rewritten plan yet
+A written plan exists and the user wants it executed. Route to `jy-executing-plans` in
+Default mode.
 
-Route:
+### Execution-ready
 
-- `jy-grill-me`
-
-Output:
-
-- first decision question, recommended answer when possible, or a Plan Mode grill-me handoff
-
-### 3. Plan-stage
-
-Signals:
-
-- a plan, proposal, outline, design doc, or TODO draft already exists
-- "Fill in the missing decisions", "Can this be implemented as-is?", "Lock this before implementation"
-- the bottleneck is decision completeness rather than task decomposition
-
-Route:
-
-- `jy-plan-review`
-
-Output:
-
-- compact review summary or a Plan Mode plan-review handoff
-
-### 4. Task-plan-stage
-
-Signals:
-
-- an approved brief or reviewed plan exists, but implementer-ready task breakdown is missing
-- "Write the implementation plan", "turn this into a task list", "make it executable"
-- execution units are the bottleneck, not the high-level decisions
-
-Route:
-
-- `jy-writing-plans`
-
-Output:
-
-- compact task-plan preview or a Plan Mode writing-plans handoff
-
-### 5. Execution-stage
-
-Signals:
-
-- a written plan already exists and real work should now follow it
-- "Execute this plan", "work from the plan", "follow the checkbox list"
-- the request is execution-ready because the plan artifact already exists
-
-Route:
-
-- `jy-executing-plans`
-
-Output:
-
-- compact execution handoff or the Default mode next step
-
-### 6. Execution-ready
-
-Signals:
-
-- "Implement this", "fix this now", "change the code", "run the tests", "review my implementation"
-- implementation is already done and an execution-oriented review or QA pass is needed
-- planning is no longer the bottleneck
-
-Route:
-
-- do not force a planning-pack route
-- send it to direct implementation or an execution skill such as `jy-review-work`
-
-Output:
-
-- `planning pack not applicable` plus the right next step
+The user wants direct implementation, debugging, or review. Return `planning pack not
+applicable` and name the relevant execution path without forcing another planning pass.
 
 ## Routing Rules
 
-- If the user explicitly named `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans`, or `jy-executing-plans`, do not override it
-- idea-stage -> `jy-framing`
-- decision-interview-stage -> `jy-grill-me`
-- plan-stage -> `jy-plan-review`
-- task-plan-stage -> `jy-writing-plans`
-- execution-stage -> `jy-executing-plans`
-- if idea and plan signals are mixed but the main uncertainty is problem definition, choose `jy-framing`
-- if the plan was reviewed but is not implementer-ready, choose `jy-writing-plans`
-- if a written plan already exists, do not send it back to earlier planning stages
-- if the request is execution-ready, do not send it through the planning pack
-- if the request is ambiguous between "lock decisions" and "execute now", prioritize the user's final verb
-
-Examples:
-
-- "review the plan" -> plan-stage
-- "grill me on this plan" -> decision-interview-stage
-- "write the implementation plan" -> task-plan-stage
-- "execute this plan" -> execution-stage
-- "review my implementation" -> execution-ready
-
-## Expected Output
-
-- the maturity classification
-- a one-line reason for that classification
-- the selected skill route or `planning pack not applicable`
-- one consolidated planning result
-- exactly one next step
+- Respect a skill the user explicitly selected.
+- Prefer the earliest unresolved planning dependency.
+- Do not send a written plan back to framing.
+- Do not send implementation-ready work into planning.
+- If two stages seem plausible, use the user's final requested verb.
 
 ## Mode-Aware Behavior
 
 ### If current collaboration mode is Default
 
-- Do not stop at classification alone
-- If the request is idea-stage, decision-interview-stage, or plan-stage:
-  - choose the route
-  - then say:
-    - "This belongs in Plan Mode. Press `Shift+Tab`, switch to Plan Mode, then run `/{skill-name}` again."
-- Still leave the smallest useful result:
-  - compact brief draft for idea-stage
-  - first grill-me question for decision-interview-stage
-  - compact review summary for plan-stage
-- If the request is task-plan-stage:
-  - route to Plan Mode for `/jy-writing-plans`
-  - still leave a compact task breakdown draft
-- If the request is execution-stage:
-  - do not recommend Plan Mode
-  - say that the written plan should be executed in Default mode with `/jy-executing-plans`
-- If the request is execution-ready:
-  - do not recommend Plan Mode
-  - say that implementation or an execution skill should happen next
-  - explicitly mark `planning pack not applicable`
+- For Idea-stage, Decision-interview-stage, Plan-stage, or Task-plan-stage, provide a
+  compact useful draft and tell the user to press `Shift+Tab` before re-running the chosen
+  planning skill.
+- For Execution-stage, keep the user in Default mode and route to `jy-executing-plans`.
+- For Execution-ready, mark the planning pack not applicable and proceed through the
+  appropriate execution workflow.
 
 ### If current collaboration mode is Plan
 
-- For idea-stage, continue with the `jy-framing` behavior
-- For decision-interview-stage, continue with the `jy-grill-me` behavior
-- For plan-stage, continue with the `jy-plan-review` behavior
-- For task-plan-stage, continue with the `jy-writing-plans` behavior
-- Use `<proposed_plan>` when the downstream skill would do so
-- For execution-stage, route back to Default mode:
-  - "This is an execution-oriented plan workflow. Leave Plan Mode with `Shift+Tab`, then run `/jy-executing-plans` again."
-- For execution-ready, route back to Default mode:
-  - "This is execution work, not planning. Leave Plan Mode with `Shift+Tab`, then run it again in Default mode."
-- Always consolidate the result into one planning outcome
+- Continue with the selected planning skill for the first four stages.
+- For Execution-stage or Execution-ready, tell the user to leave Plan mode with
+  `Shift+Tab` and re-run the execution request in Default mode.
 
-## Workflow
+## Output
 
-1. Check the current collaboration mode
-2. Check whether the user already named a specific planning skill
-3. Classify the request as `idea-stage / decision-interview-stage / plan-stage / task-plan-stage / execution-stage / execution-ready`
-4. Write a one-line reason
-5. Choose the route or mark `planning pack not applicable`
-6. Produce the mode-appropriate result
-7. Consolidate it into one response
-8. Leave one clear next step
+Return:
 
-## Boundaries
-
-- Do not assume any external orchestration runtime
-- Do not assume a third-party review pack
-- Prefer a single-response result
-- Do not force execution-ready work into a planning workflow
+1. maturity classification;
+2. one-sentence evidence;
+3. selected route or `planning pack not applicable`;
+4. one compact useful result;
+5. one next action.
 
 ## Common Mistakes
 
-- Confusing routing with mode switching
-- Recommending a planning skill without handling the mode mismatch
-- Telling the user only to switch to Plan Mode and giving no useful draft result
-- Sending task-plan work to plan review or execution
-- Sending a written plan back to brief or review stages
-- Forcing execution-ready requests through the planning pack
-- Overriding a planning skill the user explicitly named
-- Giving planning advice without actually routing
-- Sending idea-stage work straight to plan review
-- Sending an existing plan back to problem definition
-- Leaving no consolidated outcome
+- Treating routing as an automatic mode switch
+- Returning only a classification
+- Overriding the user's explicit skill choice
+- Sending execution-ready work through another planning cycle
