@@ -121,6 +121,7 @@ class BootstrapSmokeTests(unittest.TestCase):
             self.assertEqual((cached_a / "README.md").read_text(encoding="utf-8"), "repo-a\n")
             self.assertEqual((cached_b / "README.md").read_text(encoding="utf-8"), "repo-b\n")
 
+    @unittest.skipIf(os.name == "nt", "POSIX bootstrap script is not applicable on Windows")
     @unittest.skipUnless(shutil.which("bash"), "bash is not available")
     def test_posix_bootstrap_script_installs_a_snapshot(self) -> None:
         with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
