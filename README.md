@@ -3,93 +3,70 @@
 [![Language: English](https://img.shields.io/badge/Language-English-111827?style=for-the-badge)](./README.md)
 [![Language: Korean](https://img.shields.io/badge/Language-Korean-0A66C2?style=for-the-badge)](./README.ko.md)
 
-This repo defines a portable Codex working environment.
+This repository defines a portable, first-party Codex environment. It stages local plugin
+bundles, maintains a personal marketplace, and installs compact global instructions without
+editing Codex's runtime cache directly.
 
-It is not trying to reproduce an entire machine. It only syncs the parts that make
-Codex behave the same way everywhere:
+## Pack model
 
-- first-party local plugin bundles
-- plugin marketplace entries
-- generated global instruction artifacts
-- first-party Codex skills authored directly inside the installed plugin bundle
+The default environment is intentionally small. `apply` stages all four bundles under
+`~/plugins`, then explicitly installs each `INSTALLED_BY_DEFAULT` plugin through the Codex
+CLI. Marketplace policy selects the default install set; it is not an installation action
+by itself.
 
-The install surface is intentionally small:
+| Pack | Policy | Skills |
+|---|---|---|
+| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-debugging`, `jy-test-driven`, `jy-verification-before-completion`, `jy-codebase-explore`, `jy-library-research`, `jy-consult` |
+| `jy-env-planning` | `AVAILABLE` | `jy-autoplan`, `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans` |
+| `jy-env-delivery` | `AVAILABLE` | `jy-executing-plans`, `jy-worktrees`, `jy-checkpoint`, `jy-document-release`, `jy-ship`, `jy-waterfall`, `jy-env-sync-admin`, `jy-writing-skills` |
+| `jy-env-audit` | `AVAILABLE` | `jy-review-all`, `jy-review-work`, `jy-receiving-review`, `jy-slop-remover` |
 
-- plugins are installed into `~/plugins`
-- skill discovery links are installed into `~/.agents/skills/`
-- marketplace is written to `~/.agents/plugins/marketplace.json`
-- instructions are installed into `~/.codex/...`
-- Codex runtime cache under `~/.codex/plugins/cache` is left alone
+Staging and activation are deliberately separate:
 
-Local `apply` uses symlinks on macOS and Linux so an intentionally dirty development
-checkout is reflected immediately. Windows keeps copy mode via platform override. GitHub
-bootstrap installs always use copy snapshots, so later edits or pulls in the managed clone
-cannot silently change an installed environment.
+- `~/plugins/<pack>` is the local marketplace source.
+- `INSTALLED_BY_DEFAULT` makes `apply` and bootstrap run
+  `codex plugin add jy-env-core@personal-codex`.
+- `AVAILABLE` packs stay inactive until installed from the Plugins Directory or CLI.
+- This repo no longer creates a second `~/.agents/skills/<pack>` discovery link, avoiding
+  duplicate skill metadata from plugin cache and native discovery.
 
-Repo-local working state that should not be committed can live under `.codex/`.
-The first such path is `.codex/checkpoints/`, used by the first-party `jy-checkpoint`
-skill for session handoff notes.
+Install only the optional packs you need:
 
-First-party skill authoring happens in `plugins/jy-env-core/skills/`. That directory is
-the source of truth for both local development and the installed Codex skill surface.
-The current first-party workflow pack covers planning, decision interviews, plan
-authoring, isolated worktree setup, debugging, test-first implementation,
-change-scope guardrails, plan execution, whole-project audits, review feedback handling,
-waterfall-style project records, shipping, and verification disciplines.
+```bash
+codex plugin add jy-env-planning@personal-codex
+codex plugin add jy-env-delivery@personal-codex
+codex plugin add jy-env-audit@personal-codex
+```
 
-## First-Party Skill Catalog
+Start a fresh Codex thread after changing installed packs.
 
-Skill command names stay short as `jy-*`. Role grouping lives here in the README so day-to-day
-invocation stays compact while the intended use stays explicit.
+## Lazy Context7 research
 
-### Planning
+Context7 is not installed as an MCP server or a separate `jy-context7` skill. The core-lite
+`jy-library-research` skill treats it as an optional read-only provider:
 
-- `jy-autoplan` chooses the right planning path for the current request and routes to `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans`, or `jy-executing-plans` without making the user decide first.
-- `jy-framing` turns a vague feature or product idea into a sharper problem brief, constraints list, and next planning step.
-- `jy-grill-me` pressure-tests a plan or feature direction through a one-question-at-a-time decision interview before implementation.
-- `jy-plan-review` takes an existing plan or outline and closes decision gaps before implementation starts.
-- `jy-writing-plans` turns approved requirements into a decision-complete implementation plan saved under `docs/superpowers/plans/`.
-- `jy-worktrees` starts isolated feature work in `.worktrees/` after verifying that the directory is safe to use.
-- `jy-waterfall` creates approval-gated project records for work expected to last 2-3 hours or more, with timestamped orders, plans, results, feedback, and troubleshooting notes.
+1. use an existing `ctx7` command when available;
+2. otherwise, when Node.js 18+ and `npx` are available, invoke the pinned
+   `ctx7@0.5.5` package only for that research request;
+3. fall back to official documentation, source, changelogs, and issue trackers on any CLI,
+   network, sandbox, rate-limit, or index failure.
 
-### Execution
+Most public documentation queries work without authentication. If higher limits are needed,
+keep the key outside this repo in `CONTEXT7_API_KEY`. The skill never passes a key in command
+arguments and never sends private source or credentials to Context7.
 
-- `jy-executing-plans` runs a written plan task-by-task in the current session, uses TDD inside behavior changes, and closes with proportional review plus one final verification.
-- `jy-debugging` forces reproduction, hypothesis testing, and root-cause verification before patching a bug.
-- `jy-change-guardrails` keeps non-trivial code changes honest by surfacing assumptions, forcing the smallest valid change, and blocking unrelated cleanup.
-- `jy-test-driven` enforces a failing test first and keeps implementation inside a red-green-refactor loop.
-- `jy-verification-before-completion` blocks success claims until fresh verification commands and results exist.
-- `jy-review-work` runs a structured multi-angle review pass on completed implementation before handoff or merge.
-- `jy-receiving-review` triages review feedback, verifies it against the actual codebase, and supports technical pushback when comments are wrong.
-- `jy-slop-remover` cleans obvious AI-generated code smells without turning into broad stylistic refactoring.
+## Install surface
 
-### Audit
+- plugin sources: `~/plugins`
+- personal marketplace: `~/.agents/plugins/marketplace.json`
+- global instructions: `~/.codex/AGENTS.md`
+- managed state: `~/.codex-env-sync/state.json`
+- Codex-owned plugin cache, changed only through `codex plugin`: `~/.codex/plugins/cache`
 
-- `jy-review-all` audits an existing project across architecture, module depth, testability, documentation gaps, maintainability, and navigation before choosing focused follow-up work.
-
-### Research
-
-- `jy-codebase-explore` performs multi-angle repository exploration when the structure is unfamiliar or spread across modules.
-- `jy-library-research` gathers evidence-backed answers about external libraries, packages, APIs, and usage patterns.
-- `jy-consult` stays in advisory mode for architecture, reliability, performance, and repeated-failure decisions that need deeper judgment.
-
-### Maintenance
-
-- `jy-checkpoint` stores repo-local checkpoint notes under `.codex/checkpoints/` for pause, resume, and branch handoff workflows.
-- `jy-document-release` synchronizes only the documentation and manual pressure scenarios affected by a change.
-- `jy-ship` closes the final branch workflow with base-branch checks, pre-verification docs sync, proportional review, one final verification, push, and PR/MR creation.
-- `jy-env-sync-admin` validates this environment repo and reapplies the repo-owned install surface into the home Codex environment.
-
-### Authoring
-
-- `jy-writing-skills` is the first-party skill authoring guide, with risk-scoped static checks, manual pressure scenarios, and deployment checks.
-
-## Secret handling
-
-Secret values should not be committed to this repo.
-
-The current `jy-env-core` plugin bundle does not install MCP servers. Keep any future API
-keys or account tokens in machine-local configuration outside this repo.
+Local `apply` symlinks plugin sources and instructions on macOS and Linux. Windows uses copy
+mode. Bootstrap and `--snapshot` always copy a stable snapshot. After staging, the commands
+install or refresh default plugins with `codex plugin add`; optional packs remain explicit
+installs. A dirty checkout is not a second live skill-discovery surface.
 
 ## First run
 
@@ -105,69 +82,63 @@ Windows PowerShell:
 .\scripts\bootstrap.ps1 -GitUrl <git-url>
 ```
 
-Both bootstrap scripts clone once and install a stable copy snapshot.
+Both commands require the `codex` CLI, clone once, install a stable snapshot, and activate
+core-lite.
 
 ## Local development
 
-Inspect the environment defined by this repo:
+Inspect the resolved sources, install modes, and marketplace policies:
 
 ```bash
-python -m codex_env_sync.cli inspect --repo-root .
+python3 -m codex_env_sync.cli inspect --repo-root .
 ```
 
-Apply the local checkout into your home directory:
+Apply the live checkout:
 
 ```bash
-python -m codex_env_sync.cli apply --repo-root .
+python3 -m codex_env_sync.cli apply --repo-root .
 ```
 
-On macOS and Linux, that creates symlinks for the repo-managed plugin bundle, skill
-discovery surface, and instructions. A later `git pull` in the same checkout updates the
-installed Codex surface immediately.
-
-To install a detached copy from any existing checkout, use:
+Install a detached snapshot:
 
 ```bash
-python -m codex_env_sync.cli apply --repo-root . --snapshot
+python3 -m codex_env_sync.cli apply --repo-root . --snapshot
 ```
+
+After changing an already installed plugin, use the `plugin-creator` cachebuster/reinstall
+workflow and start a new thread. Do not edit `~/.codex/plugins/cache` directly.
 
 ## Layout
 
 ```text
-codex-env.toml                 # Minimal manifest: plugins + instructions + platform overrides
-codex_env_sync/                # Apply engine and CLI
-plugins/                       # First-party plugin bundles that get installed into ~/plugins
-plugins/jy-env-core/skills/    # First-party Codex skills, authoring source and install source
-instructions/                  # Generated instruction artifacts
-.codex/checkpoints/            # Repo-local ignored checkpoint notes created by jy-checkpoint
-.agents/plugins/               # Repo-local marketplace metadata for local plugin discovery
-.agents/skills/                # Home install target for Codex native skill discovery
-scripts/bootstrap.sh           # First-run shell bootstrap for macOS/Linux
-scripts/bootstrap.ps1          # First-run shell bootstrap for Windows
-tests/                         # Unit + integration tests
-skill-tests/                   # Manual first-party pressure scenarios; CI validates schema only
+codex-env.toml                    # Four plugin sources and their installation policies
+codex_env_sync/                   # Inspect/apply/bootstrap engine
+plugins/jy-env-core/              # Default core-lite bundle
+plugins/jy-env-planning/          # Optional planning pack
+plugins/jy-env-delivery/          # Optional delivery pack
+plugins/jy-env-audit/             # Optional audit pack
+instructions/AGENTS.md            # Compact global rules; no eager optional-skill routing
+.agents/plugins/marketplace.json  # Local personal marketplace catalog
+skill-tests/first-party/          # Manual pressure scenarios
+tests/                            # Unit and integration tests
 ```
 
-## Design boundaries
+First-party skill sources live only under `plugins/jy-env-*/skills/`. Upstream or
+company-shared skills are seed material; this repo stores only the customized first-party
+result and does not vendor third-party runtimes.
 
-- Upstream open source or company skills are seed material only.
-- Raw seed sources normally stay local and are not committed here.
-- First-party Codex skills are authored directly in `plugins/jy-env-core/skills/`.
-- This repo does not keep vendored upstream runtimes as part of the maintained execution surface.
-- Repo-local checkpoint notes belong under `.codex/checkpoints/` and stay gitignored.
-- What gets committed here is the first-party result after customization.
-- Re-running apply should be fast and mostly quiet when nothing changed.
+Repo-local working state that should not be committed can live under `.codex/`.
+`jy-checkpoint`, when the delivery pack is installed, uses `.codex/checkpoints/`.
 
 ## Tests
 
-Run locally:
+Run the full suite:
 
 ```bash
 python3 -m unittest discover -s tests -v
 ```
 
-For first-party manual pressure inputs and their schema checks, see
-`skill-tests/first-party/` and run:
+Validate manual pressure-scenario assets:
 
 ```bash
 python3 -m unittest tests.test_skill_scenarios -v

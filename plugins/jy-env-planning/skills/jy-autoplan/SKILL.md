@@ -21,7 +21,7 @@ straightforward implementation work.
 | Decision-interview-stage | `jy-grill-me` |
 | Plan-stage | `jy-plan-review` |
 | Task-plan-stage | `jy-writing-plans` |
-| Execution-stage | `jy-executing-plans` |
+| Execution-stage | delivery handoff when installed; otherwise planning pack not applicable |
 | Execution-ready | planning pack not applicable |
 
 ## Routing Matrix
@@ -47,8 +47,9 @@ Requirements are approved, but an implementer-ready task breakdown is missing. R
 
 ### Execution-stage
 
-A written plan exists and the user wants it executed. Route to `jy-executing-plans` in
-Default mode.
+A written plan exists and the user wants it executed. If the delivery pack is installed,
+route to `jy-executing-plans` in Default mode. Otherwise return `planning pack not
+applicable` and proceed with the available core execution workflow.
 
 ### Execution-ready
 
@@ -70,7 +71,8 @@ applicable` and name the relevant execution path without forcing another plannin
 - For Idea-stage, Decision-interview-stage, Plan-stage, or Task-plan-stage, provide a
   compact useful draft and tell the user to press `Shift+Tab` before re-running the chosen
   planning skill.
-- For Execution-stage, keep the user in Default mode and route to `jy-executing-plans`.
+- For Execution-stage, keep the user in Default mode and route to `jy-executing-plans`
+  only when the delivery pack is installed.
 - For Execution-ready, mark the planning pack not applicable and proceed through the
   appropriate execution workflow.
 

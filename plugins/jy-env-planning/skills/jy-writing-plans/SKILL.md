@@ -23,7 +23,7 @@ Do not use it when:
 
 - The problem definition is still unstable (`jy-framing`)
 - Major decisions are still missing (`jy-plan-review`)
-- A written plan already exists and only execution remains (`jy-executing-plans`)
+- A written plan already exists and only execution remains (`jy-executing-plans` when the delivery pack is installed)
 
 ## Quick Reference
 
@@ -34,7 +34,7 @@ Do not use it when:
 | 2. Lock structure | Fix changed files, ownership, and verification flow |
 | 3. Break into tasks | Create steps an implementer can follow directly |
 | 4. Document the plan | Save under `docs/superpowers/plans/` |
-| 5. Handoff | Point to `jy-worktrees` or `jy-executing-plans` |
+| 5. Handoff | Point to direct execution or the installed delivery pack |
 
 ## Plan Document Contract
 
@@ -54,7 +54,8 @@ Every plan should include at least:
 - Ordered tasks with checkbox steps
 - Verification commands and expected result
 - `acceptance criteria`
-- Next handoff: `jy-worktrees` or `jy-executing-plans`
+- Next handoff: `jy-worktrees` or `jy-executing-plans` when the delivery pack is installed;
+  otherwise direct execution
 
 A good plan:
 
@@ -105,7 +106,8 @@ commands, and expected outputs.
 5. Break the work into checkbox tasks
 6. Attach verification commands and expected results to each task
 7. End with acceptance criteria
-8. Leave the next step as `jy-worktrees` or `jy-executing-plans`
+8. Leave the next step as direct execution, or `jy-worktrees` / `jy-executing-plans`
+   when the delivery pack is installed
 
 ## Common Mistakes
 

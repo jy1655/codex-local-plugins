@@ -44,6 +44,28 @@ Then follow the matching research path.
 - Check official documentation first
 - If source inspection is needed, capture a GitHub permalink
 - Be date-aware when source material may be stale
+- When current or version-specific library docs materially affect the answer, use the
+  lazy Context7 CLI route below before broad web search
+
+#### Lazy Context7 CLI route
+
+Context7 is an optional read-only provider, not a required runtime. Do not install it
+globally or block the task when it is unavailable.
+
+1. If `ctx7` is already on `PATH`, resolve the library first with
+   `CTX7_TELEMETRY_DISABLED=1 ctx7 library <library> --json`.
+2. Query the resolved ID with
+   `CTX7_TELEMETRY_DISABLED=1 ctx7 docs <resolved-id> "<specific question>" --json`.
+3. Otherwise, when Node.js 18+ and `npx` are available, run the same two commands lazily
+   through the pinned package `npx --yes ctx7@0.5.5`.
+4. Treat a missing CLI, rate limit, sandbox or network denial, malformed output, or index
+   mismatch as a soft failure. Fall back once to the library's official documentation,
+   source repository, changelog, and issue tracker.
+
+Keep queries limited to public library names and public technical questions. Never send
+private source, credentials, tokens, customer data, or proprietary identifiers. Authentication
+is optional; when the user has configured it locally, inherit `CONTEXT7_API_KEY` from the
+environment instead of placing secrets in command arguments.
 
 ### Step 3: Answer with evidence
 
@@ -67,3 +89,5 @@ current project context.
 - Giving a generic tutorial and ignoring the actual project context
 - Modifying code instead of staying in research mode
 - Exploring the current project codebase instead of the external dependency
+- Retrying Context7 instead of falling back to authoritative public sources
+- Installing or authenticating a third-party documentation CLI without a user request

@@ -32,7 +32,7 @@ Skip this skill for a typo isolated to one already-known document.
 
 - `README.md` and `README.ko.md`
 - `instructions/AGENTS.md`
-- `plugins/jy-env-core/skills/<skill>/SKILL.md`
+- `plugins/jy-env-*/skills/<skill>/SKILL.md`
 - `skill-tests/first-party/<skill>/pressure-scenarios.json`
 - an existing plan or design note under `docs/` when the change invalidates it
 

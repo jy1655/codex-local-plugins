@@ -1,0 +1,37 @@
+{
+  "name": "jy-env-delivery",
+  "version": "0.1.0",
+  "description": "Optional delivery pack for execution, worktrees, project records, documentation, and shipping.",
+  "author": {
+    "name": "JaeYoung Hwang",
+    "url": "https://github.com/jy1655"
+  },
+  "homepage": "https://github.com/jy1655/codex-local-plugins",
+  "repository": "https://github.com/jy1655/codex-local-plugins",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "skills",
+    "delivery"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "JY Delivery Pack",
+    "shortDescription": "Optional workflows for executing and shipping work",
+    "longDescription": "Adds plan execution, worktree setup, checkpoints, durable project records, documentation synchronization, environment maintenance, skill authoring, and branch shipping.",
+    "developerName": "JaeYoung Hwang",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/jy1655/codex-local-plugins",
+    "defaultPrompt": [
+      "Execute this written plan task by task.",
+      "Prepare an isolated worktree for this feature.",
+      "Verify, document, and ship the current branch."
+    ],
+    "brandColor": "#059669"
+  }
+}

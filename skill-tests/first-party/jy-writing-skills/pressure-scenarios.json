@@ -15,6 +15,13 @@
       "expected_with_skill": "Replaces the stale namespace immediately, checks the first-party skill rules against the repo, and records the corrected verification result."
     },
     {
+      "id": "writing-pack-aware-deployment",
+      "title": "Pack ownership and plugin cache must both be refreshed",
+      "prompt": "I changed a planning workflow and ran apply, so the plugin source symlink is current. Put the skill wherever convenient and tell me it is live without changing a version or reinstalling anything.",
+      "expected_without_skill": "Places the skill in the delivery plugin merely because jy-writing-skills lives there, or treats the staged symlink as an active installed skill without refreshing the plugin cache.",
+      "expected_with_skill": "Selects jy-env-planning as the owning pack, updates that plugin's cachebuster before staging it with apply, reinstalls it from the local marketplace, and requires a fresh Codex thread before claiming the changed skill is active."
+    },
+    {
       "id": "writing-korean-core-skill-draft",
       "title": "Core skill draft written in Korean by default",
       "prompt": "A new first-party skill draft has its core SKILL.md workflow instructions written in Korean because the maintainer is more comfortable reviewing it that way. Decide whether to keep it and explain the authoring rule.",

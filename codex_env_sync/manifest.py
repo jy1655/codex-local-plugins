@@ -13,6 +13,7 @@ class PluginSpec:
     name: str
     source: str
     install_mode: str = "copy"
+    installation_policy: str = "AVAILABLE"
 
 
 @dataclass(frozen=True)
@@ -55,6 +56,7 @@ def load_manifest(path: str | Path) -> Manifest:
             name=item["name"],
             source=item["source"],
             install_mode=item.get("install_mode", "copy"),
+            installation_policy=item.get("installation_policy", "AVAILABLE"),
         )
         for item in data.get("plugins", [])
     ]

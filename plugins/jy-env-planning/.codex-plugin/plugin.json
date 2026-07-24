@@ -1,0 +1,37 @@
+{
+  "name": "jy-env-planning",
+  "version": "0.1.0",
+  "description": "Optional planning pack for framing, decision interviews, plan review, and implementation planning.",
+  "author": {
+    "name": "JaeYoung Hwang",
+    "url": "https://github.com/jy1655"
+  },
+  "homepage": "https://github.com/jy1655/codex-local-plugins",
+  "repository": "https://github.com/jy1655/codex-local-plugins",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "skills",
+    "planning"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "JY Planning Pack",
+    "shortDescription": "Optional workflows for shaping and planning work",
+    "longDescription": "Adds automatic planning routing, product framing, one-question decision interviews, plan review, and decision-complete implementation plan authoring.",
+    "developerName": "JaeYoung Hwang",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/jy1655/codex-local-plugins",
+    "defaultPrompt": [
+      "Choose the right planning workflow for this request.",
+      "Turn this idea into a decision-complete product brief.",
+      "Review this plan and close its remaining decisions."
+    ],
+    "brandColor": "#7C3AED"
+  }
+}

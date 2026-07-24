@@ -43,7 +43,6 @@ class ManagedPaths:
     def ensure_parent_dirs(self) -> None:
         self.codex_home.mkdir(parents=True, exist_ok=True)
         self.plugin_root.mkdir(parents=True, exist_ok=True)
-        self.skills_root.mkdir(parents=True, exist_ok=True)
         self.marketplace_path.parent.mkdir(parents=True, exist_ok=True)
         self.repo_cache_root.mkdir(parents=True, exist_ok=True)
         self.state_path.parent.mkdir(parents=True, exist_ok=True)

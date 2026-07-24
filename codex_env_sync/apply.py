@@ -5,6 +5,7 @@ from pathlib import Path
 from copy import deepcopy
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import time
@@ -30,6 +31,7 @@ class ApplyReport:
     repo_root: Path
     os_name: str
     plugins: list[ApplyItem] = field(default_factory=list)
+    plugin_installs: list[ApplyItem] = field(default_factory=list)
     skills: list[ApplyItem] = field(default_factory=list)
     instructions: list[ApplyItem] = field(default_factory=list)
     hooks: list[ApplyItem] = field(default_factory=list)
@@ -180,22 +182,6 @@ def _plugin_state(
 
 
 def _instruction_state(
-    source: Path,
-    destination: Path,
-    mode: str,
-    desired_hash: str,
-    installed_hash: str | None = None,
-) -> dict:
-    return {
-        "hash": desired_hash,
-        "mode": mode,
-        "installed_hash": installed_hash,
-        "source": str(source),
-        "target": str(destination),
-    }
-
-
-def _skill_state(
     source: Path,
     destination: Path,
     mode: str,
@@ -388,62 +374,6 @@ def _apply_plugin(
     raise ValueError(f"Unsupported plugin install mode for v1: {mode}")
 
 
-def _plugin_skills_source(destination: Path) -> Path | None:
-    manifest_path = destination / ".codex-plugin" / "plugin.json"
-    data = json.loads(manifest_path.read_text(encoding="utf-8"))
-    relative = data.get("skills")
-    if not isinstance(relative, str) or not relative:
-        return None
-
-    skills_path = destination / Path(relative)
-    if not skills_path.exists():
-        return None
-    return skills_path
-
-
-def _apply_plugin_skills(
-    plugin: PluginSpec,
-    paths: ManagedPaths,
-    state: dict,
-    mode_override: str | None = None,
-) -> ApplyItem | None:
-    plugin_root = paths.plugin_root / plugin.name
-    source = _plugin_skills_source(plugin_root)
-    if source is None:
-        state["skills"].pop(plugin.name, None)
-        return None
-
-    destination = paths.skills_root / plugin.name
-    desired_hash = hash_path(source)
-    previous = state["skills"].get(plugin.name, {})
-
-    mode = mode_override or ("copy" if paths.os_name == "windows" else "symlink")
-    if mode == "copy":
-        installed_hash = _existing_copy_hash(destination)
-        if (
-            destination.exists()
-            and not destination.is_symlink()
-            and previous.get("mode") == "copy"
-            and previous.get("hash") == desired_hash
-            and previous.get("installed_hash") == installed_hash
-        ):
-            state["skills"][plugin.name] = _skill_state(source, destination, "copy", desired_hash, installed_hash)
-            return ApplyItem(plugin.name, destination, "skipped", "skill content unchanged")
-
-        copy_directory(source, destination)
-        installed_hash = hash_path(destination)
-        state["skills"][plugin.name] = _skill_state(source, destination, "copy", desired_hash, installed_hash)
-        return ApplyItem(plugin.name, destination, "applied", "copied skill directory")
-
-    if is_symlink_to(destination, source):
-        state["skills"][plugin.name] = _skill_state(source, destination, "symlink", desired_hash)
-        return ApplyItem(plugin.name, destination, "skipped", "skill symlink unchanged")
-
-    symlink_path(source, destination)
-    state["skills"][plugin.name] = _skill_state(source, destination, "symlink", desired_hash)
-    return ApplyItem(plugin.name, destination, "applied", "symlinked skill directory")
-
-
 def _apply_instruction(
     instruction: InstructionSpec,
     repo_root: Path,
@@ -495,15 +425,15 @@ def _apply_instruction(
     raise ValueError(f"Unsupported instruction install mode for v1: {mode}")
 
 
-def _managed_marketplace_entry(plugin_name: str, category: str) -> dict:
+def _managed_marketplace_entry(plugin: PluginSpec, category: str) -> dict:
     return {
-        "name": plugin_name,
+        "name": plugin.name,
         "source": {
             "source": "local",
-            "path": f"./plugins/{plugin_name}",
+            "path": f"./plugins/{plugin.name}",
         },
         "policy": {
-            "installation": "AVAILABLE",
+            "installation": plugin.installation_policy,
             "authentication": "ON_INSTALL",
         },
         "category": category,
@@ -537,7 +467,7 @@ def write_marketplace(
     blocked_names = managed_names | (stale_managed_names or set())
     preserved = [entry for entry in existing["plugins"] if entry.get("name") not in blocked_names]
     managed = [
-        _managed_marketplace_entry(plugin.name, _plugin_category(repo_root, plugin))
+        _managed_marketplace_entry(plugin, _plugin_category(repo_root, plugin))
         for plugin in manifest.plugins
     ]
 
@@ -554,6 +484,62 @@ def write_marketplace(
 
     write_text_atomic(paths.marketplace_path, desired_text)
     return "applied"
+
+
+def _install_default_plugins(manifest: Manifest, paths: ManagedPaths) -> list[ApplyItem]:
+    default_plugins = [
+        plugin
+        for plugin in manifest.plugins
+        if plugin.installation_policy == "INSTALLED_BY_DEFAULT"
+    ]
+    if not default_plugins:
+        return []
+
+    marketplace = _load_json_object(paths.marketplace_path)
+    marketplace_name = marketplace.get("name")
+    if not isinstance(marketplace_name, str) or not marketplace_name:
+        raise ValueError(f"Marketplace name is missing from {paths.marketplace_path}")
+
+    codex_executable = shutil.which("codex")
+    if codex_executable is None:
+        raise RuntimeError(
+            "Codex CLI is required to install plugins marked INSTALLED_BY_DEFAULT"
+        )
+
+    environment = os.environ.copy()
+    environment["CODEX_HOME"] = str(paths.codex_home)
+    if paths.os_name == "windows":
+        environment["USERPROFILE"] = str(paths.home)
+    else:
+        environment["HOME"] = str(paths.home)
+
+    installed: list[ApplyItem] = []
+    for plugin in default_plugins:
+        selector = f"{plugin.name}@{marketplace_name}"
+        try:
+            completed = subprocess.run(
+                [codex_executable, "plugin", "add", selector],
+                check=False,
+                capture_output=True,
+                text=True,
+                env=environment,
+            )
+        except OSError as exc:
+            raise RuntimeError(f"Failed to start Codex CLI at {codex_executable}") from exc
+
+        if completed.returncode != 0:
+            detail = (completed.stderr or completed.stdout or "unknown error").strip()
+            raise RuntimeError(f"Failed to install default plugin {selector}: {detail}")
+
+        installed.append(
+            ApplyItem(
+                plugin.name,
+                paths.codex_home,
+                "applied",
+                f"installed and enabled via codex plugin add ({selector})",
+            )
+        )
+    return installed
 
 
 def _require_unique_names(items: list, label: str) -> None:
@@ -592,6 +578,7 @@ def _validate_stale_managed_paths(manifest: Manifest, paths: ManagedPaths, state
         if not _managed_path_matches_state(destination, state["plugins"].get(plugin_name, {})):
             raise ValueError(f"Refusing to remove modified managed plugin: {destination}")
 
+    for plugin_name in sorted(state["skills"]):
         skill_destination = paths.skills_root / plugin_name
         if not _managed_path_matches_state(skill_destination, state["skills"].get(plugin_name, {})):
             raise ValueError(f"Refusing to remove modified managed skill surface: {skill_destination}")
@@ -622,6 +609,14 @@ def validate_environment(
         mode = "copy" if snapshot else manifest.plugin_mode_for(paths.os_name, plugin)
         if mode not in {"copy", "symlink"}:
             raise ValueError(f"Unsupported plugin install mode for v1: {mode}")
+        if plugin.installation_policy not in {
+            "AVAILABLE",
+            "INSTALLED_BY_DEFAULT",
+            "NOT_AVAILABLE",
+        }:
+            raise ValueError(
+                f"Unsupported plugin installation policy: {plugin.installation_policy}"
+            )
 
         plugin_manifest_path = source / ".codex-plugin" / "plugin.json"
         if not plugin_manifest_path.is_file():
@@ -655,6 +650,7 @@ def apply_environment(
     home: str | Path | None = None,
     os_name: str | None = None,
     snapshot: bool = False,
+    install_defaults: bool = False,
 ) -> ApplyReport:
     repo_path = Path(repo_root).resolve()
     manifest = load_manifest(repo_path / MANIFEST_NAME)
@@ -671,6 +667,9 @@ def apply_environment(
         report.skills.append(_remove_managed_skill(plugin_name, paths, state))
         report.plugins.append(_remove_managed_plugin(plugin_name, paths, state))
 
+    for plugin_name in sorted(state["skills"]):
+        report.skills.append(_remove_managed_skill(plugin_name, paths, state))
+
     current_instruction_names = {instruction.name for instruction in manifest.instructions}
     stale_instruction_names = set(state["instructions"]) - current_instruction_names
     for instruction_name in sorted(stale_instruction_names):
@@ -682,9 +681,6 @@ def apply_environment(
     for plugin in manifest.plugins:
         mode_override = "copy" if snapshot else None
         report.plugins.append(_apply_plugin(plugin, repo_path, paths, manifest, state, mode_override=mode_override))
-        skill_item = _apply_plugin_skills(plugin, paths, state, mode_override=mode_override)
-        if skill_item is not None:
-            report.skills.append(skill_item)
 
     report.marketplace_action = write_marketplace(repo_path, manifest, paths, stale_managed_names=stale_plugin_names)
 
@@ -696,6 +692,8 @@ def apply_environment(
 
     state["last_apply"] = int(time.time())
     save_state(paths.state_path, state)
+    if install_defaults:
+        report.plugin_installs.extend(_install_default_plugins(manifest, paths))
     return report
 
 
@@ -714,10 +712,21 @@ def clone_or_update_repo(git_url: str, paths: ManagedPaths) -> Path:
     return repo_path
 
 
-def bootstrap_environment(git_url: str, home: str | Path | None = None, os_name: str | None = None) -> ApplyReport:
+def bootstrap_environment(
+    git_url: str,
+    home: str | Path | None = None,
+    os_name: str | None = None,
+    install_defaults: bool = True,
+) -> ApplyReport:
     paths = ManagedPaths.for_platform(os_name=os_name, home=home)
     paths.ensure_parent_dirs()
     repo_path = clone_or_update_repo(git_url, paths)
-    report = apply_environment(repo_path, home=paths.home, os_name=paths.os_name, snapshot=True)
+    report = apply_environment(
+        repo_path,
+        home=paths.home,
+        os_name=paths.os_name,
+        snapshot=True,
+        install_defaults=install_defaults,
+    )
     report.managed_repo = repo_path
     return report

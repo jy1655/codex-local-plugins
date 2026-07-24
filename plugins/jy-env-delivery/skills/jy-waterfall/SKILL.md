@@ -19,8 +19,10 @@ The useful pattern is a lightweight waterfall ledger:
 - connect local records to plans, execution, verification, and review
 - optionally connect GitHub issues, milestones, and branches only after explicit approval
 
-This skill coordinates existing skills. It does not replace `jy-writing-plans`,
+This skill coordinates available skills. It does not replace `jy-writing-plans`,
 `jy-executing-plans`, `jy-verification-before-completion`, `jy-review-work`, or `jy-ship`.
+Planning and audit handoffs are optional-pack capabilities: invoke them only when present,
+and otherwise record the needed handoff or perform the smallest direct equivalent.
 
 ## When to Use
 
@@ -160,10 +162,12 @@ the command. If the target repo is ambiguous, stop and ask instead of guessing f
    - chosen record root
    - sensitivity decision
    - next skill handoff
-8. Route implementation planning to `jy-writing-plans` when a decision-complete plan is missing.
+8. Route implementation planning to `jy-writing-plans` when a decision-complete plan is
+   missing and the planning pack is installed; otherwise record the missing decisions.
 9. Route execution to `jy-executing-plans` when a plan exists.
 10. Route completion claims to `jy-verification-before-completion`.
-11. Route review or handoff milestones to `jy-review-work` and final branch closure to `jy-ship`.
+11. Route review milestones to `jy-review-work` when the audit pack is installed; otherwise
+    record a compact direct review. Route final branch closure to `jy-ship`.
 
 ## Record Templates
 

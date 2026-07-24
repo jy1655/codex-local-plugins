@@ -24,10 +24,14 @@ In Plan Mode it only leaves the guarded execution approach.
 Do not use it when:
 
 - The task is trivial and unambiguous
-- The task is pure planning and belongs in `jy-autoplan` or `jy-framing`
+- The task is pure planning; use `jy-autoplan` or `jy-framing` when the planning pack is installed
 - The main job is bug investigation and belongs in `jy-debugging`
-- The work already follows a written implementation plan and belongs in `jy-executing-plans`
-- The main input is review feedback that belongs in `jy-receiving-review`
+- The work already follows a written implementation plan; use `jy-executing-plans` when the delivery pack is installed
+- The main input is review feedback; use `jy-receiving-review` when the audit pack is installed
+
+Optional-pack handoffs are capability-aware. If the named pack is unavailable, do not
+pretend the skill exists; handle the request directly with the core-lite guardrails that
+still apply.
 
 ## Quick Reference
 

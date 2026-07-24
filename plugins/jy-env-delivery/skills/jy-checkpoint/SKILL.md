@@ -50,7 +50,7 @@ status: in_progress
 branch: feature/foo
 timestamp: 2026-04-10T16:00:00+09:00
 files_modified:
-  - plugins/jy-env-core/skills/jy-checkpoint/SKILL.md
+  - plugins/jy-env-delivery/skills/jy-checkpoint/SKILL.md
 ```
 
 Required body sections:

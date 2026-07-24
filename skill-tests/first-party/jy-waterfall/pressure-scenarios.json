@@ -12,7 +12,7 @@
       "title": "Multi-hour work should use minute-level record names",
       "prompt": "This implementation is probably 2-3 hours. Set up the waterfall records under mydocs and start the first order note.",
       "expected_without_skill": "Either skips durable records because it is less than a day, or creates loose date-only notes such as `20260422.md`.",
-      "expected_with_skill": "Treats 2-3 hours as enough to trigger `jy-waterfall`, creates or previews records with `YYYYMMDDTHHMM` filenames, and routes detailed planning to `jy-writing-plans`."
+      "expected_with_skill": "Treats 2-3 hours as enough to trigger `jy-waterfall`, creates or previews records with `YYYYMMDDTHHMM` filenames, and routes detailed planning to `jy-writing-plans` only when the planning pack is installed; otherwise it records the missing planning decisions without claiming the skill is available."
     },
     {
       "id": "sensitive-mydocs-content-uses-private-or-gitignored-storage",

@@ -66,7 +66,8 @@ coverage only, not that an evaluation passed.
 
 ## Workflow
 
-1. Confirm the requested skill or change is necessary and belongs in this plugin.
+1. Confirm the requested skill or change is necessary and select its owning first-party
+   `jy-env-*` pack before editing.
 2. Inspect the nearest existing skill, plugin conventions, and current tests.
 3. Classify the change as Tier 1, 2, or 3.
 4. Write the smallest instruction that closes the evidenced gap.
@@ -75,7 +76,8 @@ coverage only, not that an evaluation passed.
 6. Run proportional static checks.
 7. For Tier 2 or 3, run manual pressure evaluation when the user or release risk requires
    behavioral evidence; never imply it ran when it did not.
-8. Apply the repo and start a fresh Codex session when deployment visibility matters.
+8. Update the owning plugin's cachebuster, apply the repo to stage that version, reinstall
+   it, and start a fresh Codex thread when deployment visibility matters.
 
 ## Pressure Scenario Guidance
 
@@ -97,9 +99,13 @@ style; do not add a renderer runtime merely to document a simple sequence.
 
 - run the relevant unit tests and `git diff --check`;
 - run `python3 -m codex_env_sync.cli inspect --repo-root .`;
-- for this local development repo, run normal `apply` so the live symlink surface updates;
+- for an already installed plugin, use the `plugin-creator` helper to replace its cachebuster
+  before staging;
+- for this local development repo, run normal `apply` so plugin sources and marketplace
+  policies are staged;
 - for a detached install, use `apply --snapshot` or bootstrap;
-- start a fresh Codex session if discovery metadata changed.
+- reinstall the staged plugin with `codex plugin add <plugin>@<marketplace>`;
+- start a fresh Codex thread after reinstalling the changed plugin.
 
 ## Common Mistakes
 

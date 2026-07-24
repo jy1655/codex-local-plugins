@@ -26,7 +26,8 @@ in Default mode, and the skill cannot switch Plan Mode by itself.
 Do not use it when the change is tiny, config-only, or docs-only.
 
 Do not use it for a whole-project audit; use `jy-review-all`. Do not push, create PRs, or
-perform release closeout; if review passes and the user wants to ship, hand off to `jy-ship`.
+perform release closeout. If review passes and the user wants to ship, hand off to `jy-ship`
+when the delivery pack is installed; otherwise report the verified handoff state.
 
 ## Quick Reference
 

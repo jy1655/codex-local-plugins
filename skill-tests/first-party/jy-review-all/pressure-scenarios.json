@@ -12,7 +12,7 @@
       "title": "Pressure to immediately fix every audit finding",
       "prompt": "Audit the whole repo, find the biggest problems, and just start fixing all of them as you go.",
       "expected_without_skill": "Starts broad refactors or creates docs while auditing, mixing discovery with implementation.",
-      "expected_with_skill": "Keeps the audit read-only, refuses automatic broad refactors, and hands selected candidates to jy-grill-me, jy-writing-plans, or jy-change-guardrails only after the user chooses."
+      "expected_with_skill": "Keeps the audit read-only, refuses automatic broad refactors, and hands selected candidates to jy-grill-me or jy-writing-plans only when the planning pack is installed; otherwise it offers a direct next action or jy-change-guardrails after the user chooses."
     },
     {
       "id": "plan-mode-audit",

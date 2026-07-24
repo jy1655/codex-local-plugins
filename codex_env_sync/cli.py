@@ -20,12 +20,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Portable Codex environment bootstrap and apply tool")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    bootstrap = subparsers.add_parser("bootstrap", help="Clone the environment repo and apply it into the current home")
+    bootstrap = subparsers.add_parser(
+        "bootstrap",
+        help="Clone, apply, and install default plugins into the current home",
+    )
     bootstrap.add_argument("git_url", help="Git URL or local git path for the environment repo")
     bootstrap.add_argument("--home", help="Override the target home directory for testing")
     bootstrap.add_argument("--os-name", choices=["darwin", "linux", "windows"], help="Override detected platform")
 
-    apply_cmd = subparsers.add_parser("apply", help="Apply the environment from an existing repo checkout")
+    apply_cmd = subparsers.add_parser(
+        "apply",
+        help="Apply the environment and install default plugins from an existing checkout",
+    )
     apply_cmd.add_argument("--repo-root", default=".", help="Path to the environment repo checkout")
     apply_cmd.add_argument("--home", help="Override the target home directory for testing")
     apply_cmd.add_argument("--os-name", choices=["darwin", "linux", "windows"], help="Override detected platform")
@@ -55,6 +61,10 @@ def _render_report(report: ApplyReport) -> str:
     for item in report.plugins:
         lines.append(f"  - {item.name}: {item.action} ({item.detail}) -> {item.destination}")
 
+    lines.append("default_plugin_installs:")
+    for item in report.plugin_installs:
+        lines.append(f"  - {item.name}: {item.action} ({item.detail}) -> {item.destination}")
+
     lines.append("skills:")
     for item in report.skills:
         lines.append(f"  - {item.name}: {item.action} ({item.detail}) -> {item.destination}")
@@ -78,7 +88,13 @@ def command_bootstrap(args: argparse.Namespace) -> int:
 
 
 def command_apply(args: argparse.Namespace) -> int:
-    report = apply_environment(args.repo_root, home=args.home, os_name=args.os_name, snapshot=args.snapshot)
+    report = apply_environment(
+        args.repo_root,
+        home=args.home,
+        os_name=args.os_name,
+        snapshot=args.snapshot,
+        install_defaults=True,
+    )
     print(_render_report(report))
     return 0
 
@@ -94,14 +110,17 @@ def command_inspect(args: argparse.Namespace) -> int:
         f"os: {paths.os_name}",
         f"home: {paths.home}",
         f"plugin_root: {paths.plugin_root}",
-        f"skills_root: {paths.skills_root}",
+        f"legacy_skills_root: {paths.skills_root}",
         f"marketplace_path: {paths.marketplace_path}",
         f"codex_home: {paths.codex_home}",
         f"state_path: {paths.state_path}",
         "plugins:",
     ]
     for plugin in manifest.plugins:
-        lines.append(f"  - {plugin.name}: {plugin.source} ({manifest.plugin_mode_for(paths.os_name, plugin)})")
+        lines.append(
+            f"  - {plugin.name}: {plugin.source} "
+            f"({manifest.plugin_mode_for(paths.os_name, plugin)}, {plugin.installation_policy})"
+        )
     lines.append("instructions:")
     for instruction in manifest.instructions:
         lines.append(

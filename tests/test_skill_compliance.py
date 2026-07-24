@@ -6,11 +6,21 @@ import unittest
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-FIRST_PARTY_SKILL_ROOT = REPO_ROOT / "plugins" / "jy-env-core" / "skills"
 
 
 def first_party_skill_paths() -> list[Path]:
-    return sorted(FIRST_PARTY_SKILL_ROOT.glob("*/SKILL.md"))
+    return sorted(REPO_ROOT.glob("plugins/jy-env-*/skills/*/SKILL.md"))
+
+
+def skill_path(skill_name: str) -> Path:
+    matches = [
+        path
+        for path in first_party_skill_paths()
+        if path.parent.name == skill_name
+    ]
+    if len(matches) != 1:
+        raise AssertionError(f"Expected one first-party skill named {skill_name}, found {len(matches)}")
+    return matches[0]
 
 
 def read_text(path: Path) -> str:
@@ -68,8 +78,8 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-verification-before-completion",
         ]
         for skill_name in mode_aware_skills:
-            skill_path = FIRST_PARTY_SKILL_ROOT / skill_name / "SKILL.md"
-            text = read_text(skill_path)
+            path = skill_path(skill_name)
+            text = read_text(path)
             with self.subTest(skill=skill_name):
                 self.assertIn("## Mode-Aware Behavior", text)
                 self.assertIn("Shift+Tab", text)
@@ -77,7 +87,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
                 self.assertIn("current collaboration mode is Plan", text)
 
     def test_codex_autoplan_documents_maturity_buckets_and_execution_escape(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-autoplan" / "SKILL.md")
+        text = read_text(skill_path("jy-autoplan"))
         self.assertIn("## Routing Matrix", text)
         self.assertIn("Idea-stage", text)
         self.assertIn("Decision-interview-stage", text)
@@ -91,7 +101,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("jy-executing-plans", text)
 
     def test_codex_checkpoint_documents_storage_contract(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-checkpoint" / "SKILL.md")
+        text = read_text(skill_path("jy-checkpoint"))
         self.assertIn(".codex/checkpoints/", text)
         self.assertIn("Save", text)
         self.assertIn("List", text)
@@ -100,7 +110,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("frontmatter", text)
 
     def test_codex_document_release_tracks_existing_doc_surface(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-document-release" / "SKILL.md")
+        text = read_text(skill_path("jy-document-release"))
         self.assertIn("README.md", text)
         self.assertIn("instructions/AGENTS.md", text)
         self.assertIn("skill-tests/first-party/", text)
@@ -115,7 +125,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertNotIn("full consistency audit", text)
 
     def test_systematic_debugging_documents_reproduce_hypothesize_and_verify(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-debugging" / "SKILL.md")
+        text = read_text(skill_path("jy-debugging"))
         self.assertIn("reproduce", text)
         self.assertIn("hypothesis", text)
         self.assertIn("minimal fix", text)
@@ -123,7 +133,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("## Debug Loop", text)
 
     def test_change_guardrails_documents_assumptions_scope_and_verification(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-change-guardrails" / "SKILL.md")
+        text = read_text(skill_path("jy-change-guardrails"))
         self.assertIn("assumptions", text)
         self.assertIn("interpretations", text)
         self.assertIn("smallest valid change", text)
@@ -135,7 +145,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("jy-verification-before-completion", text)
 
     def test_grill_me_documents_one_question_decision_interview(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-grill-me" / "SKILL.md")
+        text = read_text(skill_path("jy-grill-me"))
         self.assertIn("one question", text)
         self.assertIn("recommended answer", text)
         self.assertIn("shared understanding", text)
@@ -151,7 +161,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("Shift+Tab", text)
 
     def test_test_driven_development_documents_red_green_refactor(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-test-driven" / "SKILL.md")
+        text = read_text(skill_path("jy-test-driven"))
         self.assertIn("RED", text)
         self.assertIn("GREEN", text)
         self.assertIn("REFACTOR", text)
@@ -159,7 +169,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("Plan Mode", text)
 
     def test_verification_before_completion_requires_fresh_evidence(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-verification-before-completion" / "SKILL.md")
+        text = read_text(skill_path("jy-verification-before-completion"))
         self.assertIn("fresh verification evidence", text)
         self.assertIn("## Verification Gate", text)
         self.assertIn("evidence", text)
@@ -167,7 +177,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("not run", text)
 
     def test_ship_documents_branch_gate_pr_flow_and_doc_sync(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-ship" / "SKILL.md")
+        text = read_text(skill_path("jy-ship"))
         self.assertIn("base branch", text)
         self.assertTrue("PR" in text or "PR/MR" in text)
         self.assertIn("jy-document-release", text)
@@ -180,7 +190,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertLess(text.index("## Final Review And Verification Gate"), text.index("## Commit, Push, And PR/MR"))
 
     def test_writing_plans_documents_plan_doc_contract_and_placeholder_bans(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-writing-plans" / "SKILL.md")
+        text = read_text(skill_path("jy-writing-plans"))
         self.assertIn("docs/superpowers/plans/", text)
         self.assertIn("decision-complete", text)
         self.assertIn("acceptance criteria", text)
@@ -189,7 +199,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("## Mode-Aware Behavior", text)
 
     def test_executing_plans_documents_current_session_execution_without_auto_subagents(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-executing-plans" / "SKILL.md")
+        text = read_text(skill_path("jy-executing-plans"))
         self.assertIn("current session", text)
         self.assertIn("jy-test-driven", text)
         self.assertIn("jy-verification-before-completion", text)
@@ -200,7 +210,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("## Mode-Aware Behavior", text)
 
     def test_worktrees_documents_directory_policy_and_ignore_verification(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-worktrees" / "SKILL.md")
+        text = read_text(skill_path("jy-worktrees"))
         self.assertIn(".worktrees/", text)
         self.assertIn("worktrees/", text)
         self.assertIn("gitignored", text)
@@ -208,7 +218,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("## Mode-Aware Behavior", text)
 
     def test_waterfall_documents_project_record_and_safety_gates(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-waterfall" / "SKILL.md")
+        text = read_text(skill_path("jy-waterfall"))
         self.assertIn("2-3 hours", text)
         self.assertIn("YYYYMMDDTHHMM", text)
         self.assertIn("explicit approval", text)
@@ -224,7 +234,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("jy-verification-before-completion", text)
 
     def test_receiving_review_documents_verification_before_changes_and_pushback(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-receiving-review" / "SKILL.md")
+        text = read_text(skill_path("jy-receiving-review"))
         self.assertIn("performative agreement", text)
         self.assertIn("technical pushback", text)
         self.assertIn("codebase", text)
@@ -232,8 +242,9 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("## Mode-Aware Behavior", text)
 
     def test_review_work_respects_subagent_permission_boundary(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-review-work" / "SKILL.md")
-        agent_text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-review-work" / "agents" / "openai.yaml")
+        review_work_path = skill_path("jy-review-work")
+        text = read_text(review_work_path)
+        agent_text = read_text(review_work_path.parent / "agents" / "openai.yaml")
         scenario_text = read_text(REPO_ROOT / "skill-tests" / "first-party" / "jy-review-work" / "pressure-scenarios.json")
 
         self.assertIn("Do not auto-spawn subagents", text)
@@ -247,7 +258,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertNotIn("run_in_background", scenario_text)
 
     def test_review_all_documents_whole_project_audit_boundaries(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-review-all" / "SKILL.md")
+        text = read_text(skill_path("jy-review-all"))
         self.assertIn("whole-project audit", text)
         self.assertIn("architecture", text)
         self.assertIn("module depth", text)
@@ -263,7 +274,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("jy-grill-me", text)
 
     def test_ship_documents_review_work_as_gate_not_duplicate_scope(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-ship" / "SKILL.md")
+        text = read_text(skill_path("jy-ship"))
         self.assertIn("review gate", text)
         self.assertIn("non-trivial implementation changes", text)
         self.assertIn("docs-only", text)
@@ -271,7 +282,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("jy-review-all", text)
 
     def test_writing_skills_documents_english_first_authoring_policy(self) -> None:
-        text = read_text(FIRST_PARTY_SKILL_ROOT / "jy-writing-skills" / "SKILL.md")
+        text = read_text(skill_path("jy-writing-skills"))
         self.assertIn("English-first", text)
         self.assertIn("core `SKILL.md`", text)
         self.assertIn("agents/openai.yaml", text)
@@ -287,7 +298,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-env-sync-admin",
         ]:
             with self.subTest(skill=skill_name):
-                text = read_text(FIRST_PARTY_SKILL_ROOT / skill_name / "SKILL.md")
+                text = read_text(skill_path(skill_name))
                 self.assertIn("## Output Template", text)
                 self.assertIn("user's language", text)
 
@@ -298,7 +309,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
                 self.assertIsNone(re.search(r"[가-힣]", text))
 
     def test_writing_skill_references_are_english_first(self) -> None:
-        reference_root = FIRST_PARTY_SKILL_ROOT / "jy-writing-skills" / "references"
+        reference_root = skill_path("jy-writing-skills").parent / "references"
         for ref_path in sorted(reference_root.glob("*.md")):
             with self.subTest(reference=ref_path.name):
                 text = read_text(ref_path)
@@ -319,10 +330,10 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-verification-before-completion",
         ]
         for skill_name in execution_skills:
-            skill_path = FIRST_PARTY_SKILL_ROOT / skill_name / "SKILL.md"
-            if not skill_path.exists():
+            path = skill_path(skill_name)
+            if not path.exists():
                 continue
-            text = read_text(skill_path)
+            text = read_text(path)
             with self.subTest(skill=skill_name):
                 self.assertIn("## Mode-Aware Behavior", text,
                     f"{skill_name} is execution-oriented but lacks Mode-Aware Behavior section")
@@ -335,10 +346,10 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-review-all",
         ]
         for skill_name in advisory_skills:
-            skill_path = FIRST_PARTY_SKILL_ROOT / skill_name / "SKILL.md"
-            if not skill_path.exists():
+            path = skill_path(skill_name)
+            if not path.exists():
                 continue
-            text = read_text(skill_path)
+            text = read_text(path)
             with self.subTest(skill=skill_name):
                 self.assertTrue(
                     "Do not modify code" in text or "Do not write code" in text or "no code changes" in text,
@@ -350,10 +361,10 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             "jy-library-research",
         ]
         for skill_name in research_skills:
-            skill_path = FIRST_PARTY_SKILL_ROOT / skill_name / "SKILL.md"
-            if not skill_path.exists():
+            path = skill_path(skill_name)
+            if not path.exists():
                 continue
-            text = read_text(skill_path)
+            text = read_text(path)
             with self.subTest(skill=skill_name):
                 self.assertTrue(
                     "evidence" in text or "permalink" in text or "sources" in text or "links" in text,

@@ -7,7 +7,7 @@ import tempfile
 import textwrap
 import unittest
 
-from codex_env_sync.apply import apply_environment
+from codex_env_sync.apply import apply_environment, hash_path
 
 
 def write_fixture_repo(
@@ -27,6 +27,7 @@ def write_fixture_repo(
             name = "jy-env-core"
             source = "plugins/jy-env-core"
             install_mode = "{plugin_install_mode}"
+            installation_policy = "INSTALLED_BY_DEFAULT"
 
             [[instructions]]
             name = "global-agents"
@@ -65,6 +66,46 @@ def write_fixture_repo(
     (root / "instructions" / "AGENTS.md").write_text("# fixture\n", encoding="utf-8")
 
 
+def add_optional_pack(root: Path, name: str = "jy-env-planning") -> None:
+    plugin_root = root / "plugins" / name
+    skill_root = plugin_root / "skills" / "jy-framing"
+    (plugin_root / ".codex-plugin").mkdir(parents=True, exist_ok=True)
+    skill_root.mkdir(parents=True, exist_ok=True)
+    (plugin_root / ".codex-plugin" / "plugin.json").write_text(
+        json.dumps(
+            {
+                "name": name,
+                "version": "0.1.0",
+                "description": "fixture optional pack",
+                "skills": "./skills/",
+                "interface": {"category": "Productivity"},
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (skill_root / "SKILL.md").write_text(
+        "---\nname: jy-framing\ndescription: fixture\n---\n",
+        encoding="utf-8",
+    )
+    manifest_path = root / "codex-env.toml"
+    manifest_path.write_text(
+        manifest_path.read_text(encoding="utf-8")
+        + textwrap.dedent(
+            f"""
+
+            [[plugins]]
+            name = "{name}"
+            source = "plugins/{name}"
+            install_mode = "copy"
+            installation_policy = "AVAILABLE"
+            """
+        ),
+        encoding="utf-8",
+    )
+
+
 def supports_symlinks() -> bool:
     with tempfile.TemporaryDirectory() as temp_dir:
         root = Path(temp_dir)
@@ -79,6 +120,124 @@ def supports_symlinks() -> bool:
 
 
 class ApplyEnvironmentTests(unittest.TestCase):
+    def test_apply_stages_optional_packs_without_native_skill_overlays(self) -> None:
+        with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
+            repo_root = Path(repo_dir)
+            home_root = Path(home_dir)
+            write_fixture_repo(repo_root)
+            add_optional_pack(repo_root)
+
+            apply_environment(repo_root, home=home_root, os_name="linux")
+
+            self.assertTrue((home_root / "plugins" / "jy-env-core").is_dir())
+            self.assertTrue((home_root / "plugins" / "jy-env-planning").is_dir())
+            self.assertFalse((home_root / ".agents" / "skills" / "jy-env-core").exists())
+            self.assertFalse((home_root / ".agents" / "skills" / "jy-env-planning").exists())
+
+            marketplace = json.loads(
+                (home_root / ".agents" / "plugins" / "marketplace.json").read_text(encoding="utf-8")
+            )
+            policies = {
+                entry["name"]: entry["policy"]["installation"]
+                for entry in marketplace["plugins"]
+            }
+            self.assertEqual(
+                policies,
+                {
+                    "jy-env-core": "INSTALLED_BY_DEFAULT",
+                    "jy-env-planning": "AVAILABLE",
+                },
+            )
+
+    def test_apply_removes_legacy_managed_skill_overlay(self) -> None:
+        with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
+            repo_root = Path(repo_dir)
+            home_root = Path(home_dir)
+            write_fixture_repo(repo_root)
+            legacy_skills = home_root / ".agents" / "skills" / "jy-env-core"
+            legacy_skills.mkdir(parents=True)
+            (legacy_skills / "legacy.txt").write_text("managed\n", encoding="utf-8")
+            installed_hash = hash_path(legacy_skills)
+            state_path = home_root / ".codex-env-sync" / "state.json"
+            state_path.parent.mkdir(parents=True)
+            state_path.write_text(
+                json.dumps(
+                    {
+                        "plugins": {},
+                        "skills": {
+                            "jy-env-core": {
+                                "mode": "copy",
+                                "installed_hash": installed_hash,
+                            }
+                        },
+                        "instructions": {},
+                        "hooks": {},
+                        "last_apply": None,
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            report = apply_environment(repo_root, home=home_root, os_name="linux")
+
+            self.assertFalse(legacy_skills.exists())
+            self.assertEqual(report.skills[0].detail, "removed stale managed skill link")
+
+    def test_apply_refuses_to_remove_modified_legacy_skill_overlay(self) -> None:
+        with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
+            repo_root = Path(repo_dir)
+            home_root = Path(home_dir)
+            write_fixture_repo(repo_root)
+            legacy_skills = home_root / ".agents" / "skills" / "jy-env-core"
+            legacy_skills.mkdir(parents=True)
+            legacy_file = legacy_skills / "legacy.txt"
+            legacy_file.write_text("managed\n", encoding="utf-8")
+            installed_hash = hash_path(legacy_skills)
+            legacy_file.write_text("user change\n", encoding="utf-8")
+            state_path = home_root / ".codex-env-sync" / "state.json"
+            state_path.parent.mkdir(parents=True)
+            state_path.write_text(
+                json.dumps(
+                    {
+                        "plugins": {},
+                        "skills": {
+                            "jy-env-core": {
+                                "mode": "copy",
+                                "installed_hash": installed_hash,
+                            }
+                        },
+                        "instructions": {},
+                        "hooks": {},
+                        "last_apply": None,
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "modified managed skill surface"):
+                apply_environment(repo_root, home=home_root, os_name="linux")
+
+            self.assertEqual(legacy_file.read_text(encoding="utf-8"), "user change\n")
+
+    def test_preflight_rejects_unknown_plugin_installation_policy(self) -> None:
+        with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
+            repo_root = Path(repo_dir)
+            home_root = Path(home_dir)
+            write_fixture_repo(repo_root)
+            manifest_path = repo_root / "codex-env.toml"
+            manifest_path.write_text(
+                manifest_path.read_text(encoding="utf-8").replace(
+                    'installation_policy = "INSTALLED_BY_DEFAULT"',
+                    'installation_policy = "SOMETIMES"',
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "Unsupported plugin installation policy"):
+                apply_environment(repo_root, home=home_root, os_name="linux")
+
+            self.assertFalse((home_root / "plugins" / "jy-env-core").exists())
+
     def test_apply_writes_plugin_marketplace_and_instruction(self) -> None:
         with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
             repo_root = Path(repo_dir)
@@ -90,12 +249,11 @@ class ApplyEnvironmentTests(unittest.TestCase):
             plugin_json = home_root / "plugins" / "jy-env-core" / ".codex-plugin" / "plugin.json"
             agents_file = home_root / ".codex" / "AGENTS.md"
             marketplace = home_root / ".agents" / "plugins" / "marketplace.json"
-            skill_file = home_root / ".agents" / "skills" / "jy-env-core" / "jy-env-sync-admin" / "SKILL.md"
 
             self.assertTrue(plugin_json.exists())
             self.assertTrue(agents_file.exists())
             self.assertTrue(marketplace.exists())
-            self.assertTrue(skill_file.exists())
+            self.assertFalse((home_root / ".agents" / "skills" / "jy-env-core").exists())
             self.assertEqual(report.marketplace_action, "applied")
 
             second_report = apply_environment(repo_root, home=home_root, os_name="darwin")
@@ -321,7 +479,7 @@ class ApplyEnvironmentTests(unittest.TestCase):
             self.assertFalse((home_root / "plugins" / "codex-env-core").exists())
             self.assertFalse((home_root / ".agents" / "skills" / "codex-env-core").exists())
             self.assertTrue((home_root / "plugins" / "jy-env-core").exists())
-            self.assertTrue((home_root / ".agents" / "skills" / "jy-env-core").exists())
+            self.assertFalse((home_root / ".agents" / "skills" / "jy-env-core").exists())
 
     @unittest.skipUnless(supports_symlinks(), "symlinks are not supported on this host")
     def test_apply_symlink_mode_links_to_repo_sources(self) -> None:
@@ -334,16 +492,14 @@ class ApplyEnvironmentTests(unittest.TestCase):
 
             plugin_root = home_root / "plugins" / "jy-env-core"
             agents_file = home_root / ".codex" / "AGENTS.md"
-            skills_root = home_root / ".agents" / "skills" / "jy-env-core"
 
             self.assertEqual(report.plugins[0].detail, "symlinked plugin bundle")
             self.assertEqual(report.instructions[0].detail, "symlinked instruction artifact")
             self.assertTrue(plugin_root.is_symlink())
             self.assertTrue(agents_file.is_symlink())
-            self.assertTrue(skills_root.is_symlink())
             self.assertEqual(plugin_root.resolve(), (repo_root / "plugins" / "jy-env-core").resolve())
             self.assertEqual(agents_file.resolve(), (repo_root / "instructions" / "AGENTS.md").resolve())
-            self.assertEqual(skills_root.resolve(), (repo_root / "plugins" / "jy-env-core" / "skills").resolve())
+            self.assertFalse((home_root / ".agents" / "skills" / "jy-env-core").exists())
 
             (repo_root / "instructions" / "AGENTS.md").write_text("# updated\n", encoding="utf-8")
             self.assertEqual(agents_file.read_text(encoding="utf-8"), "# updated\n")
@@ -363,14 +519,13 @@ class ApplyEnvironmentTests(unittest.TestCase):
             report = apply_environment(repo_root, home=home_root, os_name="darwin", snapshot=True)
 
             plugin_root = home_root / "plugins" / "jy-env-core"
-            skills_root = home_root / ".agents" / "skills" / "jy-env-core"
             agents_file = home_root / ".codex" / "AGENTS.md"
             self.assertEqual(report.plugins[0].detail, "copied plugin bundle")
-            self.assertEqual(report.skills[0].detail, "copied skill directory")
+            self.assertEqual(report.skills, [])
             self.assertEqual(report.instructions[0].detail, "copied instruction artifact")
             self.assertFalse(plugin_root.is_symlink())
-            self.assertFalse(skills_root.is_symlink())
             self.assertFalse(agents_file.is_symlink())
+            self.assertFalse((home_root / ".agents" / "skills" / "jy-env-core").exists())
 
             (repo_root / "instructions" / "AGENTS.md").write_text("# changed after snapshot\n", encoding="utf-8")
             self.assertEqual(agents_file.read_text(encoding="utf-8"), "# fixture\n")
@@ -402,7 +557,7 @@ class ApplyEnvironmentTests(unittest.TestCase):
                 apply_environment(repo_root, home=home_root, os_name="linux")
 
             self.assertTrue((home_root / "plugins" / "jy-env-core").exists())
-            self.assertTrue((home_root / ".agents" / "skills" / "jy-env-core").exists())
+            self.assertFalse((home_root / ".agents" / "skills" / "jy-env-core").exists())
             self.assertTrue((home_root / ".codex" / "AGENTS.md").exists())
 
     def test_preflight_preserves_drifted_stale_install_instead_of_deleting_it(self) -> None:
@@ -420,7 +575,7 @@ class ApplyEnvironmentTests(unittest.TestCase):
                 apply_environment(repo_root, home=home_root, os_name="linux")
 
             self.assertEqual(installed_payload.read_text(encoding="utf-8"), "user-owned replacement\n")
-            self.assertTrue((home_root / ".agents" / "skills" / "jy-env-core").exists())
+            self.assertFalse((home_root / ".agents" / "skills" / "jy-env-core").exists())
             self.assertTrue((home_root / ".codex" / "AGENTS.md").exists())
 
 

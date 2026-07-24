@@ -24,7 +24,7 @@ refactor.
 Do not use it when:
 
 - the user wants review of a specific completed diff (`jy-review-work`)
-- the user wants push, PR/MR, or release closeout (`jy-ship`)
+- the user wants push, PR/MR, or release closeout (`jy-ship` when the delivery pack is installed)
 - the user only needs to find where something is implemented (`jy-codebase-explore`)
 - the user has already picked a concrete refactor to implement (`jy-change-guardrails`)
 
@@ -71,7 +71,7 @@ Return a compact audit report:
 
 | Priority | Area | Finding | Evidence | Candidate | Next |
 |----------|------|---------|----------|-----------|------|
-| P1 | Architecture | ... | path:line | ... | jy-grill-me |
+| P1 | Architecture | ... | path:line | ... | available handoff or direct action |
 
 ## Keep
 - patterns that should not be disturbed
@@ -80,14 +80,17 @@ Return a compact audit report:
 - surfaces skipped and why
 ```
 
-Recommended next handoffs:
+Recommended next handoffs are capability-aware:
 
 - `jy-codebase-explore` for deeper tracing before judging a candidate
-- `jy-grill-me` to pressure-test one candidate before planning
-- `jy-plan-review` when a remediation plan exists and needs decision closure
-- `jy-writing-plans` when the user approves a candidate and wants an execution plan
+- `jy-grill-me` to pressure-test one candidate before planning, when the planning pack is installed
+- `jy-plan-review` when a remediation plan exists and the planning pack is installed
+- `jy-writing-plans` when the user wants an execution plan and the planning pack is installed
 - `jy-change-guardrails` when implementing a focused refactor
 - `jy-review-work` only after a concrete implementation diff exists
+
+If an optional handoff pack is absent, describe the required next action without claiming
+that the named skill is available.
 
 ## Mode-Aware Behavior
 

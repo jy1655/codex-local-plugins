@@ -11,6 +11,42 @@
         "path": "./plugins/jy-env-core"
       },
       "policy": {
+        "installation": "INSTALLED_BY_DEFAULT",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "jy-env-planning",
+      "source": {
+        "source": "local",
+        "path": "./plugins/jy-env-planning"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "jy-env-delivery",
+      "source": {
+        "source": "local",
+        "path": "./plugins/jy-env-delivery"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "jy-env-audit",
+      "source": {
+        "source": "local",
+        "path": "./plugins/jy-env-audit"
+      },
+      "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
       },

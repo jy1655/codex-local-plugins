@@ -1,7 +1,7 @@
 # First-Party Skill Pressure Scenarios
 
 This directory stores manual evaluation inputs for the first-party skills under
-`plugins/jy-env-core/skills/`. Each skill has one `pressure-scenarios.json` file.
+`plugins/jy-env-*/skills/`. Each skill has one `pressure-scenarios.json` file.
 
 These files are not proof that an agent run passed. CI validates only their presence and
 schema. Record behavioral results outside this tree only when the scenarios were actually

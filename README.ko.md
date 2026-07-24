@@ -3,93 +3,72 @@
 [![언어: English](https://img.shields.io/badge/Language-English-111827?style=for-the-badge)](./README.md)
 [![언어: Korean](https://img.shields.io/badge/Language-Korean-0A66C2?style=for-the-badge)](./README.ko.md)
 
-이 저장소는 이식 가능한 Codex 작업 환경을 정의합니다.
+이 저장소는 이식 가능한 first-party Codex 환경을 정의합니다. 로컬 plugin bundle을
+stage하고 personal marketplace와 간결한 전역 instruction을 관리하되, Codex runtime
+cache를 직접 수정하지 않습니다.
 
-전체 머신을 복제하려는 목적은 아닙니다. 대신 Codex가 어디서 실행되더라도
-같은 방식으로 동작하도록 만드는 표면만 동기화합니다.
+## Pack model
 
-- first-party 로컬 plugin bundle
-- plugin marketplace entry
-- 생성된 전역 instruction artifact
-- 설치된 plugin bundle 안에서 직접 작성되는 first-party Codex skill
+기본 환경은 의도적으로 작게 유지합니다. `apply`는 네 bundle을 모두 `~/plugins`에
+stage한 뒤 `INSTALLED_BY_DEFAULT` plugin을 Codex CLI로 명시적으로 설치합니다.
+Marketplace policy는 기본 설치 대상을 고르며, policy 자체가 설치 작업을 수행하지는
+않습니다.
 
-설치 표면은 의도적으로 작게 유지합니다.
+| Pack | Policy | Skills |
+|---|---|---|
+| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-debugging`, `jy-test-driven`, `jy-verification-before-completion`, `jy-codebase-explore`, `jy-library-research`, `jy-consult` |
+| `jy-env-planning` | `AVAILABLE` | `jy-autoplan`, `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans` |
+| `jy-env-delivery` | `AVAILABLE` | `jy-executing-plans`, `jy-worktrees`, `jy-checkpoint`, `jy-document-release`, `jy-ship`, `jy-waterfall`, `jy-env-sync-admin`, `jy-writing-skills` |
+| `jy-env-audit` | `AVAILABLE` | `jy-review-all`, `jy-review-work`, `jy-receiving-review`, `jy-slop-remover` |
 
-- plugin은 `~/plugins`에 설치됩니다
-- skill discovery link는 `~/.agents/skills/`에 설치됩니다
-- marketplace는 `~/.agents/plugins/marketplace.json`에 기록됩니다
-- instruction은 `~/.codex/...`에 설치됩니다
-- `~/.codex/plugins/cache` 아래의 Codex runtime cache는 건드리지 않습니다
+Stage와 activation은 서로 다른 동작입니다.
 
-로컬 `apply`는 macOS와 Linux에서 symlink를 사용하므로 의도적으로 dirty한 개발
-checkout도 즉시 반영됩니다. Windows는 platform override로 copy mode를 유지합니다.
-GitHub bootstrap 설치는 항상 copy snapshot을 사용하므로 managed clone의 이후 수정이나
-pull이 설치된 환경을 조용히 바꾸지 않습니다.
+- `~/plugins/<pack>`은 local marketplace source입니다.
+- `INSTALLED_BY_DEFAULT`이면 `apply`와 bootstrap이
+  `codex plugin add jy-env-core@personal-codex`를 실행합니다.
+- `AVAILABLE` 선택 pack은 Plugins Directory 또는 CLI에서 설치하기 전까지
+  비활성 상태입니다.
+- 이 저장소는 더 이상 `~/.agents/skills/<pack>` discovery link를 별도로 만들지
+  않으므로 plugin cache와 native discovery의 skill metadata 중복을 피합니다.
 
-커밋하면 안 되는 repo-local 작업 상태는 `.codex/` 아래에 둘 수 있습니다.
-첫 번째 경로는 `.codex/checkpoints/`이며, 세션 handoff note를 저장하는
-first-party `jy-checkpoint` skill이 사용합니다.
+필요한 선택 pack만 설치합니다.
 
-first-party skill authoring은 `plugins/jy-env-core/skills/`에서 이뤄집니다. 이 디렉터리는
-로컬 개발과 설치된 Codex skill 표면 모두의 source of truth입니다.
-현재 first-party workflow pack은 planning, decision interview, 구현 계획 작성,
-isolated worktree 준비, debugging, test-first implementation, change-scope
-guardrail, plan execution, whole-project audit, review feedback handling, waterfall-style project
-record, shipping, verification discipline을 다룹니다.
+```bash
+codex plugin add jy-env-planning@personal-codex
+codex plugin add jy-env-delivery@personal-codex
+codex plugin add jy-env-audit@personal-codex
+```
 
-## First-Party Skill Catalog
+설치된 pack을 바꾼 뒤에는 새 Codex thread를 시작합니다.
 
-실제 호출명은 `jy-*`처럼 짧게 유지하고, role 구분은 이 README에서 설명합니다.
-즉 일상적인 invocation은 간결하게 두고, intended use는 문서에서 명확히 확인할 수 있게 했습니다.
+## Lazy Context7 research
 
-### Planning
+Context7은 MCP server나 별도 `jy-context7` skill로 설치하지 않습니다. core-lite의
+`jy-library-research`가 Context7을 선택형 read-only provider로 다룹니다.
 
-- `jy-autoplan`은 현재 요청에 맞는 planning 경로를 고르고, 사용자가 먼저 선택하지 않아도 `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans`, `jy-executing-plans`로 라우팅합니다.
-- `jy-framing`는 모호한 feature 또는 product idea를 더 선명한 problem brief, 제약 조건 목록, 다음 planning step으로 정리합니다.
-- `jy-grill-me`는 구현 전에 plan 또는 feature direction을 한 번에 하나의 질문으로 압박 검토하는 decision interview를 진행합니다.
-- `jy-plan-review`는 이미 있는 plan 또는 outline을 받아 구현 전에 decision gap을 닫습니다.
-- `jy-writing-plans`는 승인된 요구사항을 `docs/superpowers/plans/` 아래의 decision-complete implementation plan으로 바꿉니다.
-- `jy-worktrees`는 `.worktrees/`를 기본값으로 삼아 안전한 isolated feature workspace를 준비합니다.
-- `jy-waterfall`은 2-3시간 이상 걸릴 작업에 대해 승인 기반 project record를 만들고, timestamp가 포함된 order, plan, result, feedback, troubleshooting note를 연결합니다.
+1. 이미 `ctx7` command가 있으면 그것을 사용합니다.
+2. 없다면 Node.js 18+와 `npx`가 있을 때 해당 조사 요청에서만 고정된
+   `ctx7@0.5.5` package를 실행합니다.
+3. CLI, network, sandbox, rate limit, index 문제 중 하나라도 발생하면 official docs,
+   source, changelog, issue tracker로 즉시 fallback합니다.
 
-### Execution
+대부분의 공개 문서 query는 인증 없이 동작합니다. 더 높은 rate limit이 필요하면 key를
+repo 밖의 `CONTEXT7_API_KEY` 환경변수에 둡니다. Skill은 key를 command argument로
+전달하지 않으며 private source나 credential을 Context7에 보내지 않습니다.
 
-- `jy-executing-plans`는 작성된 plan을 현재 세션에서 task-by-task로 실행하고, behavior change 안에서는 TDD를 쓰며 마지막에 proportional review와 한 번의 final verification으로 닫습니다.
-- `jy-debugging`은 버그를 patch하기 전에 reproduction, hypothesis test, root-cause verification을 강제합니다.
-- `jy-change-guardrails`는 non-trivial code change에서 assumption을 드러내고, smallest valid change를 강제하며, unrelated cleanup으로 diff가 번지는 일을 막습니다.
-- `jy-test-driven`는 failing test first를 강제하고 구현을 red-green-refactor loop 안에 묶습니다.
-- `jy-verification-before-completion`은 fresh verification command와 결과가 없으면 success claim을 막습니다.
-- `jy-review-work`는 handoff 또는 merge 전에 완료된 구현을 multi-angle review 방식으로 검토합니다.
-- `jy-receiving-review`는 리뷰 코멘트를 실제 코드베이스와 대조해 검증하고, 잘못된 피드백에는 기술적으로 반박할 수 있게 합니다.
-- `jy-slop-remover`는 불필요하게 범위를 넓히지 않고 obvious AI-generated code smell만 정리합니다.
+## Install surface
 
-### Audit
+- plugin source: `~/plugins`
+- personal marketplace: `~/.agents/plugins/marketplace.json`
+- global instruction: `~/.codex/AGENTS.md`
+- managed state: `~/.codex-env-sync/state.json`
+- `codex plugin`으로만 변경하는 Codex 소유 cache: `~/.codex/plugins/cache`
 
-- `jy-review-all`은 기존 project를 architecture, module depth, testability, documentation gap, maintainability, navigation 관점으로 점검하고 focused follow-up work 후보를 우선순위로 정리합니다.
-
-### Research
-
-- `jy-codebase-explore`는 구조가 낯설거나 여러 모듈에 흩어진 repository를 multi-angle 방식으로 탐색합니다.
-- `jy-library-research`는 외부 library, package, API, usage pattern에 대해 evidence-backed answer를 수집합니다.
-- `jy-consult`는 architecture, reliability, performance, repeated-failure decision에 대해 advisory mode로 깊게 판단합니다.
-
-### Maintenance
-
-- `jy-checkpoint`는 pause, resume, branch handoff workflow를 위해 repo-local checkpoint note를 `.codex/checkpoints/` 아래에 저장합니다.
-- `jy-document-release`는 change가 실제로 영향을 준 문서와 manual pressure scenario만 동기화합니다.
-- `jy-ship`은 base branch check, verification 전 docs sync, proportional review, 한 번의 final verification, push, PR/MR 생성 순서로 branch를 닫습니다.
-- `jy-env-sync-admin`은 이 환경 repo를 검증하고 repo-owned install surface를 home Codex 환경에 다시 적용합니다.
-
-### Authoring
-
-- `jy-writing-skills`는 risk-scoped static check, manual pressure scenario, deployment check를 사용하는 first-party authoring guide입니다.
-
-## Secret handling
-
-secret value는 이 repo에 커밋하지 않습니다.
-
-현재 `jy-env-core` plugin bundle은 MCP server를 설치하지 않습니다. 향후 API key나
-account token이 필요하면 이 repo 밖의 machine-local 설정에 보관합니다.
+로컬 `apply`는 macOS와 Linux에서 plugin source와 instruction을 symlink하고,
+Windows에서는 copy mode를 사용합니다. Bootstrap과 `--snapshot`은 항상 안정적인
+copy snapshot을 설치합니다. Stage 후에는 `codex plugin add`로 기본 plugin을
+설치하거나 갱신하며, 선택 pack은 명시적으로 설치해야 합니다. Dirty checkout은
+별도의 live skill discovery surface로 노출하지 않습니다.
 
 ## First run
 
@@ -105,69 +84,63 @@ Windows PowerShell:
 .\scripts\bootstrap.ps1 -GitUrl <git-url>
 ```
 
-두 bootstrap script는 repo를 한 번만 clone하고 안정적인 copy snapshot을 설치합니다.
+두 명령 모두 `codex` CLI가 필요하며, repo를 한 번 clone하고 안정적인 snapshot과
+core-lite를 설치합니다.
 
 ## Local development
 
-이 repo가 정의하는 환경을 점검하려면:
+해석된 source, install mode, marketplace policy를 점검합니다.
 
 ```bash
-python -m codex_env_sync.cli inspect --repo-root .
+python3 -m codex_env_sync.cli inspect --repo-root .
 ```
 
-현재 checkout을 홈 디렉터리에 적용하려면:
+현재 checkout을 적용합니다.
 
 ```bash
-python -m codex_env_sync.cli apply --repo-root .
+python3 -m codex_env_sync.cli apply --repo-root .
 ```
 
-macOS와 Linux에서는 이 명령이 repo-managed plugin bundle, skill discovery surface,
-instruction에 대한 symlink를 만듭니다. 같은 checkout에서 나중에 `git pull`을 하면
-설치된 Codex 표면도 즉시 업데이트됩니다.
-
-기존 checkout에서 분리된 copy를 설치하려면 다음을 사용합니다.
+분리된 snapshot을 설치합니다.
 
 ```bash
-python -m codex_env_sync.cli apply --repo-root . --snapshot
+python3 -m codex_env_sync.cli apply --repo-root . --snapshot
 ```
+
+이미 설치된 plugin을 바꾼 뒤에는 `plugin-creator`의 cachebuster/reinstall 흐름을
+사용하고 새 thread를 시작합니다. `~/.codex/plugins/cache`를 직접 수정하지 않습니다.
 
 ## Layout
 
 ```text
-codex-env.toml                 # Minimal manifest: plugins + instructions + platform overrides
-codex_env_sync/                # Apply engine and CLI
-plugins/                       # First-party plugin bundles that get installed into ~/plugins
-plugins/jy-env-core/skills/    # First-party Codex skills, authoring source and install source
-instructions/                  # Generated instruction artifacts
-.codex/checkpoints/            # Repo-local ignored checkpoint notes created by jy-checkpoint
-.agents/plugins/               # Repo-local marketplace metadata for local plugin discovery
-.agents/skills/                # Home install target for Codex native skill discovery
-scripts/bootstrap.sh           # First-run shell bootstrap for macOS/Linux
-scripts/bootstrap.ps1          # First-run shell bootstrap for Windows
-tests/                         # Unit + integration tests
-skill-tests/                   # Manual pressure scenario; CI는 schema만 검증
+codex-env.toml                    # 네 plugin source와 installation policy
+codex_env_sync/                   # inspect/apply/bootstrap engine
+plugins/jy-env-core/              # 기본 core-lite bundle
+plugins/jy-env-planning/          # 선택 planning pack
+plugins/jy-env-delivery/          # 선택 delivery pack
+plugins/jy-env-audit/             # 선택 audit pack
+instructions/AGENTS.md            # 선택 skill을 eager routing하지 않는 전역 규칙
+.agents/plugins/marketplace.json  # local personal marketplace catalog
+skill-tests/first-party/          # manual pressure scenario
+tests/                            # unit·integration test
 ```
 
-## Design boundaries
+First-party skill source는 `plugins/jy-env-*/skills/`에만 둡니다. Upstream 또는
+company-shared skill은 seed material이며, 이 repo는 customization이 끝난 first-party
+결과만 저장하고 third-party runtime을 vendor하지 않습니다.
 
-- upstream open source 또는 company skill은 seed material로만 사용합니다.
-- raw seed source는 보통 local에만 두고 여기에는 커밋하지 않습니다.
-- first-party Codex skill은 `plugins/jy-env-core/skills/` 아래에서 직접 작성합니다.
-- 이 repo는 유지보수되는 execution surface의 일부로 vendored upstream runtime을 보관하지 않습니다.
-- repo-local checkpoint note는 `.codex/checkpoints/` 아래에 두고 gitignored 상태를 유지합니다.
-- 여기 커밋되는 것은 customization이 끝난 first-party 결과물입니다.
-- 변경이 없을 때 `apply`를 다시 실행하면 빠르고 조용하게 끝나야 합니다.
+커밋하면 안 되는 repo-local 작업 상태는 `.codex/` 아래에 둘 수 있습니다. Delivery
+pack을 설치한 경우 `jy-checkpoint`는 `.codex/checkpoints/`를 사용합니다.
 
 ## Tests
 
-로컬 실행:
+전체 suite:
 
 ```bash
 python3 -m unittest discover -s tests -v
 ```
 
-first-party manual pressure input과 schema check는 `skill-tests/first-party/`를 참고하고,
-다음 테스트를 실행하면 됩니다.
+Manual pressure-scenario asset 검증:
 
 ```bash
 python3 -m unittest tests.test_skill_scenarios -v

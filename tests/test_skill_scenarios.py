@@ -6,12 +6,14 @@ import unittest
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-FIRST_PARTY_SKILL_ROOT = REPO_ROOT / "plugins" / "jy-env-core" / "skills"
 SCENARIO_ROOT = REPO_ROOT / "skill-tests" / "first-party"
 
 
 def first_party_skill_dirs() -> list[Path]:
-    return sorted(path for path in FIRST_PARTY_SKILL_ROOT.iterdir() if (path / "SKILL.md").exists())
+    return sorted(
+        path.parent
+        for path in REPO_ROOT.glob("plugins/jy-env-*/skills/*/SKILL.md")
+    )
 
 
 def scenario_dirs() -> list[Path]:

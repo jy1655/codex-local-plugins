@@ -50,10 +50,12 @@ Do not use it for unfinished debugging or planning-only requests.
 
 ## Final Review And Verification Gate
 
-- Use `jy-review-work` as the review gate for non-trivial implementation changes.
+- Use `jy-review-work` as the review gate for non-trivial implementation changes when the
+  audit pack is installed. Otherwise perform a compact goal, diff, regression, security,
+  and test-evidence review directly.
 - Skip a full review for docs-only, config-only, or already-reviewed low-risk changes unless
   new evidence raises the risk.
-- Do not use `jy-review-all` as a ship gate; it is a whole-project audit.
+- Do not use `jy-review-all`, when available, as a ship gate; it is a whole-project audit.
 - Run `jy-verification-before-completion` once after docs and review fixes are settled.
 - Reject test memory, a stale CI result, or an earlier agent report as evidence for the
   final candidate.

@@ -5,272 +5,123 @@ import json
 import unittest
 
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def plugin_roots() -> list[Path]:
+    return sorted(
+        path.parent.parent
+        for path in REPO_ROOT.glob("plugins/jy-env-*/.codex-plugin/plugin.json")
+    )
+
+
+def skill_paths() -> list[Path]:
+    return sorted(REPO_ROOT.glob("plugins/jy-env-*/skills/*/SKILL.md"))
+
+
 class RepoBundleTests(unittest.TestCase):
-    def test_global_agents_instructions_include_codex_planning_routing(self) -> None:
-        agents_path = Path(__file__).resolve().parents[1] / "instructions" / "AGENTS.md"
-        text = agents_path.read_text(encoding="utf-8")
+    def test_global_agents_instructions_define_compact_pack_model(self) -> None:
+        text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text(encoding="utf-8")
 
-        self.assertIn("## Skill Routing", text)
-        self.assertIn("jy-autoplan", text)
-        self.assertIn("jy-framing", text)
-        self.assertIn("jy-grill-me", text)
-        self.assertIn("jy-plan-review", text)
-        self.assertIn("jy-writing-plans", text)
-        self.assertIn("jy-worktrees", text)
-        self.assertIn("jy-document-release", text)
-        self.assertIn("jy-ship", text)
-        self.assertIn("Shift+Tab", text)
+        self.assertIn("## Pack Model", text)
+        self.assertIn("jy-env-core", text)
+        self.assertIn("jy-env-planning", text)
+        self.assertIn("jy-env-delivery", text)
+        self.assertIn("jy-env-audit", text)
+        self.assertIn("actually available", text)
+        self.assertNotIn("## Skill Routing", text)
+        self.assertNotIn("## Execution Skill Routing", text)
+        self.assertNotIn("## Advisory and Research Skill Routing", text)
 
-    def test_global_agents_instructions_include_checkpoint_routing(self) -> None:
-        agents_path = Path(__file__).resolve().parents[1] / "instructions" / "AGENTS.md"
-        text = agents_path.read_text(encoding="utf-8")
+    def test_global_agents_instructions_define_owned_surfaces_and_language(self) -> None:
+        text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text(encoding="utf-8")
 
-        self.assertIn("jy-checkpoint", text)
-        self.assertIn(".codex/checkpoints/", text)
-
-    def test_global_agents_instructions_include_native_skill_discovery_surface(self) -> None:
-        agents_path = Path(__file__).resolve().parents[1] / "instructions" / "AGENTS.md"
-        text = agents_path.read_text(encoding="utf-8")
-
-        self.assertIn("~/.agents/skills/", text)
         self.assertIn("~/plugins", text)
-        self.assertIn("source-owned install surface", text)
-        self.assertNotIn("repo-managed hook", text)
-
-    def test_global_agents_instructions_include_user_language_response_rule(self) -> None:
-        agents_path = Path(__file__).resolve().parents[1] / "instructions" / "AGENTS.md"
-        text = agents_path.read_text(encoding="utf-8")
-
+        self.assertIn("~/.agents/plugins/marketplace.json", text)
+        self.assertNotIn("~/.agents/skills/", text)
+        self.assertIn("plugins/jy-env-*/skills/", text)
         self.assertIn("## Response Language", text)
         self.assertIn("user's language", text)
         self.assertIn("output-language rule", text)
 
-    def test_readme_groups_short_skill_names_by_role(self) -> None:
-        readme_path = Path(__file__).resolve().parents[1] / "README.md"
-        text = readme_path.read_text(encoding="utf-8")
-
-        self.assertIn("## First-Party Skill Catalog", text)
-        self.assertIn("### Planning", text)
-        self.assertIn("### Execution", text)
-        self.assertIn("### Audit", text)
-        self.assertIn("### Research", text)
-        self.assertIn("### Maintenance", text)
-        self.assertIn("### Authoring", text)
-        self.assertIn("`jy-autoplan`", text)
-        self.assertIn("`jy-grill-me`", text)
-        self.assertIn("`jy-writing-plans`", text)
-        self.assertIn("`jy-worktrees`", text)
-        self.assertIn("`jy-test-driven`", text)
-        self.assertIn("`jy-executing-plans`", text)
-        self.assertIn("`jy-receiving-review`", text)
-        self.assertIn("`jy-review-all`", text)
-        self.assertIn("`jy-ship`", text)
-        self.assertIn("`jy-env-sync-admin`", text)
-        self.assertIn("`jy-writing-skills`", text)
-
-    def test_readme_language_switch_and_korean_doc_exist(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        english = (repo_root / "README.md").read_text(encoding="utf-8")
-        korean_path = repo_root / "README.ko.md"
-        korean = korean_path.read_text(encoding="utf-8")
-
-        self.assertTrue(korean_path.exists())
-        self.assertIn("./README.ko.md", english)
-        self.assertIn("./README.md", korean)
-        self.assertIn("Language-English", english)
-        self.assertIn("Language-Korean", english)
-        self.assertIn("## First-Party Skill Catalog", korean)
-
-    def test_codex_env_core_bundle_has_no_mcp_server_definition(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        plugin_json = json.loads(
-            (repo_root / "plugins" / "jy-env-core" / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
-        )
-
-        self.assertNotIn("mcpServers", plugin_json)
-        self.assertFalse((repo_root / "plugins" / "jy-env-core" / ".mcp.json").exists())
-
-    def test_plugin_metadata_and_license_match_this_repository(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        plugin_json = json.loads(
-            (repo_root / "plugins" / "jy-env-core" / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
-        )
-        repository = "https://github.com/jy1655/codex-local-plugins"
-
-        self.assertEqual(plugin_json["repository"], repository)
-        self.assertEqual(plugin_json["homepage"], repository)
-        self.assertEqual(plugin_json["interface"]["websiteURL"], repository)
-        self.assertEqual(plugin_json["interface"]["developerName"], "JaeYoung Hwang")
-        self.assertNotIn("privacyPolicyURL", plugin_json["interface"])
-        self.assertNotIn("termsOfServiceURL", plugin_json["interface"])
-        self.assertEqual(plugin_json["author"]["url"], "https://github.com/jy1655")
-        self.assertNotIn("email", plugin_json["author"])
-        license_text = (repo_root / "LICENSE").read_text(encoding="utf-8")
-        self.assertIn("MIT License", license_text)
-        self.assertIn("JaeYoung Hwang", license_text)
-
-    def test_repo_uses_instruction_only_necessity_gate(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        manifest_text = (repo_root / "codex-env.toml").read_text(encoding="utf-8")
-        agents_text = (repo_root / "instructions" / "AGENTS.md").read_text(encoding="utf-8")
+    def test_global_agents_instructions_keep_instruction_only_necessity_gate(self) -> None:
+        manifest_text = (REPO_ROOT / "codex-env.toml").read_text(encoding="utf-8")
+        agents_text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text(encoding="utf-8")
 
         self.assertNotIn("[[hooks]]", manifest_text)
-        self.assertFalse((repo_root / "hooks" / "necessity-gate.json").exists())
-        self.assertFalse((repo_root / "plugins" / "jy-env-core" / "hooks" / "necessity_gate.py").exists())
+        self.assertFalse((REPO_ROOT / "hooks" / "necessity-gate.json").exists())
         self.assertIn("## Necessity Gate", agents_text)
 
-    def test_codex_env_core_bundle_includes_writing_skills(self) -> None:
-        skill_root = Path(__file__).resolve().parents[1] / "plugins" / "jy-env-core" / "skills" / "jy-writing-skills"
+    def test_all_plugin_manifests_match_repository_metadata_and_have_no_mcp(self) -> None:
+        repository = "https://github.com/jy1655/codex-local-plugins"
+        self.assertEqual(
+            {path.name for path in plugin_roots()},
+            {"jy-env-core", "jy-env-planning", "jy-env-delivery", "jy-env-audit"},
+        )
+
+        for plugin_root in plugin_roots():
+            with self.subTest(plugin=plugin_root.name):
+                plugin_json = json.loads(
+                    (plugin_root / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
+                )
+                self.assertEqual(plugin_json["name"], plugin_root.name)
+                self.assertEqual(plugin_json["repository"], repository)
+                self.assertEqual(plugin_json["homepage"], repository)
+                self.assertEqual(plugin_json["interface"]["websiteURL"], repository)
+                self.assertEqual(plugin_json["interface"]["developerName"], "JaeYoung Hwang")
+                self.assertEqual(plugin_json["author"]["url"], "https://github.com/jy1655")
+                self.assertNotIn("email", plugin_json["author"])
+                self.assertNotIn("mcpServers", plugin_json)
+                self.assertFalse((plugin_root / ".mcp.json").exists())
+
+    def test_every_skill_directory_is_discoverable_and_unique(self) -> None:
+        names: list[str] = []
+        for skill_path in skill_paths():
+            with self.subTest(skill=skill_path.parent.name):
+                names.append(skill_path.parent.name)
+                self.assertTrue((skill_path.parent / "agents" / "openai.yaml").is_file())
+
+        self.assertEqual(len(names), 24)
+        self.assertEqual(len(names), len(set(names)))
+
+    def test_writing_skills_keeps_its_reference_assets(self) -> None:
+        skill_root = REPO_ROOT / "plugins" / "jy-env-delivery" / "skills" / "jy-writing-skills"
 
         self.assertTrue((skill_root / "SKILL.md").exists())
         self.assertTrue((skill_root / "references" / "skill-testing-guide.md").exists())
         self.assertTrue((skill_root / "references" / "graphviz-conventions.dot").exists())
         self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
 
-    def test_codex_env_core_bundle_includes_codex_planning_skills(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        skill_root = repo_root / "plugins" / "jy-env-core" / "skills"
+    def test_retired_and_provider_named_skills_are_absent(self) -> None:
+        skill_names = {path.parent.name for path in skill_paths()}
+        scenario_root = REPO_ROOT / "skill-tests" / "first-party"
 
-        self.assertTrue((skill_root / "jy-framing" / "SKILL.md").exists())
-        self.assertTrue((skill_root / "jy-framing" / "agents" / "openai.yaml").exists())
-        self.assertTrue((skill_root / "jy-plan-review" / "SKILL.md").exists())
-        self.assertTrue((skill_root / "jy-plan-review" / "agents" / "openai.yaml").exists())
-        self.assertTrue((skill_root / "jy-autoplan" / "SKILL.md").exists())
-        self.assertTrue((skill_root / "jy-autoplan" / "agents" / "openai.yaml").exists())
-        self.assertTrue((skill_root / "jy-writing-plans" / "SKILL.md").exists())
-        self.assertTrue((skill_root / "jy-writing-plans" / "agents" / "openai.yaml").exists())
-        self.assertTrue((skill_root / "jy-worktrees" / "SKILL.md").exists())
-        self.assertTrue((skill_root / "jy-worktrees" / "agents" / "openai.yaml").exists())
-
-    def test_plugin_skill_root_contains_only_discoverable_skill_directories(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        skill_root = repo_root / "plugins" / "jy-env-core" / "skills"
-
-        for child in sorted(path for path in skill_root.iterdir() if path.is_dir()):
-            with self.subTest(skill=child.name):
-                self.assertTrue((child / "SKILL.md").is_file())
-                self.assertTrue((child / "agents" / "openai.yaml").is_file())
-
-    def test_codex_env_core_bundle_includes_codex_checkpoint(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        skill_root = repo_root / "plugins" / "jy-env-core" / "skills" / "jy-checkpoint"
-
-        self.assertTrue((skill_root / "SKILL.md").exists())
-        self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
-
-    def test_codex_env_core_bundle_includes_codex_document_release(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        skill_root = repo_root / "plugins" / "jy-env-core" / "skills" / "jy-document-release"
-
-        self.assertTrue((skill_root / "SKILL.md").exists())
-        self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
-
-    def test_codex_env_core_bundle_includes_ship_workflow(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        skill_root = repo_root / "plugins" / "jy-env-core" / "skills" / "jy-ship"
-
-        self.assertTrue((skill_root / "SKILL.md").exists())
-        self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
-
-    def test_codex_env_core_bundle_includes_debugging_and_verification_workflow_skills(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        skill_root = repo_root / "plugins" / "jy-env-core" / "skills"
-
-        for skill_name in [
-            "jy-debugging",
-            "jy-test-driven",
-            "jy-executing-plans",
-            "jy-receiving-review",
-            "jy-verification-before-completion",
-        ]:
+        for skill_name in ["jy-intent-gate", "jy-loop", "jy-context7"]:
             with self.subTest(skill=skill_name):
-                self.assertTrue((skill_root / skill_name / "SKILL.md").exists())
-                self.assertTrue((skill_root / skill_name / "agents" / "openai.yaml").exists())
-
-    def test_global_agents_instructions_include_execution_skill_routing(self) -> None:
-        agents_path = Path(__file__).resolve().parents[1] / "instructions" / "AGENTS.md"
-        text = agents_path.read_text(encoding="utf-8")
-
-        self.assertIn("## Execution Skill Routing", text)
-        self.assertIn("jy-review-work", text)
-        self.assertNotIn("jy-loop", text)
-        self.assertIn("jy-slop-remover", text)
-        self.assertIn("jy-debugging", text)
-        self.assertIn("jy-test-driven", text)
-        self.assertIn("jy-executing-plans", text)
-        self.assertIn("jy-receiving-review", text)
-        self.assertIn("jy-ship", text)
-        self.assertIn("jy-verification-before-completion", text)
-
-    def test_global_agents_instructions_include_advisory_skill_routing(self) -> None:
-        agents_path = Path(__file__).resolve().parents[1] / "instructions" / "AGENTS.md"
-        text = agents_path.read_text(encoding="utf-8")
-
-        self.assertIn("## Advisory and Research Skill Routing", text)
-        self.assertIn("jy-consult", text)
-        self.assertIn("jy-review-all", text)
-        self.assertIn("jy-library-research", text)
-        self.assertIn("jy-codebase-explore", text)
-        self.assertNotIn("jy-intent-gate", text)
-
-    def test_retired_routing_and_loop_skills_are_absent(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        skill_root = repo_root / "plugins" / "jy-env-core" / "skills"
-        scenario_root = repo_root / "skill-tests" / "first-party"
-
-        for skill_name in ["jy-intent-gate", "jy-loop"]:
-            with self.subTest(skill=skill_name):
-                self.assertFalse((skill_root / skill_name).exists())
+                self.assertNotIn(skill_name, skill_names)
                 self.assertFalse((scenario_root / skill_name).exists())
 
-    def test_codex_env_core_bundle_includes_change_guardrails_skill(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        skill_root = repo_root / "plugins" / "jy-env-core" / "skills" / "jy-change-guardrails"
+    def test_readmes_document_pack_installation_in_both_languages(self) -> None:
+        english = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+        korean = (REPO_ROOT / "README.ko.md").read_text(encoding="utf-8")
 
-        self.assertTrue((skill_root / "SKILL.md").exists())
-        self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
+        self.assertIn("./README.ko.md", english)
+        self.assertIn("./README.md", korean)
+        for text in [english, korean]:
+            self.assertIn("core-lite", text)
+            self.assertIn("jy-env-planning", text)
+            self.assertIn("jy-env-delivery", text)
+            self.assertIn("jy-env-audit", text)
+            self.assertIn("Context7", text)
+            self.assertIn("CONTEXT7_API_KEY", text)
 
-    def test_codex_env_core_bundle_includes_grill_me_skill(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        skill_root = repo_root / "plugins" / "jy-env-core" / "skills" / "jy-grill-me"
+    def test_repository_does_not_track_native_skill_overlay(self) -> None:
+        self.assertFalse((REPO_ROOT / ".agents" / "skills").exists())
 
-        self.assertTrue((skill_root / "SKILL.md").exists())
-        self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
-
-    def test_codex_env_core_bundle_includes_review_all_skill(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        skill_root = repo_root / "plugins" / "jy-env-core" / "skills" / "jy-review-all"
-
-        self.assertTrue((skill_root / "SKILL.md").exists())
-        self.assertTrue((skill_root / "agents" / "openai.yaml").exists())
-
-    def test_readme_lists_change_guardrails_in_execution_catalog(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        english = (repo_root / "README.md").read_text(encoding="utf-8")
-        korean = (repo_root / "README.ko.md").read_text(encoding="utf-8")
-
-        self.assertIn("`jy-change-guardrails`", english)
-        self.assertIn("`jy-change-guardrails`", korean)
-
-    def test_readme_lists_grill_me_in_planning_catalog(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        english = (repo_root / "README.md").read_text(encoding="utf-8")
-        korean = (repo_root / "README.ko.md").read_text(encoding="utf-8")
-
-        self.assertIn("`jy-grill-me`", english)
-        self.assertIn("`jy-grill-me`", korean)
-
-    def test_readme_lists_review_all_in_audit_catalog(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        english = (repo_root / "README.md").read_text(encoding="utf-8")
-        korean = (repo_root / "README.ko.md").read_text(encoding="utf-8")
-
-        self.assertIn("`jy-review-all`", english)
-        self.assertIn("`jy-review-all`", korean)
-
-    def test_repo_no_longer_tracks_vendored_skill_runtime(self) -> None:
-        repo_root = Path(__file__).resolve().parents[1]
-        self.assertFalse((repo_root / ".agents" / "skills").exists())
+    def test_license_matches_plugin_publisher(self) -> None:
+        license_text = (REPO_ROOT / "LICENSE").read_text(encoding="utf-8")
+        self.assertIn("MIT License", license_text)
+        self.assertIn("JaeYoung Hwang", license_text)
 
 
 if __name__ == "__main__":

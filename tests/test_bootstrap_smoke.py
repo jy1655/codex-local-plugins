@@ -14,47 +14,67 @@ from codex_env_sync.platforms import ManagedPaths
 
 
 def write_bootstrap_repo(root: Path) -> None:
-    (root / "plugins" / "jy-env-core" / ".codex-plugin").mkdir(parents=True, exist_ok=True)
-    (root / "plugins" / "jy-env-core" / "skills" / "jy-env-sync-admin").mkdir(parents=True, exist_ok=True)
     (root / "instructions").mkdir(parents=True, exist_ok=True)
+    plugins = [
+        ("jy-env-core", "jy-debugging", "INSTALLED_BY_DEFAULT"),
+        ("jy-env-planning", "jy-framing", "AVAILABLE"),
+        ("jy-env-delivery", "jy-ship", "AVAILABLE"),
+        ("jy-env-audit", "jy-review-all", "AVAILABLE"),
+    ]
 
     (root / "codex-env.toml").write_text(
         textwrap.dedent(
-            """
+            """\
             schema_version = 1
             name = "bootstrap-fixture"
-
-            [[plugins]]
-            name = "jy-env-core"
-            source = "plugins/jy-env-core"
+            """
+        )
+        + "\n".join(
+            textwrap.dedent(
+                f"""
+                [[plugins]]
+                name = "{plugin_name}"
+                source = "plugins/{plugin_name}"
+                installation_policy = "{policy}"
+                """
+            ).strip()
+            for plugin_name, _, policy in plugins
+        )
+        + textwrap.dedent(
+            """
 
             [[instructions]]
             name = "global-agents"
             source = "instructions/AGENTS.md"
             target = ".codex/AGENTS.md"
             """
-        ).strip()
-        + "\n",
-        encoding="utf-8",
-    )
-    (root / "plugins" / "jy-env-core" / ".codex-plugin" / "plugin.json").write_text(
-        json.dumps(
-            {
-                "name": "jy-env-core",
-                "version": "0.1.0",
-                "description": "fixture",
-                "skills": "./skills/",
-                "interface": {"category": "Productivity"},
-            },
-            indent=2,
         )
         + "\n",
         encoding="utf-8",
     )
-    (root / "plugins" / "jy-env-core" / "skills" / "jy-env-sync-admin" / "SKILL.md").write_text(
-        "---\nname: jy-env-sync-admin\ndescription: fixture\n---\n",
-        encoding="utf-8",
-    )
+    for plugin_name, skill_name, _ in plugins:
+        plugin_root = root / "plugins" / plugin_name
+        skill_root = plugin_root / "skills" / skill_name
+        (plugin_root / ".codex-plugin").mkdir(parents=True)
+        skill_root.mkdir(parents=True)
+        (plugin_root / ".codex-plugin" / "plugin.json").write_text(
+            json.dumps(
+                {
+                    "name": plugin_name,
+                    "version": "0.1.0",
+                    "description": "fixture",
+                    "skills": "./skills/",
+                    "interface": {"category": "Productivity"},
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        (skill_root / "SKILL.md").write_text(
+            f"---\nname: {skill_name}\ndescription: fixture\n---\n",
+            encoding="utf-8",
+        )
     (root / "instructions" / "AGENTS.md").write_text("# smoke\n", encoding="utf-8")
 
 
@@ -89,15 +109,36 @@ class BootstrapSmokeTests(unittest.TestCase):
                     write_bootstrap_repo(repo_root)
                     git_repo = make_local_git_repo(repo_root)
 
-                    report = bootstrap_environment(str(git_repo), home=home_dir, os_name=os_name)
+                    report = bootstrap_environment(
+                        str(git_repo),
+                        home=home_dir,
+                        os_name=os_name,
+                        install_defaults=False,
+                    )
 
                     self.assertIsNotNone(report.managed_repo)
-                    self.assertTrue((Path(home_dir) / "plugins" / "jy-env-core").exists())
-                    self.assertTrue((Path(home_dir) / ".agents" / "skills" / "jy-env-core" / "jy-env-sync-admin" / "SKILL.md").exists())
+                    for plugin_name in [
+                        "jy-env-core",
+                        "jy-env-planning",
+                        "jy-env-delivery",
+                        "jy-env-audit",
+                    ]:
+                        self.assertTrue((Path(home_dir) / "plugins" / plugin_name).exists())
+                        self.assertFalse((Path(home_dir) / "plugins" / plugin_name).is_symlink())
+                    self.assertFalse((Path(home_dir) / ".agents" / "skills").exists())
                     self.assertTrue((Path(home_dir) / ".codex" / "AGENTS.md").exists())
-                    self.assertTrue((Path(home_dir) / ".agents" / "plugins" / "marketplace.json").exists())
-                    self.assertFalse((Path(home_dir) / "plugins" / "jy-env-core").is_symlink())
-                    self.assertFalse((Path(home_dir) / ".agents" / "skills" / "jy-env-core").is_symlink())
+                    marketplace = json.loads(
+                        (Path(home_dir) / ".agents" / "plugins" / "marketplace.json").read_text(encoding="utf-8")
+                    )
+                    policies = {
+                        entry["name"]: entry["policy"]["installation"]
+                        for entry in marketplace["plugins"]
+                    }
+                    self.assertEqual(policies["jy-env-core"], "INSTALLED_BY_DEFAULT")
+                    self.assertEqual(
+                        {policy for name, policy in policies.items() if name != "jy-env-core"},
+                        {"AVAILABLE"},
+                    )
                     self.assertFalse((Path(home_dir) / ".codex" / "AGENTS.md").is_symlink())
 
     def test_clone_or_update_repo_separates_same_basename_sources(self) -> None:
@@ -124,7 +165,11 @@ class BootstrapSmokeTests(unittest.TestCase):
     @unittest.skipIf(os.name == "nt", "POSIX bootstrap script is not applicable on Windows")
     @unittest.skipUnless(shutil.which("bash"), "bash is not available")
     def test_posix_bootstrap_script_installs_a_snapshot(self) -> None:
-        with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as home_dir:
+        with (
+            tempfile.TemporaryDirectory() as repo_dir,
+            tempfile.TemporaryDirectory() as home_dir,
+            tempfile.TemporaryDirectory() as bin_dir,
+        ):
             repo_root = Path(repo_dir)
             write_bootstrap_repo(repo_root)
             source_package = Path(__file__).resolve().parents[1] / "codex_env_sync"
@@ -135,8 +180,15 @@ class BootstrapSmokeTests(unittest.TestCase):
             )
             git_repo = make_local_git_repo(repo_root)
             script = Path(__file__).resolve().parents[1] / "scripts" / "bootstrap.sh"
+            fake_codex = Path(bin_dir) / "codex"
+            fake_codex.write_text(
+                "#!/usr/bin/env bash\nprintf '%s\\n' \"$*\" >> \"$HOME/codex-plugin-add.log\"\n",
+                encoding="utf-8",
+            )
+            fake_codex.chmod(0o755)
             env = os.environ.copy()
             env["HOME"] = home_dir
+            env["PATH"] = bin_dir + os.pathsep + env["PATH"]
 
             result = subprocess.run(
                 ["bash", str(script), str(git_repo)],
@@ -149,8 +201,12 @@ class BootstrapSmokeTests(unittest.TestCase):
 
             home_root = Path(home_dir)
             self.assertFalse((home_root / "plugins" / "jy-env-core").is_symlink())
-            self.assertFalse((home_root / ".agents" / "skills" / "jy-env-core").is_symlink())
+            self.assertFalse((home_root / ".agents" / "skills").exists())
             self.assertFalse((home_root / ".codex" / "AGENTS.md").is_symlink())
+            self.assertEqual(
+                (home_root / "codex-plugin-add.log").read_text(encoding="utf-8"),
+                "plugin add jy-env-core@personal-codex\n",
+            )
 
     def test_powershell_bootstrap_does_not_persist_a_temporary_pythonpath(self) -> None:
         script = Path(__file__).resolve().parents[1] / "scripts" / "bootstrap.ps1"

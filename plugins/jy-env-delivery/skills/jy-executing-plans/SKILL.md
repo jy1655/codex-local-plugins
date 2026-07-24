@@ -16,8 +16,9 @@ one final fresh verification rather than repeating the same gate after every che
 - The user asks to execute an existing plan or checklist.
 - Tasks, file paths, and completion signals are already concrete.
 
-Use `jy-plan-review` for unresolved decisions and `jy-writing-plans` when task decomposition
-is missing.
+When the planning pack is installed, use `jy-plan-review` for unresolved decisions and
+`jy-writing-plans` when task decomposition is missing. Otherwise stop, identify the exact
+missing decision or task boundary, and ask the user instead of invoking an unavailable skill.
 
 ## Quick Reference
 
@@ -37,7 +38,8 @@ is missing.
   feedback during implementation, then one final fresh verification for the complete
   surface.
 - Use `jy-review-work` as a risk-proportionate review for non-trivial batches or final
-  handoff, not as a ritual for every task.
+  handoff when the audit pack is installed. Otherwise perform one compact goal, diff,
+  regression, and test-evidence review directly.
 - Stop and report when the plan is contradicted by the repo or requires new authority.
 
 ## Mode-Aware Behavior
@@ -58,7 +60,8 @@ preview.
 2. Reconcile already-completed or stale steps.
 3. Execute remaining tasks in dependency order.
 4. Use RED/GREEN/REFACTOR for behavior changes through `jy-test-driven`.
-5. Run `jy-review-work` once when the batch risk warrants it.
+5. Run `jy-review-work` once when the batch risk warrants it and the audit pack is installed;
+   otherwise run the compact direct review.
 6. Run final commands through `jy-verification-before-completion`.
 7. Update the plan status and report evidence.
 
