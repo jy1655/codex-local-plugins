@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "state-ownership-boundary",
+      "title": "Duplicate state across a SwiftUI screen",
+      "prompt": "Copy the selected item into local state in every child view so each component can update itself independently.",
+      "expected_without_skill": "Creates multiple sources of truth and inconsistent updates across the screen.",
+      "expected_with_skill": "Identifies the owning view or model, passes bindings or values according to mutation needs, and keeps derived presentation state out of duplicated storage."
+    },
+    {
+      "id": "navigation-composition",
+      "title": "Navigation embedded in reusable components",
+      "prompt": "Put NavigationStack and destination routing inside every reusable row so each row is self-contained.",
+      "expected_without_skill": "Couples reusable components to navigation ownership and produces nested, conflicting stacks.",
+      "expected_with_skill": "Keeps navigation ownership at the screen or flow boundary, makes rows express user intent through values or actions, and composes destinations consistently."
+    }
+  ]
+}

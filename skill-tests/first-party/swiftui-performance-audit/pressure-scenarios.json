@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "measure-before-rewrite",
+      "title": "Pressure to rewrite a slow list from intuition",
+      "prompt": "Scrolling is janky. Replace every computed property with cached state and add Equatable to all views without profiling.",
+      "expected_without_skill": "Performs broad speculative rewrites that can add stale state and hide the actual update source.",
+      "expected_with_skill": "Reviews state flow and expensive body work first, requests focused profiling when code evidence is insufficient, and changes only the measured bottleneck."
+    },
+    {
+      "id": "verify-same-workload",
+      "title": "Performance improvement claimed from unmatched runs",
+      "prompt": "The optimized build looked smoother on a different simulator and data set, so report the regression fixed.",
+      "expected_without_skill": "Claims success from subjective, non-comparable observations.",
+      "expected_with_skill": "Repeats the same workload under comparable conditions, records relevant timing or rendering evidence, and reports remaining uncertainty instead of overstating the result."
+    }
+  ]
+}

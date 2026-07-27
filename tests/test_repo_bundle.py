@@ -28,6 +28,7 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("jy-env-planning", text)
         self.assertIn("jy-env-delivery", text)
         self.assertIn("jy-env-audit", text)
+        self.assertIn("jy-env-ios", text)
         self.assertIn("actually available", text)
         self.assertNotIn("## Skill Routing", text)
         self.assertNotIn("## Execution Skill Routing", text)
@@ -52,11 +53,17 @@ class RepoBundleTests(unittest.TestCase):
         self.assertFalse((REPO_ROOT / "hooks" / "necessity-gate.json").exists())
         self.assertIn("## Necessity Gate", agents_text)
 
-    def test_all_plugin_manifests_match_repository_metadata_and_have_no_mcp(self) -> None:
+    def test_all_plugin_manifests_match_repository_metadata_and_limit_mcp_to_ios(self) -> None:
         repository = "https://github.com/jy1655/codex-local-plugins"
         self.assertEqual(
             {path.name for path in plugin_roots()},
-            {"jy-env-core", "jy-env-planning", "jy-env-delivery", "jy-env-audit"},
+            {
+                "jy-env-core",
+                "jy-env-planning",
+                "jy-env-delivery",
+                "jy-env-audit",
+                "jy-env-ios",
+            },
         )
 
         for plugin_root in plugin_roots():
@@ -71,8 +78,12 @@ class RepoBundleTests(unittest.TestCase):
                 self.assertEqual(plugin_json["interface"]["developerName"], "JaeYoung Hwang")
                 self.assertEqual(plugin_json["author"]["url"], "https://github.com/jy1655")
                 self.assertNotIn("email", plugin_json["author"])
-                self.assertNotIn("mcpServers", plugin_json)
-                self.assertFalse((plugin_root / ".mcp.json").exists())
+                if plugin_root.name == "jy-env-ios":
+                    self.assertEqual(plugin_json["mcpServers"], "./.mcp.json")
+                    self.assertTrue((plugin_root / ".mcp.json").is_file())
+                else:
+                    self.assertNotIn("mcpServers", plugin_json)
+                    self.assertFalse((plugin_root / ".mcp.json").exists())
 
     def test_every_skill_directory_is_discoverable_and_unique(self) -> None:
         names: list[str] = []
@@ -81,7 +92,7 @@ class RepoBundleTests(unittest.TestCase):
                 names.append(skill_path.parent.name)
                 self.assertTrue((skill_path.parent / "agents" / "openai.yaml").is_file())
 
-        self.assertEqual(len(names), 24)
+        self.assertEqual(len(names), 33)
         self.assertEqual(len(names), len(set(names)))
 
     def test_writing_skills_keeps_its_reference_assets(self) -> None:
@@ -112,6 +123,7 @@ class RepoBundleTests(unittest.TestCase):
             self.assertIn("jy-env-planning", text)
             self.assertIn("jy-env-delivery", text)
             self.assertIn("jy-env-audit", text)
+            self.assertIn("jy-env-ios", text)
             self.assertIn("Context7", text)
             self.assertIn("CONTEXT7_API_KEY", text)
 

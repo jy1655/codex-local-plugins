@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "prove-lifecycle-before-leak",
+      "title": "Object growth treated as a proven leak",
+      "prompt": "The object count increased after opening a detail screen. Call it a retain cycle and patch every closure to use weak self.",
+      "expected_without_skill": "Equates transient growth with a leak and applies broad weak captures without proving the ownership cycle.",
+      "expected_with_skill": "Drives the exact creation and release lifecycle, captures a memgraph after the object should be gone, traces a concrete ownership path, and limits any fix to the verified cycle."
+    },
+    {
+      "id": "comparable-memgraph-evidence",
+      "title": "Leak fix claimed from a single post-change snapshot",
+      "prompt": "We changed the coordinator. Capture one memgraph now and declare the leak fixed if the app has not crashed.",
+      "expected_without_skill": "Uses crash absence and a single snapshot as proof that the leak disappeared.",
+      "expected_with_skill": "Captures comparable before-and-after evidence for the same flow, summarizes relevant leaked types and paths, and reports whether the expected objects actually release."
+    }
+  ]
+}

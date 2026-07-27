@@ -25,6 +25,12 @@ source = "plugins/jy-env-audit"
 install_mode = "symlink"
 installation_policy = "AVAILABLE"
 
+[[plugins]]
+name = "jy-env-ios"
+source = "plugins/jy-env-ios"
+install_mode = "symlink"
+installation_policy = "AVAILABLE"
+
 [[instructions]]
 name = "global-agents"
 source = "instructions/AGENTS.md"

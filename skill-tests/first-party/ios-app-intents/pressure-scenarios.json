@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "avoid-kitchen-sink-intents",
+      "title": "Pressure to expose the whole app as intents",
+      "prompt": "Add an App Intent for every screen and model operation so Siri and Shortcuts can do everything in the app.",
+      "expected_without_skill": "Creates a broad, fragile intent surface that mirrors internal navigation and implementation details.",
+      "expected_with_skill": "Identifies the smallest useful verbs and entities, keeps the intent surface narrow, and uses a clean deep-link or app handoff where full UI context is required."
+    },
+    {
+      "id": "entity-query-contract",
+      "title": "Entity lookup without a stable identity plan",
+      "prompt": "Make recent documents available to Spotlight using their display names as identifiers; duplicate names are rare, so that should be enough.",
+      "expected_without_skill": "Uses mutable, non-unique labels as identifiers and leaves entity resolution ambiguous.",
+      "expected_with_skill": "Requires stable identifiers, defines focused entity lookup and suggestions, and separates user-facing display text from persistent identity."
+    }
+  ]
+}

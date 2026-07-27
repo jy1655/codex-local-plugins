@@ -9,7 +9,7 @@ cache를 직접 수정하지 않습니다.
 
 ## Pack model
 
-기본 환경은 의도적으로 작게 유지합니다. `apply`는 네 bundle을 모두 `~/plugins`에
+기본 환경은 의도적으로 작게 유지합니다. `apply`는 다섯 bundle을 모두 `~/plugins`에
 stage한 뒤 `INSTALLED_BY_DEFAULT` plugin을 Codex CLI로 명시적으로 설치합니다.
 Marketplace policy는 기본 설치 대상을 고르며, policy 자체가 설치 작업을 수행하지는
 않습니다.
@@ -20,6 +20,7 @@ Marketplace policy는 기본 설치 대상을 고르며, policy 자체가 설치
 | `jy-env-planning` | `AVAILABLE` | `jy-autoplan`, `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans` |
 | `jy-env-delivery` | `AVAILABLE` | `jy-executing-plans`, `jy-worktrees`, `jy-checkpoint`, `jy-document-release`, `jy-ship`, `jy-waterfall`, `jy-env-sync-admin`, `jy-writing-skills` |
 | `jy-env-audit` | `AVAILABLE` | `jy-review-all`, `jy-review-work`, `jy-receiving-review`, `jy-slop-remover` |
+| `jy-env-ios` | `AVAILABLE` | iOS Simulator debugging, performance, memory, App Intents, SwiftUI workflow |
 
 Stage와 activation은 서로 다른 동작입니다.
 
@@ -37,9 +38,20 @@ Stage와 activation은 서로 다른 동작입니다.
 codex plugin add jy-env-planning@personal-codex
 codex plugin add jy-env-delivery@personal-codex
 codex plugin add jy-env-audit@personal-codex
+codex plugin add jy-env-ios@personal-codex
 ```
 
 설치된 pack을 바꾼 뒤에는 새 Codex thread를 시작합니다.
+
+## 고정된 XcodeBuildMCP
+
+`jy-env-ios`는 이 머신에서 upstream `build-ios-apps` plugin을 대체합니다.
+`npx`로 `xcodebuildmcp@2.7.0`을 실행하고 `simulator`, `ui-automation`,
+`debugging` workflow만 활성화합니다. 포함된 debugger skill은 현재
+session-default, runtime-log, `elementRef` UI contract를 사용합니다.
+
+`build-ios-apps@openai-curated`와 `jy-env-ios@personal-codex`를 동시에 활성화하지
+마십시오. 둘 다 `xcodebuildmcp` server name을 등록합니다.
 
 ## Lazy Context7 research
 
@@ -113,12 +125,13 @@ python3 -m codex_env_sync.cli apply --repo-root . --snapshot
 ## Layout
 
 ```text
-codex-env.toml                    # 네 plugin source와 installation policy
+codex-env.toml                    # 다섯 plugin source와 installation policy
 codex_env_sync/                   # inspect/apply/bootstrap engine
 plugins/jy-env-core/              # 기본 core-lite bundle
 plugins/jy-env-planning/          # 선택 planning pack
 plugins/jy-env-delivery/          # 선택 delivery pack
 plugins/jy-env-audit/             # 선택 audit pack
+plugins/jy-env-ios/               # 선택 pinned iOS/XcodeBuildMCP pack
 instructions/AGENTS.md            # 선택 skill을 eager routing하지 않는 전역 규칙
 .agents/plugins/marketplace.json  # local personal marketplace catalog
 skill-tests/first-party/          # manual pressure scenario

@@ -28,7 +28,7 @@ This machine is managed by the portable Codex environment sync repo.
 ## Pack Model
 
 - `jy-env-core` is the compact default pack.
-- `jy-env-planning`, `jy-env-delivery`, and `jy-env-audit` are optional marketplace installs.
+- `jy-env-planning`, `jy-env-delivery`, `jy-env-audit`, and `jy-env-ios` are optional marketplace installs.
 - Staging a plugin under `~/plugins` makes it installable; it does not activate its skills.
 - Route through skills that are actually available in the current session. Do not assume an
   optional pack is installed.

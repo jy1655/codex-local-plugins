@@ -9,7 +9,7 @@ editing Codex's runtime cache directly.
 
 ## Pack model
 
-The default environment is intentionally small. `apply` stages all four bundles under
+The default environment is intentionally small. `apply` stages all five bundles under
 `~/plugins`, then explicitly installs each `INSTALLED_BY_DEFAULT` plugin through the Codex
 CLI. Marketplace policy selects the default install set; it is not an installation action
 by itself.
@@ -20,6 +20,7 @@ by itself.
 | `jy-env-planning` | `AVAILABLE` | `jy-autoplan`, `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans` |
 | `jy-env-delivery` | `AVAILABLE` | `jy-executing-plans`, `jy-worktrees`, `jy-checkpoint`, `jy-document-release`, `jy-ship`, `jy-waterfall`, `jy-env-sync-admin`, `jy-writing-skills` |
 | `jy-env-audit` | `AVAILABLE` | `jy-review-all`, `jy-review-work`, `jy-receiving-review`, `jy-slop-remover` |
+| `jy-env-ios` | `AVAILABLE` | iOS Simulator debugging, performance, memory, App Intents, and SwiftUI workflows |
 
 Staging and activation are deliberately separate:
 
@@ -36,9 +37,20 @@ Install only the optional packs you need:
 codex plugin add jy-env-planning@personal-codex
 codex plugin add jy-env-delivery@personal-codex
 codex plugin add jy-env-audit@personal-codex
+codex plugin add jy-env-ios@personal-codex
 ```
 
 Start a fresh Codex thread after changing installed packs.
+
+## Pinned XcodeBuildMCP
+
+`jy-env-ios` replaces the upstream `build-ios-apps` plugin on this machine. It runs
+`xcodebuildmcp@2.7.0` through `npx` and enables only the `simulator`, `ui-automation`,
+and `debugging` workflows. The bundled debugger skill uses the current session-default,
+runtime-log, and `elementRef` UI contracts.
+
+Do not enable `build-ios-apps@openai-curated` and `jy-env-ios@personal-codex` together;
+both register the `xcodebuildmcp` server name.
 
 ## Lazy Context7 research
 
@@ -111,12 +123,13 @@ workflow and start a new thread. Do not edit `~/.codex/plugins/cache` directly.
 ## Layout
 
 ```text
-codex-env.toml                    # Four plugin sources and their installation policies
+codex-env.toml                    # Five plugin sources and their installation policies
 codex_env_sync/                   # Inspect/apply/bootstrap engine
 plugins/jy-env-core/              # Default core-lite bundle
 plugins/jy-env-planning/          # Optional planning pack
 plugins/jy-env-delivery/          # Optional delivery pack
 plugins/jy-env-audit/             # Optional audit pack
+plugins/jy-env-ios/               # Optional pinned iOS/XcodeBuildMCP pack
 instructions/AGENTS.md            # Compact global rules; no eager optional-skill routing
 .agents/plugins/marketplace.json  # Local personal marketplace catalog
 skill-tests/first-party/          # Manual pressure scenarios

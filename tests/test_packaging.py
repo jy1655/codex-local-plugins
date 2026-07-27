@@ -41,6 +41,17 @@ EXPECTED_PACKS = {
         "jy-receiving-review",
         "jy-slop-remover",
     },
+    "jy-env-ios": {
+        "ios-app-intents",
+        "ios-debugger-agent",
+        "ios-ettrace-performance",
+        "ios-memgraph-leaks",
+        "ios-simulator-browser",
+        "swiftui-liquid-glass",
+        "swiftui-performance-audit",
+        "swiftui-ui-patterns",
+        "swiftui-view-refactor",
+    },
 }
 
 
@@ -74,6 +85,7 @@ class PackagingTests(unittest.TestCase):
                 "jy-env-planning": "AVAILABLE",
                 "jy-env-delivery": "AVAILABLE",
                 "jy-env-audit": "AVAILABLE",
+                "jy-env-ios": "AVAILABLE",
             },
         )
 
@@ -86,8 +98,50 @@ class PackagingTests(unittest.TestCase):
                 )
                 self.assertEqual(manifest["name"], plugin_name)
                 self.assertEqual(manifest["skills"], "./skills/")
-                self.assertNotIn("mcpServers", manifest)
-                self.assertFalse((plugin_root / ".mcp.json").exists())
+                if plugin_name == "jy-env-ios":
+                    self.assertEqual(manifest["mcpServers"], "./.mcp.json")
+                    self.assertTrue((plugin_root / ".mcp.json").is_file())
+                else:
+                    self.assertNotIn("mcpServers", manifest)
+                    self.assertFalse((plugin_root / ".mcp.json").exists())
+
+    def test_ios_pack_pins_current_xcodebuildmcp_contract(self) -> None:
+        plugin_root = REPO_ROOT / "plugins" / "jy-env-ios"
+        mcp = json.loads((plugin_root / ".mcp.json").read_text(encoding="utf-8"))
+        server = mcp["mcpServers"]["xcodebuildmcp"]
+
+        self.assertEqual(server["command"], "npx")
+        self.assertEqual(server["args"], ["-y", "xcodebuildmcp@2.7.0", "mcp"])
+        self.assertEqual(
+            server["env"]["XCODEBUILDMCP_ENABLED_WORKFLOWS"],
+            "simulator,ui-automation,debugging",
+        )
+        self.assertNotIn("@latest", json.dumps(server))
+        self.assertNotIn(
+            "logging",
+            server["env"]["XCODEBUILDMCP_ENABLED_WORKFLOWS"].split(","),
+        )
+
+        skill_text = (
+            plugin_root / "skills" / "ios-debugger-agent" / "SKILL.md"
+        ).read_text(encoding="utf-8")
+        for current_name in [
+            "session_show_defaults",
+            "session_set_defaults",
+            "snapshot_ui",
+            "build_run_sim",
+            "launch_app_sim",
+        ]:
+            self.assertIn(current_name, skill_text)
+        for retired_name in [
+            "session-set-defaults",
+            "describe_ui",
+            "start_sim_log_cap",
+            "stop_sim_log_cap",
+        ]:
+            self.assertNotIn(retired_name, skill_text)
+        self.assertIn("elementRef", skill_text)
+        self.assertIn("runtime log", skill_text.lower())
 
     def test_library_research_uses_lazy_pinned_context7_cli(self) -> None:
         skill_path = (
