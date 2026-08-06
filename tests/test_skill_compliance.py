@@ -273,6 +273,22 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("jy-review-work", text)
         self.assertIn("jy-grill-me", text)
 
+    def test_explain_change_is_explicit_only_and_separates_understanding_from_approval(self) -> None:
+        path = skill_path("jy-explain-change")
+        text = read_text(path)
+        agent_text = read_text(path.parent / "agents" / "openai.yaml")
+
+        self.assertIn("description: Use when the user explicitly invokes", text)
+        self.assertIn("$jy-explain-change", text)
+        self.assertIn("exact comparison target", text)
+        self.assertIn("causal", text.lower())
+        self.assertIn("five", text.lower())
+        self.assertIn("file:line", text)
+        self.assertIn("does not establish correctness", text)
+        self.assertIn("Do not modify code", text)
+        self.assertIn("allow_implicit_invocation: false", agent_text)
+        self.assertIn("$jy-explain-change", agent_text)
+
     def test_ship_documents_review_work_as_gate_not_duplicate_scope(self) -> None:
         text = read_text(skill_path("jy-ship"))
         self.assertIn("review gate", text)
@@ -342,6 +358,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         """Advisory skills should state they do not modify code."""
         advisory_skills = [
             "jy-consult",
+            "jy-explain-change",
             "jy-grill-me",
             "jy-review-all",
         ]

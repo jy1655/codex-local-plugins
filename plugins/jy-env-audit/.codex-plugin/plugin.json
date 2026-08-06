@@ -1,7 +1,7 @@
 {
   "name": "jy-env-audit",
-  "version": "0.1.0",
-  "description": "Optional audit pack for project health, completed work, review feedback, and AI-code-smell assessment.",
+  "version": "0.1.0+codex.20260806041838",
+  "description": "Optional audit pack for code-change explanations, project health, completed work, review feedback, and AI-code-smell assessment.",
   "author": {
     "name": "JaeYoung Hwang",
     "url": "https://github.com/jy1655"
@@ -17,8 +17,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "JY Audit Pack",
-    "shortDescription": "Optional workflows for review and project audits",
-    "longDescription": "Adds whole-project audits, multi-angle implementation review, evidence-based review-feedback handling, and focused removal of AI-generated code smells.",
+    "shortDescription": "Optional workflows for change explanations and audits",
+    "longDescription": "Adds explicit code-change explanations with understanding checks, whole-project audits, multi-angle implementation review, evidence-based review-feedback handling, and focused removal of AI-generated code smells.",
     "developerName": "JaeYoung Hwang",
     "category": "Productivity",
     "capabilities": [
@@ -30,7 +30,7 @@
     "defaultPrompt": [
       "Audit this project and prioritize evidence-backed findings.",
       "Review the completed implementation from multiple angles.",
-      "Verify these review comments against the actual code."
+      "Use $jy-explain-change to explain the current code change and quiz me on how it works."
     ],
     "brandColor": "#DC2626"
   }

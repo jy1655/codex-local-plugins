@@ -19,7 +19,7 @@ Marketplace policy는 기본 설치 대상을 고르며, policy 자체가 설치
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-debugging`, `jy-test-driven`, `jy-verification-before-completion`, `jy-codebase-explore`, `jy-library-research`, `jy-consult` |
 | `jy-env-planning` | `AVAILABLE` | `jy-autoplan`, `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans` |
 | `jy-env-delivery` | `AVAILABLE` | `jy-executing-plans`, `jy-worktrees`, `jy-checkpoint`, `jy-document-release`, `jy-ship`, `jy-waterfall`, `jy-env-sync-admin`, `jy-writing-skills` |
-| `jy-env-audit` | `AVAILABLE` | `jy-review-all`, `jy-review-work`, `jy-receiving-review`, `jy-slop-remover` |
+| `jy-env-audit` | `AVAILABLE` | `jy-explain-change` (명시 호출 전용), `jy-review-all`, `jy-review-work`, `jy-receiving-review`, `jy-slop-remover` |
 | `jy-env-ios` | `AVAILABLE` | iOS Simulator debugging, performance, memory, App Intents, SwiftUI workflow |
 
 Stage와 activation은 서로 다른 동작입니다.

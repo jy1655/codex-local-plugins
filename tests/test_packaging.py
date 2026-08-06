@@ -36,6 +36,7 @@ EXPECTED_PACKS = {
         "jy-writing-skills",
     },
     "jy-env-audit": {
+        "jy-explain-change",
         "jy-review-all",
         "jy-review-work",
         "jy-receiving-review",

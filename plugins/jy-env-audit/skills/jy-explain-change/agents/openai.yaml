@@ -1,0 +1,7 @@
+interface:
+  display_name: "JY Explain Change"
+  short_description: "Explain a code change and check understanding"
+  default_prompt: "Use $jy-explain-change to explain the specified diff, commit, branch, or PR and quiz me on the change."
+
+policy:
+  allow_implicit_invocation: false

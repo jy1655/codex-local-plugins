@@ -19,7 +19,7 @@ by itself.
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-debugging`, `jy-test-driven`, `jy-verification-before-completion`, `jy-codebase-explore`, `jy-library-research`, `jy-consult` |
 | `jy-env-planning` | `AVAILABLE` | `jy-autoplan`, `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans` |
 | `jy-env-delivery` | `AVAILABLE` | `jy-executing-plans`, `jy-worktrees`, `jy-checkpoint`, `jy-document-release`, `jy-ship`, `jy-waterfall`, `jy-env-sync-admin`, `jy-writing-skills` |
-| `jy-env-audit` | `AVAILABLE` | `jy-review-all`, `jy-review-work`, `jy-receiving-review`, `jy-slop-remover` |
+| `jy-env-audit` | `AVAILABLE` | `jy-explain-change` (explicit invocation only), `jy-review-all`, `jy-review-work`, `jy-receiving-review`, `jy-slop-remover` |
 | `jy-env-ios` | `AVAILABLE` | iOS Simulator debugging, performance, memory, App Intents, and SwiftUI workflows |
 
 Staging and activation are deliberately separate:
