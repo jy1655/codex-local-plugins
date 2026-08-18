@@ -10,7 +10,6 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 EXPECTED_PACKS = {
     "jy-env-core": {
-        "agent-bridge-delegation",
         "jy-change-guardrails",
         "jy-debugging",
         "jy-test-driven",

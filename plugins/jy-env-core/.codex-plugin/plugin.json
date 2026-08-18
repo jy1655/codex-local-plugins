@@ -1,6 +1,6 @@
 {
   "name": "jy-env-core",
-  "version": "0.1.0+codex.20260818041644",
+  "version": "0.1.0+codex.20260724094801",
   "description": "Minimal default skill pack for safe implementation, debugging, verification, and evidence-based research.",
   "author": {
     "name": "JaeYoung Hwang",

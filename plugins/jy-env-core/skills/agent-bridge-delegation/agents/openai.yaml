@@ -1,4 +1,0 @@
-interface:
-  display_name: "Agent Bridge Delegation"
-  short_description: "Delegate work through installed Agent Bridge"
-  default_prompt: "Use $agent-bridge-delegation to delegate this task through the installed Agent Bridge."
