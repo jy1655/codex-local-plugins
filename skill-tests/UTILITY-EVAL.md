@@ -1,7 +1,8 @@
 # Skill Utility Evaluation
 
+The objective is maximum task performance with minimum context, routing, and procedural weight.
 This line tests whether a first-party skill changes current-model behavior enough to justify
-its context, routing, latency, and maintenance cost. Scenario prose alone is not evidence.
+its latency and maintenance cost. Scenario prose alone is not evidence.
 
 ## Comparison contract
 
@@ -15,6 +16,11 @@ shuffled order:
 
 Holding pack peers constant measures the target's marginal value in the bundle users actually
 install. It catches overlap and routing competition that a target-only comparison would miss.
+
+This is an ablated baseline: remove the target procedure while preserving safety, permission,
+and data-protection boundaries. Supply the objective, required context, boundaries, and success
+criteria, but do not prescribe the route unless that route is the invariant being tested. Restore
+only the smallest causal rule after a repeated, reproducible failure, then rerun the same cases.
 
 Codex JSONL supplies token, latency, tool-call, and observed `SKILL.md` read data. A separate
 blind judge sees responses labeled only A/B/C and scores them against the scenario contract.
@@ -122,6 +128,12 @@ Removal recommendations are marginal to the current pack. Remove at most one rev
 at a time and rerun the now-stale pack before considering another; two overlapping skills can
 otherwise make each other look individually redundant.
 
+Retain harness elements only for a measurable quality, cost, or safety benefit over the simpler
+baseline. The automated verdict currently measures response quality, activation, tokens, and
+latency; it does not quantify safety. A verdict therefore does not authorize a change to safety,
+permission, or data-protection boundaries. Such a change needs separate direct evidence and the
+harness owner's explicit approval.
+
 ## Artifacts and reporting
 
 Ignored local artifacts live under `.codex/skill-evals/`:
@@ -153,7 +165,9 @@ activation needs its own cadence and authenticated runner choice.
 Current pressure scenarios primarily evaluate decisions and final responses in an empty,
 read-only workspace. This can measure instruction and trigger value, but it does not prove
 Simulator, device, build, external-service, or live-runtime behavior. Those skills still need
-their task-specific runtime evidence before an add/remove decision.
+their task-specific runtime evidence before an add/remove decision. For those roles, use
+representative direct feedback from the actual tool, test, build, runtime, or readback surface;
+prose-only agreement is not deletion-grade evidence.
 
 The model slug and Codex CLI version are detectable. A silent server-side revision behind an
 unchanged model slug is not; rerun periodically or when OpenAI announces a model update.

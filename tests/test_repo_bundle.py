@@ -66,6 +66,29 @@ class RepoBundleTests(unittest.TestCase):
         for status in ["CURRENT", "STALE", "UNKNOWN", "NOT-VERIFIED"]:
             self.assertIn(status, text)
 
+    def test_global_agents_uses_an_ablated_harness_baseline(self) -> None:
+        text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text(encoding="utf-8")
+
+        self.assertIn("maximum task performance", text)
+        self.assertIn("minimum standing context", text)
+        self.assertIn("simplest baseline", text)
+        self.assertIn("repeated, reproducible failure", text)
+        self.assertIn("objective, required context, safety boundaries, and success criteria", text)
+        self.assertIn("always-on context", text)
+        self.assertIn("direct feedback", text)
+        self.assertIn("least privilege", text)
+        self.assertIn("harness owner's explicit approval", text)
+
+    def test_skill_utility_evaluation_preserves_safety_boundaries(self) -> None:
+        text = (REPO_ROOT / "skill-tests" / "UTILITY-EVAL.md").read_text(encoding="utf-8")
+
+        self.assertIn("maximum task performance", text)
+        self.assertIn("minimum context, routing, and procedural weight", text)
+        self.assertIn("ablated baseline", text)
+        self.assertIn("representative direct feedback", text)
+        self.assertIn("does not authorize", text)
+        self.assertIn("harness owner's explicit approval", text)
+
     def test_all_plugin_manifests_match_repository_metadata_and_limit_mcp_to_ios(self) -> None:
         repository = "https://github.com/jy1655/codex-local-plugins"
         self.assertEqual(

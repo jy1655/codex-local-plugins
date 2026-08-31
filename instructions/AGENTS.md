@@ -13,16 +13,33 @@ This machine is managed by the portable Codex environment sync repo.
 
 ## Native Capability and Gate Policy
 
+- Optimize for maximum task performance with minimum standing context, routing, and procedural
+  weight. Treat each added harness element as overhead that must earn its place with evidence.
+- Start from the simplest baseline that preserves safety, permission, and data-protection
+  boundaries. Do not retain a procedure merely because an older model needed it. Reintroduce
+  only the smallest rule that addresses a repeated, reproducible failure.
 - Before adding agent orchestration, task registries, checkpoints, planner state, or other
   scaffolding, first use available model- or API-native session state and context compression.
   Add external state only for a concrete boundary such as a new thread, another actor, an audit
   or recovery requirement, or reproduced state loss, and keep it to the smallest justified form.
+- State the objective, required context, safety boundaries, and success criteria, then let the
+  model choose the solution path. Do not force an unverified procedure as the default.
+- Keep always-on context to the project purpose and durable constraints. Before adding more
+  instructions or examples, improve the structure of tools and source material; load transient
+  logs and one-off details only when the task needs them.
+- Prefer direct feedback from tests, builds, and runtime readback. For costly or hard-to-reverse
+  actions, enforce least privilege, isolation, and explicit approval at the system layer rather
+  than relying on prompt text alone.
 - Hard gates are for permissions, explicit approvals, secrets, irreversible or consequential
   external side effects, and non-negotiable safety or security invariants. Do not make
   read-only exploration, analysis, or planning wait for a mode switch or speculative completeness.
 - Keep exploration and planning moving with the best available context. When currency affects a
   decision, label evidence `CURRENT`, `STALE`, `UNKNOWN`, or `NOT-VERIFIED`; prefer current source
   and runtime evidence, and use stale material as a search lead rather than present authority.
+- Retain a harness element only when representative comparison shows measurable quality, cost,
+  or safety improvement over the simpler baseline. Operational procedures may evolve, but a
+  change to safety, permission, or data-protection boundaries requires separate evidence and the
+  harness owner's explicit approval.
 
 ## Local Wiki Retrieval and Feedback (this Mac only)
 
