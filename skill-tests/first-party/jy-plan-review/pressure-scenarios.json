@@ -15,11 +15,11 @@
       "expected_with_skill": "Produces findings across scope, UX, data flow, and compatibility, then returns a revised plan with acceptance criteria."
     },
     {
-      "id": "default-mode-review-routing",
-      "title": "Default mode review should route into Plan Mode",
+      "id": "default-mode-review-continues",
+      "title": "Default mode review should use available context",
       "prompt": "Use jy-plan-review on this rough plan, but I am still in Default mode.",
-      "expected_without_skill": "Acts like it can do the full interactive plan-closing workflow without acknowledging the current mode.",
-      "expected_with_skill": "Calls out that the task belongs in Plan Mode, tells the user to use Shift+Tab, and still leaves the top findings plus a compact draft revised plan."
+      "expected_without_skill": "Stops at a Plan Mode instruction or repeats the rough plan without reconciling it against current repository evidence.",
+      "expected_with_skill": "Reviews and revises the plan in the current mode, distinguishes current repository evidence from stale or unknown assumptions, and asks only for a decision that cannot be safely inferred."
     }
   ]
 }

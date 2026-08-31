@@ -1,6 +1,6 @@
 {
   "name": "jy-env-delivery",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260831021246",
   "description": "Optional delivery pack for execution, worktrees, project records, documentation, and shipping.",
   "author": {
     "name": "JaeYoung Hwang",

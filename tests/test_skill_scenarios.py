@@ -58,14 +58,9 @@ class FirstPartySkillScenarioAssetTests(unittest.TestCase):
                     self.assertNotIn(scenario_id, all_ids)
                     all_ids.add(scenario_id)
 
-    def test_mode_aware_assets_include_plan_mode_pressure(self) -> None:
-        mode_aware_skills = [
+    def test_mutating_mode_aware_assets_include_plan_mode_pressure(self) -> None:
+        mutating_mode_aware_skills = [
             "jy-slop-remover",
-            "jy-framing",
-            "jy-plan-review",
-            "jy-autoplan",
-            "jy-grill-me",
-            "jy-writing-plans",
             "jy-worktrees",
             "jy-checkpoint",
             "jy-document-release",
@@ -79,11 +74,27 @@ class FirstPartySkillScenarioAssetTests(unittest.TestCase):
             "jy-waterfall",
             "jy-verification-before-completion",
         ]
-        for skill_name in mode_aware_skills:
+        for skill_name in mutating_mode_aware_skills:
             with self.subTest(skill=skill_name):
                 text = (SCENARIO_ROOT / skill_name / "pressure-scenarios.json").read_text(encoding="utf-8")
                 self.assertIn("Shift+Tab", text)
                 self.assertIn("Plan Mode", text)
+
+    def test_advisory_planning_assets_do_not_require_a_mode_switch(self) -> None:
+        scenario_ids = {
+            "jy-framing": "default-mode-framing-continues",
+            "jy-plan-review": "default-mode-review-continues",
+            "jy-grill-me": "default-mode-interview-continues",
+            "jy-writing-plans": "default-mode-provisional-plan",
+        }
+        for skill_name, scenario_id in scenario_ids.items():
+            with self.subTest(skill=skill_name):
+                scenario_file = SCENARIO_ROOT / skill_name / "pressure-scenarios.json"
+                data = json.loads(scenario_file.read_text(encoding="utf-8"))
+                scenario = next(
+                    item for item in data["scenarios"] if item["id"] == scenario_id
+                )
+                self.assertNotIn("Shift+Tab", scenario["expected_with_skill"])
 
     def test_ship_asset_covers_stale_verification_and_pre_push_doc_sync(self) -> None:
         text = (SCENARIO_ROOT / "jy-ship" / "pressure-scenarios.json").read_text(encoding="utf-8")
@@ -91,7 +102,7 @@ class FirstPartySkillScenarioAssetTests(unittest.TestCase):
         self.assertIn("jy-document-release", text)
         self.assertIn("before final verification and push", text)
 
-    def test_waterfall_asset_covers_approval_time_and_secret_gates(self) -> None:
+    def test_waterfall_asset_covers_approval_boundary_and_secret_gates(self) -> None:
         text = (SCENARIO_ROOT / "jy-waterfall" / "pressure-scenarios.json").read_text(encoding="utf-8")
         self.assertIn("explicit approval", text)
         self.assertIn("must not run `gh issue create`", text)

@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "model": "gpt-5.6-sol",
+  "reasoning_effort": "max",
+  "judge_model": "gpt-5.6-luna",
+  "judge_reasoning_effort": "medium",
+  "service_tier": "fast",
+  "timeout_seconds": 600,
+  "repetitions": 3,
+  "scenarios_per_skill": 2,
+  "minimum_scenarios": 2,
+  "minimum_pairs": 6,
+  "quality_floor": 3.0,
+  "meaningful_gain": 0.5,
+  "neutral_band": 0.25,
+  "maximum_input_token_overhead_ratio": 0.25,
+  "maximum_latency_overhead_ratio": 0.5,
+  "minimum_implicit_activation_rate": 0.8
+}

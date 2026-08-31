@@ -8,9 +8,9 @@ description: Use when creating a new skill, revising an existing skill, or verif
 ## Overview
 
 Author small, discoverable first-party skills whose instructions are proportional to their
-risk. Use static checks for structure, manual pressure scenarios for behavior, and fresh
-deployment checks for the installed surface. Do not manufacture a behavioral test cycle for
-a wording-only edit.
+risk. Use static checks for structure, controlled skill-utility evaluation for behavior, and
+fresh deployment checks for the installed surface. Do not manufacture a behavioral test
+cycle for a wording-only edit.
 
 ## Authoring Language
 
@@ -50,8 +50,8 @@ Examples: description trigger, routing decision, mode behavior, output contract.
 - define the failure the change should prevent;
 - update the matching `pressure-scenarios.json` input;
 - run relevant static tests;
-- manually run the scenario when behavioral confidence is required, and record the actual
-  model/configuration externally.
+- when behavioral confidence or a keep/remove decision is required, run the repository's
+  baseline/implicit/explicit comparison and retain its named model/configuration report.
 
 ### Tier 3: safety or irreversible action
 
@@ -59,10 +59,12 @@ Examples: git publication, destructive operations, external messages, secret han
 
 - use adversarial pressure cases and explicit stop conditions;
 - test likely rationalizations and permission boundaries;
-- require fresh, task-specific verification before deployment.
+- require fresh, task-specific verification before deployment;
+- do not add or remove the skill from one smoke run or an expectation-only scenario asset.
 
-The files in `skill-tests/first-party/` are manual inputs. Their presence proves schema
-coverage only, not that an evaluation passed.
+The files in `skill-tests/first-party/` are evaluation inputs. Their presence proves schema
+coverage only, not that an evaluation passed. Executed evidence lives under the ignored
+`.codex/skill-evals/` artifact tree.
 
 ## Workflow
 
@@ -74,14 +76,16 @@ coverage only, not that an evaluation passed.
 5. Update `agents/openai.yaml`, routing docs, or pressure scenarios only when their contract
    changed.
 6. Run proportional static checks.
-7. For Tier 2 or 3, run manual pressure evaluation when the user or release risk requires
-   behavioral evidence; never imply it ran when it did not.
+7. For Tier 2 or 3, read the utility-evaluation section of
+   [skill-testing-guide.md](references/skill-testing-guide.md). Preview model-call scope, then
+   run the controlled comparison when the user or release risk requires behavioral evidence.
+   Never promote a one-scenario smoke run to keep/remove evidence.
 8. Update the owning plugin's cachebuster, apply the repo to stage that version, reinstall
    it, and start a fresh Codex thread when deployment visibility matters.
 
 ## Pressure Scenario Guidance
 
-Each manual scenario should name one realistic pressure, a likely failure without the
+Each scenario should name one realistic pressure, a likely failure without the
 skill, and observable expected behavior with it. Avoid vague success language.
 
 See [skill-testing-guide.md](references/skill-testing-guide.md) for scenario design. For
@@ -113,5 +117,7 @@ style; do not add a renderer runtime merely to document a simple sequence.
 - Adding boilerplate sections that do not affect decisions
 - Treating scenario JSON as evidence of an executed evaluation
 - Requiring a no-skill baseline for a typo or metadata-only change
+- Treating a single smoke comparison, unblinded preference, or `expected_with_skill` prose as
+  removal-grade evidence
 - Copying stale namespaces or third-party runtime assumptions
 - Editing generated plugin cache instead of the first-party source

@@ -63,6 +63,10 @@ Before asking about existing structure, search the codebase directly. If the sea
 multiple modules or the path is unclear, use `jy-codebase-explore` first, then ask the
 next decision question based on what was found.
 
+Treat older plans and documentation as leads. When their currency affects the question,
+distinguish current repository evidence from `STALE`, `UNKNOWN`, or `NOT-VERIFIED` context and
+continue the read-only investigation.
+
 Examples of questions to answer yourself first:
 
 - where the existing implementation lives
@@ -109,11 +113,10 @@ If docs are explicitly requested:
 
 ### If current collaboration mode is Default
 
-- Run the first pass directly when one or two questions are enough
-- If the user wants an extended back-and-forth interview, say:
-  - "This belongs in Plan Mode. Press `Shift+Tab`, switch to Plan Mode, then run `/jy-grill-me` again."
-- Still leave a useful first question, why it matters, and a recommended answer if possible
-- Do not rely on Plan-only question flows while staying in Default mode
+- Start the interview directly with one focused question, why it matters, and a recommended
+  answer when evidence supports one.
+- Continue across normal conversation turns; do not require a mode switch for an extended loop.
+- Mention Plan Mode only as an optional richer input surface when bounded structured choices would help.
 
 ### If current collaboration mode is Plan
 
@@ -160,5 +163,5 @@ Then state the next handoff:
 - treating `CONTEXT.md` as an implementation spec instead of a glossary
 - offering an ADR for easy-to-reverse or obvious decisions
 - rewriting the whole plan instead of running the interview
-- staying in Default mode for a long interactive loop without mentioning Shift+Tab
+- treating collaboration mode as a prerequisite for a read-only decision interview
 - ending without shared understanding or a clear handoff

@@ -9,7 +9,8 @@ description: Use when implementing or reviewing a non-trivial code change that r
 
 Apply lightweight execution guardrails before and during a non-trivial code change.
 Surface risky assumptions, choose the smallest valid change, keep edits inside a declared
-boundary, and tie the work to direct verification.
+boundary, prefer available native capabilities over new scaffolding, and tie the work to
+direct verification.
 
 This skill is execution-oriented. In Default mode it can clarify, implement, and verify.
 In Plan Mode it only leaves the guarded execution approach.
@@ -24,7 +25,7 @@ In Plan Mode it only leaves the guarded execution approach.
 Do not use it when:
 
 - The task is trivial and unambiguous
-- The task is pure planning; use `jy-autoplan` or `jy-framing` when the planning pack is installed
+- The task is pure planning; use the matching planning skill such as `jy-framing` when the planning pack is installed
 - The main job is bug investigation and belongs in `jy-debugging`
 - The work already follows a written implementation plan; use `jy-executing-plans` when the delivery pack is installed
 - The main input is review feedback; use `jy-receiving-review` when the audit pack is installed
@@ -40,6 +41,7 @@ still apply.
 | assumptions | separate explicit requirements from inferred ones | silent guessing |
 | interpretations | name competing readings when they matter | choosing one without saying so |
 | smallest valid change | prefer the simplest code that fits the request | one-off abstraction or speculative flexibility |
+| native leverage | use available model, API, and project capabilities first | new state or orchestration without a concrete boundary |
 | edit boundary | declare what is in and out of scope | drive-by cleanup |
 | verification | pick the most direct proving command | "should work" with no evidence |
 
@@ -61,6 +63,11 @@ still apply.
 
 - Reuse the current project pattern before inventing a new abstraction
 - Treat future-proofing, configurability, and fallback code as out of scope unless requested
+- Before adding agent orchestration, registries, checkpoints, or persistence, check whether
+  available model- or API-native session state and context handling already cover the task
+- Add external state only for a concrete boundary such as a new thread, another actor, an audit
+  requirement, or a reproduced state-loss failure; make ownership, lifetime, freshness, and
+  recovery explicit
 - Use `jy-test-driven` when the change adds or changes behavior
 
 ### 4. Declare the edit boundary
@@ -94,6 +101,7 @@ still apply.
 
 - Silently guessing across ambiguous requirements
 - Building a generic framework for a one-off change
+- Building agent-state scaffolding before proving that native context cannot cross a required boundary
 - Expanding the diff into adjacent refactors or comment cleanup
 - Adding speculative error handling for scenarios nobody asked about
 - Claiming success without a direct proving command

@@ -1,6 +1,6 @@
 {
   "name": "jy-env-planning",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260831021246",
   "description": "Optional planning pack for framing, decision interviews, plan review, and implementation planning.",
   "author": {
     "name": "JaeYoung Hwang",
@@ -18,7 +18,7 @@
   "interface": {
     "displayName": "JY Planning Pack",
     "shortDescription": "Optional workflows for shaping and planning work",
-    "longDescription": "Adds automatic planning routing, product framing, one-question decision interviews, plan review, and decision-complete implementation plan authoring.",
+    "longDescription": "Adds product framing, one-question decision interviews, plan review, and decision-complete implementation plan authoring.",
     "developerName": "JaeYoung Hwang",
     "category": "Productivity",
     "capabilities": [

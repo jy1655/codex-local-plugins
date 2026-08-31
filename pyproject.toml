@@ -13,6 +13,7 @@ authors = [{name = "jy"}]
 
 [project.scripts]
 codex-env-sync = "codex_env_sync.cli:main"
+codex-skill-eval = "codex_env_sync.skill_eval:main"
 
 [tool.setuptools.packages.find]
 include = ["codex_env_sync*"]

@@ -17,7 +17,7 @@ by itself.
 | Pack | Policy | Skills |
 |---|---|---|
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-debugging`, `jy-test-driven`, `jy-verification-before-completion`, `jy-codebase-explore`, `jy-library-research`, `jy-consult` |
-| `jy-env-planning` | `AVAILABLE` | `jy-autoplan`, `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans` |
+| `jy-env-planning` | `AVAILABLE` | `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans` |
 | `jy-env-delivery` | `AVAILABLE` | `jy-executing-plans`, `jy-worktrees`, `jy-checkpoint`, `jy-document-release`, `jy-ship`, `jy-waterfall`, `jy-env-sync-admin`, `jy-writing-skills` |
 | `jy-env-audit` | `AVAILABLE` | `jy-explain-change` (explicit invocation only), `jy-review-all`, `jy-review-work`, `jy-receiving-review`, `jy-slop-remover` |
 | `jy-env-ios` | `AVAILABLE` | iOS Simulator debugging, performance, memory, App Intents, and SwiftUI workflows |
@@ -132,7 +132,8 @@ plugins/jy-env-audit/             # Optional audit pack
 plugins/jy-env-ios/               # Optional pinned iOS/XcodeBuildMCP pack
 instructions/AGENTS.md            # Compact global rules; no eager optional-skill routing
 .agents/plugins/marketplace.json  # Local personal marketplace catalog
-skill-tests/first-party/          # Manual pressure scenarios
+skill-tests/first-party/          # Skill utility pressure scenarios
+skill-tests/UTILITY-EVAL.md       # Three-arm skill utility and reporting contract
 tests/                            # Unit and integration tests
 ```
 
@@ -151,8 +152,40 @@ Run the full suite:
 python3 -m unittest discover -s tests -v
 ```
 
-Validate manual pressure-scenario assets:
+Validate pressure-scenario assets:
 
 ```bash
 python3 -m unittest tests.test_skill_scenarios -v
 ```
+
+## Skill utility gate
+
+Do not keep a skill merely because its instructions sound reasonable. The utility evaluator
+compares the same task on the same model and effort as `baseline` (skill absent), `implicit`
+(discoverable), and `explicit` (forced), while holding same-plugin peers constant. It then
+blind-scores the responses and applies quality,
+token, latency, and implicit-activation gates while recording tool calls and observed skill
+reads.
+
+Preview model-call scope first:
+
+```bash
+python3 -m codex_env_sync.skill_eval plan \
+  --repo-root . --skill jy-change-guardrails
+```
+
+Run one skill and inspect freshness or the latest report:
+
+```bash
+python3 -m codex_env_sync.skill_eval run \
+  --repo-root . --skill jy-change-guardrails
+
+python3 -m codex_env_sync.skill_eval status --repo-root .
+python3 -m codex_env_sync.skill_eval report --repo-root .
+```
+
+Use `run --candidate --skill <name>` before adopting a new source,
+`run --changed-from <ref>` for skill changes, `run --stale` for invalidated evidence, and
+`run --all --model <new-model>` for a new model baseline. Reports and raw JSONL are ignored
+under `.codex/skill-evals/`; no verdict automatically installs or deletes a skill. See
+[skill-tests/UTILITY-EVAL.md](skill-tests/UTILITY-EVAL.md) for thresholds and evidence limits.

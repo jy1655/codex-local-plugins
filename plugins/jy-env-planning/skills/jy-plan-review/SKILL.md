@@ -9,10 +9,8 @@ description: Use when a plan exists and needs to be made decision-complete acros
 
 Read an existing plan and close the gaps so an implementer does not need to make new
 decisions during execution. Review scope, architecture, UX or operator impact, and
-verification in one pass.
-
-This skill must respect the current collaboration mode. Plan Mode is usually the better
-place for a decision-complete review, but the skill cannot change modes by itself.
+verification in one pass. Reconcile the plan with current repository evidence and keep the
+review moving in the current collaboration mode.
 
 ## When to Use
 
@@ -46,6 +44,7 @@ Do not use it when:
 
 - findings ordered by priority
 - missing decisions that must be added
+- current, stale, unknown, or unverified assumptions when currency affects implementation
 - a revised plan with those decisions filled in
 - acceptance criteria before implementation begins
 - the next handoff: `jy-writing-plans` or direct execution
@@ -63,12 +62,12 @@ Do not use it when:
 
 ### If current collaboration mode is Default
 
-- First decide whether the review can be completed in one response
-- If the gap is large enough to require back-and-forth, route like this:
-  - "This should be locked in Plan Mode. Press `Shift+Tab`, switch to Plan Mode, then run `/jy-plan-review` again."
-- Still leave the most important 3-5 findings and a compact revised-plan draft
+- Complete as much of the review and revision as current evidence supports.
+- Ask one plain-text focused question only when a missing decision cannot be safely inferred and
+  materially changes the plan.
+- Mark stale or unverified assumptions instead of treating incomplete context as a reason to stop.
+- Mention Plan Mode only as an optional richer interaction surface for substantial bounded choices.
 - If the plan is approved but not yet taskized, explicitly hand off to `jy-writing-plans`
-- Do not rely on `<proposed_plan>` or Plan-only question flows while staying in Default mode
 
 ### If current collaboration mode is Plan
 
@@ -80,12 +79,13 @@ Do not use it when:
 ## Workflow
 
 1. Check the current collaboration mode
-2. Read the plan and repo context
-3. Identify the missing decisions that would block implementation
-4. Order the findings by severity
-5. Rewrite the plan with the missing decisions filled in
-6. State implementation entry conditions and verification criteria
-7. If the plan is still not taskized, hand off to `jy-writing-plans`
+2. Read the plan, current repo context, and relevant source timestamps or revisions
+3. Mark assumptions `CURRENT`, `STALE`, `UNKNOWN`, or `NOT-VERIFIED` when it matters
+4. Identify the missing decisions that would block implementation
+5. Order the findings by severity
+6. Rewrite the plan with the missing decisions filled in
+7. State implementation entry conditions and verification criteria
+8. If the plan is still not taskized, hand off to `jy-writing-plans`
 
 ## Boundaries
 
@@ -96,7 +96,7 @@ Do not use it when:
 ## Common Mistakes
 
 - Assuming the skill can enable Plan Mode automatically
-- Starting a long question session in Default mode without first routing appropriately
+- Stopping at a mode-switch instruction when the review can continue with available evidence
 - Evaluating the idea without actually locking implementation decisions
 - Looking only at architecture and missing UX, migration, or verification criteria
 - Listing findings without rewriting the plan

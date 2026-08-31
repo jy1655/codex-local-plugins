@@ -8,10 +8,8 @@ description: Use when a user is still shaping a product or feature direction and
 ## Overview
 
 Turn an idea-stage request into a short, execution-ready brief before anyone starts
-planning implementation. Narrow the user, pain, scope, and success criteria first.
-
-This skill must be mode-aware. It can recommend Plan Mode, but it cannot switch Codex
-collaboration mode by itself.
+planning implementation. Narrow the user, pain, scope, and success criteria first, using
+the best available context in the current collaboration mode.
 
 ## When to Use
 
@@ -52,32 +50,34 @@ A compact brief containing:
 - success criteria
 - non-goals
 - open questions
+- evidence or freshness notes when they affect the brief
 - recommended next step
 
 ## Mode-Aware Behavior
 
 ### If current collaboration mode is Default
 
-- First decide whether back-and-forth planning is truly needed
-- If it is, route like this:
-  - "This belongs in Plan Mode. Press `Shift+Tab`, switch to Plan Mode, and run `/jy-framing` again."
-- Do not stop there when a compact draft brief is still possible
-- Do not rely on Plan-only flows such as `request_user_input` while staying in Default mode
+- Produce the best compact brief supported by the available context.
+- Ask one plain-text question only when the answer materially changes the smallest useful wedge.
+- Mark unresolved material facts `UNKNOWN` or `NOT-VERIFIED`; do not treat them as blockers when
+  a provisional brief is still useful.
+- Mention Plan Mode only when its structured input would materially improve an extended interview.
 
 ### If current collaboration mode is Plan
 
 - Narrow the remaining open questions for real
-- Ask only when needed
+- Ask only when needed, using `request_user_input` when it improves a bounded choice
 - End with a brief plus an explicit next step: `jy-plan-review`, `jy-writing-plans`, or direct execution
 
 ## Workflow
 
 1. Check the current collaboration mode
 2. Read the request and relevant repo context
-3. Turn the idea into user, pain, and constraint statements
-4. Replace vague wording with measurable wording
-5. Summarize the key decisions that must be agreed before implementation
-6. Recommend the next step: `jy-plan-review`, `jy-writing-plans`, or execution
+3. Distinguish current evidence from stale, unknown, or unverified inputs when it matters
+4. Turn the idea into user, pain, and constraint statements
+5. Replace vague wording with measurable wording
+6. Summarize the key decisions that must be agreed before implementation
+7. Recommend the next step: `jy-plan-review`, `jy-writing-plans`, or execution
 
 ## Boundaries
 
@@ -89,7 +89,7 @@ A compact brief containing:
 ## Common Mistakes
 
 - Acting as if the skill can switch collaboration mode automatically
-- Starting a Plan-only question flow while still in Default mode
+- Stopping at a mode-switch instruction instead of producing a useful brief
 - Choosing a solution before the user and problem are clear
 - Expanding to a large system before narrowing scope
 - Writing a nice idea summary with no success criteria

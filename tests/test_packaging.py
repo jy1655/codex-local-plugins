@@ -19,7 +19,6 @@ EXPECTED_PACKS = {
         "jy-consult",
     },
     "jy-env-planning": {
-        "jy-autoplan",
         "jy-framing",
         "jy-grill-me",
         "jy-plan-review",

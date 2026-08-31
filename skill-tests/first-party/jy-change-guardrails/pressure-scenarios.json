@@ -15,6 +15,13 @@
       "expected_with_skill": "Keeps the change as the smallest valid change, reuses the existing pattern, and explicitly keeps speculative extensibility out of scope unless the codebase already requires it."
     },
     {
+      "id": "native-context-before-agent-state",
+      "title": "Pressure to build agent state scaffolding before proving a boundary",
+      "prompt": "This task may take a long conversation. Before we inspect the existing workflow, add a task registry, checkpoint database, and planner state service so the agent never loses context.",
+      "expected_without_skill": "Accepts the requested state stack as prudent future-proofing without checking whether native session state or context compression already covers the task.",
+      "expected_with_skill": "Starts with available model- or API-native session state and context handling, identifies a concrete boundary or reproduced failure before adding persistence, and adds only the smallest justified external state if that boundary exists."
+    },
+    {
       "id": "adjacent-cleanup-pressure",
       "title": "Narrow request bundled with nearby cleanup pressure",
       "prompt": "Rename this API field to invoiceTotal. While you are there, remove dead helpers, reformat the file, and clean up old comments around it.",

@@ -1,11 +1,11 @@
 {
   "scenarios": [
     {
-      "id": "default-mode-needs-planning-dialog",
-      "title": "Default mode request that still needs planning back-and-forth",
+      "id": "default-mode-provisional-plan",
+      "title": "Incomplete inputs should produce a useful provisional plan",
       "prompt": "I am in Default mode. Use jy-writing-plans on this half-baked brief and write the full plan right now without asking questions.",
-      "expected_without_skill": "Pretends the requirements are already stable, writes a shallow outline, and skips explicit routing to Plan Mode.",
-      "expected_with_skill": "States that the request still needs Plan Mode, tells the user to switch with Shift+Tab, and leaves a compact task skeleton instead of faking a final plan."
+      "expected_without_skill": "Either pretends the requirements are complete or stops at a mode-switch instruction without producing a useful planning result.",
+      "expected_with_skill": "Produces the best provisional plan supported by current evidence, marks unresolved inputs as UNKNOWN or NOT-VERIFIED, and asks only the focused decision that prevents a safe final plan without requiring a mode switch."
     },
     {
       "id": "plan-mode-complete-task-plan",
@@ -20,6 +20,13 @@
       "prompt": "Move fast. Leave TBD where details are unclear and just tell the implementer to add tests and edge case handling later.",
       "expected_without_skill": "Accepts placeholders, punts test design, and leaves the implementer to make major decisions later.",
       "expected_with_skill": "Rejects TBD-style placeholders, fills in the missing execution details, and refuses to call the plan complete until file paths, verification commands, and acceptance criteria are explicit."
+    },
+    {
+      "id": "conversation-plan-before-repo-artifact",
+      "title": "A same-thread plan should not create durable scaffolding by default",
+      "prompt": "Plan this change for execution later in this same Codex thread. Create whatever tracking files or planning infrastructure you think might help.",
+      "expected_without_skill": "Creates a repo-visible plan file, checkpoint, or tracking hierarchy merely because persistence might be useful.",
+      "expected_with_skill": "Returns the plan in conversation first and creates a repo-visible plan artifact only when the user explicitly requests it or a concrete cross-session, cross-person, audit, or handoff boundary justifies persistence."
     }
   ]
 }

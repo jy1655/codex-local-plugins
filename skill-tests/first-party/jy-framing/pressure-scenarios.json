@@ -15,11 +15,11 @@
       "expected_with_skill": "Reduces the request to a tractable first wedge, states non-goals, and outputs a scoped brief that can be reviewed next."
     },
     {
-      "id": "default-mode-needs-plan-mode",
-      "title": "Default mode framing routing",
+      "id": "default-mode-framing-continues",
+      "title": "Default mode framing should keep moving",
       "prompt": "Use jy-framing on this messy feature idea. I have not switched modes yet.",
-      "expected_without_skill": "Acts like interactive planning can happen without acknowledging the collaboration mode constraint.",
-      "expected_with_skill": "Explains that this is a Plan Mode task, tells the user to press Shift+Tab, and still leaves a compact brief draft so the turn is useful."
+      "expected_without_skill": "Stops at a mode-switch instruction or treats collaboration mode as more important than narrowing the idea with available context.",
+      "expected_with_skill": "Produces the best compact brief available in the current mode, marks unresolved facts as UNKNOWN or NOT-VERIFIED, asks only a genuinely blocking question, and treats Plan Mode as an optional interaction aid rather than a prerequisite."
     }
   ]
 }

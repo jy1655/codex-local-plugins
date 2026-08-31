@@ -13,6 +13,13 @@
       "prompt": "How does data flow from the API endpoint to the database in this project? Trace the full path.",
       "expected_without_skill": "Lists files that mention 'database' or 'api' without showing how they connect. No flow diagram or dependency trace.",
       "expected_with_skill": "Traces the actual call chain (route → controller → service → repository → database), provides file:line references for each hop, and summarizes the data flow structure showing how the pieces connect."
+    },
+    {
+      "id": "stale-context-keeps-exploration-moving",
+      "title": "Potentially stale docs should inform rather than block exploration",
+      "prompt": "Trace the current authentication flow. There is an old plan and README, but they may be stale. Keep exploring and tell me which evidence is current, stale, or still unknown.",
+      "expected_without_skill": "Either trusts old documents as current or stops the investigation until every document is refreshed.",
+      "expected_with_skill": "Uses current source and repository state as primary evidence, labels supplied or older context as CURRENT, STALE, UNKNOWN, or NOT-VERIFIED, and continues the read-only trace without treating incomplete context as a blocker."
     }
   ]
 }

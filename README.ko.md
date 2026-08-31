@@ -17,7 +17,7 @@ Marketplace policy는 기본 설치 대상을 고르며, policy 자체가 설치
 | Pack | Policy | Skills |
 |---|---|---|
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-debugging`, `jy-test-driven`, `jy-verification-before-completion`, `jy-codebase-explore`, `jy-library-research`, `jy-consult` |
-| `jy-env-planning` | `AVAILABLE` | `jy-autoplan`, `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans` |
+| `jy-env-planning` | `AVAILABLE` | `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans` |
 | `jy-env-delivery` | `AVAILABLE` | `jy-executing-plans`, `jy-worktrees`, `jy-checkpoint`, `jy-document-release`, `jy-ship`, `jy-waterfall`, `jy-env-sync-admin`, `jy-writing-skills` |
 | `jy-env-audit` | `AVAILABLE` | `jy-explain-change` (명시 호출 전용), `jy-review-all`, `jy-review-work`, `jy-receiving-review`, `jy-slop-remover` |
 | `jy-env-ios` | `AVAILABLE` | iOS Simulator debugging, performance, memory, App Intents, SwiftUI workflow |
@@ -134,7 +134,8 @@ plugins/jy-env-audit/             # 선택 audit pack
 plugins/jy-env-ios/               # 선택 pinned iOS/XcodeBuildMCP pack
 instructions/AGENTS.md            # 선택 skill을 eager routing하지 않는 전역 규칙
 .agents/plugins/marketplace.json  # local personal marketplace catalog
-skill-tests/first-party/          # manual pressure scenario
+skill-tests/first-party/          # skill 실용성 pressure scenario
+skill-tests/UTILITY-EVAL.md       # 3-arm skill 실용성·보고 계약
 tests/                            # unit·integration test
 ```
 
@@ -153,8 +154,40 @@ pack을 설치한 경우 `jy-checkpoint`는 `.codex/checkpoints/`를 사용합�
 python3 -m unittest discover -s tests -v
 ```
 
-Manual pressure-scenario asset 검증:
+Pressure-scenario asset 검증:
 
 ```bash
 python3 -m unittest tests.test_skill_scenarios -v
 ```
+
+## Skill 실용성 gate
+
+지침이 그럴듯하다는 이유만으로 skill을 유지하지 않습니다. 실용성 evaluator는 같은
+task를 같은 model·effort에서 `baseline`(skill 없음), `implicit`(발견 가능),
+`explicit`(강제 호출)로 비교하되 같은 plugin의 나머지 skill은 고정합니다. 이후
+응답을 blind scoring하고 품질, token,
+latency, implicit 활성 gate를 적용하며 tool call과 실제 skill read 여부를 기록합니다.
+
+먼저 model call 범위를 확인합니다.
+
+```bash
+python3 -m codex_env_sync.skill_eval plan \
+  --repo-root . --skill jy-change-guardrails
+```
+
+한 skill을 실행하고 freshness 또는 최신 보고서를 확인합니다.
+
+```bash
+python3 -m codex_env_sync.skill_eval run \
+  --repo-root . --skill jy-change-guardrails
+
+python3 -m codex_env_sync.skill_eval status --repo-root .
+python3 -m codex_env_sync.skill_eval report --repo-root .
+```
+
+새 source 채택 전에는 `run --candidate --skill <name>`, skill 변경에는
+`run --changed-from <ref>`, 무효화된 증거에는 `run --stale`, 새 model baseline에는
+`run --all --model <new-model>`을 사용합니다. 보고서와 raw JSONL은
+`.codex/skill-evals/` 아래에 ignore되며 어떤 verdict도 skill을 자동 설치·삭제하지
+않습니다. Threshold와 증거 경계는
+[skill-tests/UTILITY-EVAL.md](skill-tests/UTILITY-EVAL.md)를 따릅니다.

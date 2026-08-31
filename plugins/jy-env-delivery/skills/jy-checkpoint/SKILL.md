@@ -7,8 +7,9 @@ description: Use when the user wants to save, list, or resume repo-local working
 
 ## Overview
 
-Create repo-local checkpoint notes that make it easy to resume work in a later session or
-from another branch.
+Use available native session state and context compression first. Create a repo-local checkpoint
+only when the user explicitly requests durable state or the work must cross a boundary that native
+context cannot reliably cover, such as a new thread, branch handoff, or another person.
 
 Two rules matter most:
 
@@ -19,12 +20,13 @@ Two rules matter most:
 
 - "Save this state", "let's continue later", "leave a checkpoint"
 - "What was I working on?", "restore the last state", "resume"
-- You want to preserve decisions and remaining work before switching branches or ending the session
+- Work must cross a new thread, branch handoff, another person, or another explicit durable boundary
 - Another person needs a compact handoff they can resume immediately
 
 Do not use it when:
 
 - a one-line chat summary is enough
+- the work will continue in the same thread and native context remains available
 - an official long-lived document should be committed instead
 
 ## Quick Reference
@@ -104,16 +106,18 @@ Required body sections:
 ## Workflow
 
 1. Classify the user's intent as `Save`, `List`, or `Resume`
-2. Gather repo context:
+2. For `Save`, confirm an explicit durable-state request or a concrete boundary that native
+   session context cannot reliably cross; otherwise keep the state in conversation
+3. Gather repo context:
    - `git branch --show-current`
    - `git status --short`
    - recent checkpoint list if needed
-3. For `Save`, infer the title, status, and modified files from the current context
-4. Create a new append-only Markdown file in `.codex/checkpoints/`
-5. For `List`, show current-branch items first in newest-first order
-6. For `Resume`, use the user-specified item or default to the latest relevant checkpoint
-7. Warn on branch mismatch, but do not block resume
-8. Keep the result focused on prior work, remaining work, and warnings
+4. For `Save`, infer the title, status, and modified files from the current context
+5. Create a new append-only Markdown file in `.codex/checkpoints/`
+6. For `List`, show current-branch items first in newest-first order
+7. For `Resume`, use the user-specified item or default to the latest relevant checkpoint
+8. Warn on branch mismatch, but do not block resume
+9. Keep the result focused on prior work, remaining work, and warnings
 
 ## Resume Matching Rules
 
@@ -130,11 +134,12 @@ Required body sections:
 - Do not add telemetry, update checks, or session analytics
 - Do not silently edit or overwrite existing checkpoints
 - Do not block resume only because the branch differs
-- Do not assume built-in session persistence is enough and skip checkpoint creation
+- Do not assume native session persistence is insufficient; identify the boundary before creating a file
 
 ## Common Mistakes
 
-- Leaving only a chat summary and no durable checkpoint file
+- Leaving only a chat summary when a durable checkpoint was explicitly requested or required by a boundary
+- Creating a checkpoint for same-thread continuation when native context is still available
 - Introducing hidden home-directory state instead of `.codex/checkpoints/`
 - Overwriting an older checkpoint and breaking the time sequence
 - Ignoring the current branch when auto-selecting a checkpoint to resume

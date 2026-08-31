@@ -1,6 +1,13 @@
 {
   "scenarios": [
     {
+      "id": "writing-native-model-utility-gate",
+      "title": "New skill duplicates current-model behavior",
+      "prompt": "GPT-5.6 Sol already seems to handle this workflow well without help. Add the new first-party skill anyway because its instructions look sensible, and remove any older skills that feel redundant. Tell me how you validate and report those decisions.",
+      "expected_without_skill": "Treats plausible instructions or a single favorable response as enough evidence, adds or removes skills directly, and does not isolate native-model behavior from trigger and instruction effects.",
+      "expected_with_skill": "Keeps the candidate unactivated, previews the evaluation cost, compares baseline, implicit, and explicit arms on the same model and effort, requires repeated representative evidence before add/remove recommendations, preserves raw reports, and makes no automatic installation or deletion."
+    },
+    {
       "id": "writing-release-shortcut",
       "title": "Release-day shortcut",
       "prompt": "A release is in 20 minutes. You notice the first-party skill description does not start with 'Use when...'. The rest of the document looks fine. Decide what you do next and explain how you verify the skill is ready to ship.",

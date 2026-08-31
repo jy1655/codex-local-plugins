@@ -1,21 +1,21 @@
 ---
 name: jy-waterfall
-description: Use when a project task needs a durable waterfall-style project record across orders, plans, execution reports, feedback, and troubleshooting notes.
+description: Use when the user requests a durable project record or work must cross a concrete multi-session, multi-person, audit, or review-trail boundary.
 ---
 
 # JY Waterfall
 
 ## Overview
 
-Create and maintain a repo-visible project record for work that is too large to rely on
-chat memory alone. This skill is for tasks expected to take 2-3 hours or more, or any task
-that needs a durable order, plan, execution report, review trail, or troubleshooting log.
+Create and maintain the smallest useful durable project record when native session state cannot
+reliably cross a concrete boundary. Duration alone does not justify a ledger; same-thread,
+single-person work should normally stay in native context.
 
 The useful pattern is a lightweight waterfall ledger:
 
-- decide whether the work is large enough to track
+- identify the exact persistence boundary before creating files
 - choose a public or private record surface before writing details
-- create timestamped project notes with `YYYYMMDDTHHMM`
+- create one timestamped record with `YYYYMMDDTHHMM`, then expand only when later work requires it
 - connect local records to plans, execution, verification, and review
 - optionally connect GitHub issues, milestones, and branches only after explicit approval
 
@@ -26,7 +26,6 @@ and otherwise record the needed handoff or perform the smallest direct equivalen
 
 ## When to Use
 
-- work is expected to last 2-3 hours or more
 - a task spans multiple sessions, branches, issues, or review passes
 - the user asks for `mydocs/`, project records, task orders, work reports, or a waterfall log
 - decisions, verification results, and feedback need to remain readable after the chat ends
@@ -35,6 +34,8 @@ and otherwise record the needed handoff or perform the smallest direct equivalen
 Do not use it when:
 
 - a one-line `jy-checkpoint` handoff is enough
+- work remains in one thread with one person and has no audit or durable handoff requirement,
+  even when it takes several hours
 - the task is a tiny edit with no durable decision trail
 - the user only wants an implementation plan (`jy-writing-plans`)
 - the user only wants to execute an existing plan (`jy-executing-plans`)
@@ -44,10 +45,10 @@ Do not use it when:
 | Step | Action |
 |------|--------|
 | 0. Mode check | Mutate in Default, preview in Plan |
-| 1. Size gate | Use this for 2-3 hours or larger work |
+| 1. Boundary check | Require an explicit request or a concrete persistence boundary |
 | 2. Security gate | Decide public, private repo, or gitignored record storage |
 | 3. GitHub gate | Ask before issue, milestone, or branch creation |
-| 4. Record | Create timestamped notes using `YYYYMMDDTHHMM` |
+| 4. Record | Create the single smallest timestamped note that crosses the boundary |
 | 5. Route | Hand off plan, execution, verification, and review to existing skills |
 
 ## Record Surface
@@ -75,6 +76,9 @@ Default private local record root:
   tech/
   troubleshootings/
 ```
+
+These trees describe allowed destinations, not scaffolding to pre-create. Create only the
+directory and record kind needed for the current boundary; add later kinds lazily.
 
 Use `mydocs/` for committed project knowledge only when the contents are safe to commit.
 Use `.codex/waterfall/` or another gitignored path when details include secrets, credentials,
@@ -147,7 +151,8 @@ the command. If the target repo is ambiguous, stop and ask instead of guessing f
 ## Workflow
 
 1. Check the current collaboration mode.
-2. Estimate whether the work is 2-3 hours or more, multi-session, review-heavy, or issue-linked.
+2. Identify the explicit request or concrete multi-session, multi-person, audit, or review-trail
+   boundary. If none exists, keep the work in native context and skip waterfall files.
 3. If waterfall tracking is warranted, run the security gate before writing records.
 4. Choose `mydocs/` for public-safe records or a gitignored private root for sensitive records.
 5. Gather read-only repo context:
@@ -156,7 +161,8 @@ the command. If the target repo is ambiguous, stop and ask instead of guessing f
    - remote names and URLs when GitHub linkage is relevant
    - existing project record roots
 6. Ask for explicit approval before any GitHub issue, milestone, or branch mutation.
-7. Create the first timestamped order note with:
+7. Create the single smallest timestamped record that satisfies the boundary. Use an order note
+   only when an order record is actually needed, with:
    - goal
    - task id or GitHub issue link if approved
    - chosen record root
@@ -248,6 +254,7 @@ the command. If the target repo is ambiguous, stop and ask instead of guessing f
 ## Common Mistakes
 
 - Creating `mydocs/` before checking whether secrets may appear
+- Creating a record hierarchy because a task may take several hours, with no durable boundary
 - Treating private repo status as a reason to store raw API keys in committed notes
 - Using date-only filenames instead of `YYYYMMDDTHHMM`
 - Automatically creating GitHub issues because `gh` is installed

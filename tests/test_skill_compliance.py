@@ -56,12 +56,11 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             with self.subTest(skill=skill_path.parent.name):
                 self.assertNotIn("coding-convention:", read_text(skill_path))
 
-    def test_mode_aware_skills_document_collaboration_mode_routing(self) -> None:
+    def test_mode_aware_skills_document_collaboration_modes(self) -> None:
         mode_aware_skills = [
             "jy-slop-remover",
             "jy-framing",
             "jy-plan-review",
-            "jy-autoplan",
             "jy-grill-me",
             "jy-writing-plans",
             "jy-worktrees",
@@ -82,23 +81,28 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
             text = read_text(path)
             with self.subTest(skill=skill_name):
                 self.assertIn("## Mode-Aware Behavior", text)
-                self.assertIn("Shift+Tab", text)
                 self.assertIn("current collaboration mode is Default", text)
                 self.assertIn("current collaboration mode is Plan", text)
 
-    def test_codex_autoplan_documents_maturity_buckets_and_execution_escape(self) -> None:
-        text = read_text(skill_path("jy-autoplan"))
-        self.assertIn("## Routing Matrix", text)
-        self.assertIn("Idea-stage", text)
-        self.assertIn("Decision-interview-stage", text)
-        self.assertIn("Plan-stage", text)
-        self.assertIn("Task-plan-stage", text)
-        self.assertIn("Execution-stage", text)
-        self.assertIn("Execution-ready", text)
-        self.assertIn("planning pack not applicable", text)
-        self.assertIn("jy-grill-me", text)
-        self.assertIn("jy-writing-plans", text)
-        self.assertIn("jy-executing-plans", text)
+    def test_mutating_mode_aware_skills_document_execution_handoff(self) -> None:
+        mutating_skills = [
+            "jy-slop-remover",
+            "jy-worktrees",
+            "jy-checkpoint",
+            "jy-document-release",
+            "jy-review-all",
+            "jy-review-work",
+            "jy-debugging",
+            "jy-test-driven",
+            "jy-executing-plans",
+            "jy-receiving-review",
+            "jy-ship",
+            "jy-waterfall",
+            "jy-verification-before-completion",
+        ]
+        for skill_name in mutating_skills:
+            with self.subTest(skill=skill_name):
+                self.assertIn("Shift+Tab", read_text(skill_path(skill_name)))
 
     def test_codex_checkpoint_documents_storage_contract(self) -> None:
         text = read_text(skill_path("jy-checkpoint"))
@@ -158,7 +162,7 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("explicitly asks", text)
         self.assertIn("Do not modify code", text)
         self.assertIn("## Mode-Aware Behavior", text)
-        self.assertIn("Shift+Tab", text)
+        self.assertIn("do not require a mode switch", text)
 
     def test_test_driven_development_documents_red_green_refactor(self) -> None:
         text = read_text(skill_path("jy-test-driven"))
@@ -219,7 +223,8 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
 
     def test_waterfall_documents_project_record_and_safety_gates(self) -> None:
         text = read_text(skill_path("jy-waterfall"))
-        self.assertIn("2-3 hours", text)
+        self.assertIn("Duration alone does not justify", text)
+        self.assertIn("concrete persistence boundary", text)
         self.assertIn("YYYYMMDDTHHMM", text)
         self.assertIn("explicit approval", text)
         self.assertIn("must not create GitHub issues", text)

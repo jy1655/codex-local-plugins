@@ -53,6 +53,19 @@ class RepoBundleTests(unittest.TestCase):
         self.assertFalse((REPO_ROOT / "hooks" / "necessity-gate.json").exists())
         self.assertIn("## Necessity Gate", agents_text)
 
+    def test_global_agents_prefers_native_context_and_limits_hard_gates(self) -> None:
+        text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text(encoding="utf-8")
+
+        self.assertIn("## Native Capability and Gate Policy", text)
+        self.assertIn("session state", text)
+        self.assertIn("context compression", text)
+        self.assertIn("concrete boundary", text)
+        self.assertIn("Hard gates", text)
+        self.assertIn("permissions", text)
+        self.assertIn("read-only exploration", text)
+        for status in ["CURRENT", "STALE", "UNKNOWN", "NOT-VERIFIED"]:
+            self.assertIn(status, text)
+
     def test_all_plugin_manifests_match_repository_metadata_and_limit_mcp_to_ios(self) -> None:
         repository = "https://github.com/jy1655/codex-local-plugins"
         self.assertEqual(
@@ -92,7 +105,7 @@ class RepoBundleTests(unittest.TestCase):
                 names.append(skill_path.parent.name)
                 self.assertTrue((skill_path.parent / "agents" / "openai.yaml").is_file())
 
-        self.assertEqual(len(names), 34)
+        self.assertEqual(len(names), 33)
         self.assertEqual(len(names), len(set(names)))
 
     def test_writing_skills_keeps_its_reference_assets(self) -> None:
