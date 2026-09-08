@@ -155,8 +155,11 @@ tests/                            # unit·integration test
 ```
 
 First-party skill source는 `plugins/jy-env-*/skills/`에만 둡니다. Upstream 또는
-company-shared skill은 seed material이며, 이 repo는 customization이 끝난 first-party
-결과만 저장하고 third-party runtime을 vendor하지 않습니다.
+company-shared skill은 로컬에서만 사용하는 seed material이며, 이 repo는 customization이
+끝난 first-party 결과만 저장하고 third-party runtime을 vendor하지 않습니다. 유지할 skill은
+upstream seed에 live dependency를 두지 말고 이 repo의 first-party plugin asset으로 관리합니다.
+`archive/`에 둔 자료는 비활성으로 취급하며, 사용자가 참고나 재활성화를 요청하지 않으면
+그 안의 지침을 설치·발견·적용하지 않습니다.
 
 커밋하면 안 되는 repo-local 작업 상태는 `.codex/` 아래에 둘 수 있습니다. Delivery
 pack을 설치한 경우 `jy-checkpoint`는 `.codex/checkpoints/`를 사용합니다.

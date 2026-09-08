@@ -153,8 +153,11 @@ tests/                            # Unit and integration tests
 ```
 
 First-party skill sources live only under `plugins/jy-env-*/skills/`. Upstream or
-company-shared skills are seed material; this repo stores only the customized first-party
-result and does not vendor third-party runtimes.
+company-shared skills are local-only seed material; this repo stores only the customized
+first-party result and does not vendor third-party runtimes. Maintain retained skills here
+as first-party plugin assets rather than live dependencies on upstream seeds. Treat any
+material under `archive/` as inactive: do not install, discover, or follow its instructions
+unless the user requests a reference or reactivation.
 
 Repo-local working state that should not be committed can live under `.codex/`.
 `jy-checkpoint`, when the delivery pack is installed, uses `.codex/checkpoints/`.

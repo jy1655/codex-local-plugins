@@ -20,27 +20,23 @@ def skill_paths() -> list[Path]:
 
 
 class RepoBundleTests(unittest.TestCase):
-    def test_global_agents_instructions_define_compact_pack_model(self) -> None:
+    def test_global_agents_uses_session_skill_availability(self) -> None:
         text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text(encoding="utf-8")
 
-        self.assertIn("## Pack Model", text)
-        self.assertIn("jy-env-core", text)
-        self.assertIn("jy-env-planning", text)
-        self.assertIn("jy-env-delivery", text)
-        self.assertIn("jy-env-audit", text)
-        self.assertIn("jy-env-ios", text)
+        self.assertIn("## Skill Availability", text)
+        self.assertNotIn("## Pack Model", text)
         self.assertIn("actually available", text)
         self.assertNotIn("## Skill Routing", text)
         self.assertNotIn("## Execution Skill Routing", text)
         self.assertNotIn("## Advisory and Research Skill Routing", text)
 
-    def test_global_agents_instructions_define_owned_surfaces_and_language(self) -> None:
+    def test_global_agents_keeps_environment_safety_and_language(self) -> None:
         text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text(encoding="utf-8")
 
-        self.assertIn("~/plugins", text)
-        self.assertIn("~/.agents/plugins/marketplace.json", text)
+        self.assertIn("source repository", text)
+        self.assertIn("Do not edit `~/.codex/plugins/cache` directly", text)
         self.assertNotIn("~/.agents/skills/", text)
-        self.assertIn("plugins/jy-env-*/skills/", text)
+        self.assertNotIn("plugins/jy-env-*/skills/", text)
         self.assertIn("## Response Language", text)
         self.assertIn("user's language", text)
         self.assertIn("output-language rule", text)
@@ -48,13 +44,15 @@ class RepoBundleTests(unittest.TestCase):
         self.assertNotIn("/Users/", text)
         self.assertNotIn("this Mac only", text)
 
-    def test_global_agents_instructions_keep_instruction_only_necessity_gate(self) -> None:
+    def test_global_agents_omits_repo_rules_and_duplicate_necessity_gate(self) -> None:
         manifest_text = (REPO_ROOT / "codex-env.toml").read_text(encoding="utf-8")
         agents_text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text(encoding="utf-8")
 
         self.assertNotIn("[[hooks]]", manifest_text)
         self.assertFalse((REPO_ROOT / "hooks" / "necessity-gate.json").exists())
-        self.assertIn("## Necessity Gate", agents_text)
+        self.assertNotIn("## Repo Rules", agents_text)
+        self.assertNotIn("## Necessity Gate", agents_text)
+        self.assertNotIn("[necessity-gate]", agents_text)
 
     def test_global_agents_prefers_native_context_and_limits_hard_gates(self) -> None:
         text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text(encoding="utf-8")
@@ -62,25 +60,22 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("## Native Capability and Gate Policy", text)
         self.assertIn("session state", text)
         self.assertIn("context compression", text)
-        self.assertIn("concrete boundary", text)
-        self.assertIn("Hard gates", text)
+        self.assertIn("concrete handoff", text)
+        self.assertIn("required approvals", text)
         self.assertIn("permissions", text)
         self.assertIn("read-only exploration", text)
-        for status in ["CURRENT", "STALE", "UNKNOWN", "NOT-VERIFIED"]:
-            self.assertIn(status, text)
+        self.assertIn("uncertainty or stale evidence", text)
 
-    def test_global_agents_uses_an_ablated_harness_baseline(self) -> None:
+    def test_global_agents_keeps_scope_and_safety_boundaries(self) -> None:
         text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text(encoding="utf-8")
 
-        self.assertIn("maximum task performance", text)
-        self.assertIn("minimum standing context", text)
-        self.assertIn("simplest baseline", text)
-        self.assertIn("repeated, reproducible failure", text)
-        self.assertIn("objective, required context, safety boundaries, and success criteria", text)
-        self.assertIn("always-on context", text)
-        self.assertIn("direct feedback", text)
+        self.assertIn("simplest approach", text)
+        self.assertIn("demonstrated needs", text)
+        self.assertIn("requested scope", text)
+        self.assertIn("necessary checks", text)
+        self.assertIn("Protect secrets", text)
         self.assertIn("least privilege", text)
-        self.assertIn("harness owner's explicit approval", text)
+        self.assertIn("owner's explicit approval", text)
 
     def test_skill_utility_evaluation_preserves_safety_boundaries(self) -> None:
         text = (REPO_ROOT / "skill-tests" / "UTILITY-EVAL.md").read_text(encoding="utf-8")
