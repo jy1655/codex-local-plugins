@@ -312,7 +312,7 @@ class SkillEvalEvidenceTests(unittest.TestCase):
         )
 
         self.assertEqual(environment["CODEX_API_KEY"], "codex-key")
-        self.assertEqual(environment["HOME"], "/tmp/eval-home")
+        self.assertEqual(Path(environment["HOME"]), Path("/tmp/eval-home"))
         self.assertNotIn("AWS_SECRET_ACCESS_KEY", environment)
         self.assertNotIn("GH_TOKEN", environment)
         self.assertNotIn("UNRELATED", environment)

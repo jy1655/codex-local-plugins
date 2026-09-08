@@ -1,7 +1,5 @@
 # Global Codex Instructions
 
-This machine is managed by the portable Codex environment sync repo.
-
 ## Machine-Local Instructions
 
 - Before starting work, read `LOCAL.md` from the Codex home directory: `CODEX_HOME` when
