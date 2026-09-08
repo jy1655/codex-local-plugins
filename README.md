@@ -72,6 +72,7 @@ arguments and never sends private source or credentials to Context7.
 - plugin sources: `~/plugins`
 - personal marketplace: `~/.agents/plugins/marketplace.json`
 - global instructions: `~/.codex/AGENTS.md`
+- machine-local instructions (user-maintained, not synced): `~/.codex/LOCAL.md`
 - managed state: `~/.codex-env-sync/state.json`
 - Codex-owned plugin cache, changed only through `codex plugin`: `~/.codex/plugins/cache`
 
@@ -79,6 +80,20 @@ Local `apply` symlinks plugin sources and instructions on macOS and Linux. Windo
 mode. Bootstrap and `--snapshot` always copy a stable snapshot. After staging, the commands
 install or refresh default plugins with `codex plugin add`; optional packs remain explicit
 installs. A dirty checkout is not a second live skill-discovery surface.
+
+### Machine-local instructions
+
+Keep machine-specific paths, local tools, and workspace rules in `LOCAL.md` alongside the
+installed global `AGENTS.md`: `~/.codex/LOCAL.md` on macOS/Linux or
+`%USERPROFILE%\.codex\LOCAL.md` on Windows. If Codex uses a custom `CODEX_HOME`, put
+`LOCAL.md` there. When `AGENTS.md` is a symlink, use the installed directory rather than
+the repository's `instructions/` directory.
+
+The shared `AGENTS.md` instructs Codex to read this optional file before work; `LOCAL.md`
+is not a built-in automatically discovered instruction filename. If it is absent, Codex
+continues with the shared rules. `apply`, bootstrap, and snapshot installs leave this file
+unmanaged: they do not create, copy, overwrite, or delete it. Keep it outside the repository
+and out of `codex-env.toml`. Start a fresh Codex session after changing instructions.
 
 ## First run
 

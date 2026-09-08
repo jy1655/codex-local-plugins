@@ -73,6 +73,7 @@ repo 밖의 `CONTEXT7_API_KEY` 환경변수에 둡니다. Skill은 key를 comman
 - plugin source: `~/plugins`
 - personal marketplace: `~/.agents/plugins/marketplace.json`
 - global instruction: `~/.codex/AGENTS.md`
+- machine-local instruction (사용자 관리, 동기화 제외): `~/.codex/LOCAL.md`
 - managed state: `~/.codex-env-sync/state.json`
 - `codex plugin`으로만 변경하는 Codex 소유 cache: `~/.codex/plugins/cache`
 
@@ -81,6 +82,20 @@ Windows에서는 copy mode를 사용합니다. Bootstrap과 `--snapshot`은 항�
 copy snapshot을 설치합니다. Stage 후에는 `codex plugin add`로 기본 plugin을
 설치하거나 갱신하며, 선택 pack은 명시적으로 설치해야 합니다. Dirty checkout은
 별도의 live skill discovery surface로 노출하지 않습니다.
+
+### 컴퓨터별 로컬 지침
+
+각 컴퓨터의 경로·로컬 도구·작업 공간 규칙은 설치된 전역 `AGENTS.md` 옆의 `LOCAL.md`에
+작성합니다. 기본 위치는 macOS/Linux에서 `~/.codex/LOCAL.md`, Windows에서
+`%USERPROFILE%\.codex\LOCAL.md`입니다. Codex가 별도의 `CODEX_HOME`을 사용한다면
+그 디렉터리에 둡니다. `AGENTS.md`가 symlink여도 저장소의 `instructions/`가 아닌
+설치된 전역 파일의 디렉터리를 사용합니다.
+
+공통 `AGENTS.md`가 작업 전에 이 파일을 읽도록 지시합니다. `LOCAL.md`는 Codex의 기본
+자동 탐색 파일명이 아니며, 파일이 없으면 공통 지침만으로 진행합니다. `apply`, bootstrap,
+snapshot 설치는 이 파일을 관리하지 않으므로 생성·복사·덮어쓰기·삭제하지 않습니다.
+저장소와 `codex-env.toml`에는 포함하지 않습니다. 지침을 변경한 뒤에는 새 Codex session을
+시작합니다.
 
 ## First run
 

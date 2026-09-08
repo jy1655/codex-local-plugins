@@ -44,6 +44,9 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("## Response Language", text)
         self.assertIn("user's language", text)
         self.assertIn("output-language rule", text)
+        self.assertIn("LOCAL.md", text)
+        self.assertNotIn("/Users/", text)
+        self.assertNotIn("this Mac only", text)
 
     def test_global_agents_instructions_keep_instruction_only_necessity_gate(self) -> None:
         manifest_text = (REPO_ROOT / "codex-env.toml").read_text(encoding="utf-8")
