@@ -1,0 +1,3 @@
+# Preserve archived originals exactly and keep active plugin assets consistent.
+archive/** -text
+plugins/** text=auto eol=lf

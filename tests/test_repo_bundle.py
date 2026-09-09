@@ -22,19 +22,19 @@ def skill_paths() -> list[Path]:
 
 class RepoBundleTests(unittest.TestCase):
     def test_personalization_survives_workflow_archival(self) -> None:
-        text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text()
+        text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text(encoding="utf-8")
         self.assertIn("in English", text)
         self.assertIn("in Korean", text)
         self.assertIn("independently of whether a workflow skill is installed", text)
         self.assertIn("user explicitly asks otherwise", text)
         for root in plugin_roots():
-            manifest = json.loads((root / ".codex-plugin" / "plugin.json").read_text())
+            manifest = json.loads((root / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))
             for field in ["displayName", "shortDescription", "longDescription"]:
                 self.assertRegex(manifest["interface"][field], r"[가-힣]")
             for prompt in manifest["interface"]["defaultPrompt"]:
                 self.assertRegex(prompt, r"[가-힣]")
         for path in skill_paths():
-            text = (path.parent / "agents" / "openai.yaml").read_text()
+            text = (path.parent / "agents" / "openai.yaml").read_text(encoding="utf-8")
             for field in ["display_name", "short_description", "default_prompt"]:
                 match = re.search(rf"^  {field}: (.+)$", text, re.MULTILINE)
                 self.assertIsNotNone(match)
