@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "focused-symbolicated-trace",
+      "title": "Pressure to profile an undefined performance problem",
+      "prompt": "The app feels slow. Record a long ETTrace session across the entire app and tell me which function is bad.",
+      "expected_without_skill": "Captures an unfocused trace and draws conclusions from noisy or unsymbolicated stacks.",
+      "expected_with_skill": "Defines one reproducible flow with explicit start and stop points, checks symbolication, captures focused evidence, and ties the hottest stacks to that flow."
+    },
+    {
+      "id": "preserve-comparable-artifacts",
+      "title": "Before-and-after claim without trace provenance",
+      "prompt": "Run the optimized build once and say performance improved; we do not need to keep the old trace or build metadata.",
+      "expected_without_skill": "Makes an improvement claim from incomparable evidence and discards the artifacts needed to verify it.",
+      "expected_with_skill": "Preserves baseline and candidate traces with configuration and symbol context, compares the same flow, and reports uncertainty when the captures are not comparable."
+    }
+  ]
+}

@@ -7,40 +7,49 @@ This repository defines a portable, first-party Codex environment. It stages loc
 bundles, maintains a personal marketplace, and installs compact global instructions without
 editing Codex's runtime cache directly.
 
+User-visible plugin and skill labels, descriptions, and suggested prompts are Korean.
+Model-facing skill instructions and trigger descriptions stay English. Shared language,
+authorization, privacy, and workspace-preservation rules remain in global `AGENTS.md`
+regardless of workflow installation. Machine-specific instructions live in a separate,
+user-maintained `LOCAL.md`.
+
 ## Pack model
 
-The default environment is intentionally small. `apply` stages all five bundles under
-`~/plugins`, then explicitly installs each `INSTALLED_BY_DEFAULT` plugin through the Codex
-CLI. Marketplace policy selects the default install set; it is not an installation action
-by itself.
+The GPT-6 Astra baseline keeps `max` reasoning with one default core-lite guardrail,
+an explicitly invoked orchestration skill, and an optional iOS tool pack.
+`apply` stages only the two active bundles under `~/plugins`, then installs
+`INSTALLED_BY_DEFAULT` entries through the Codex CLI.
 
 | Pack | Policy | Skills |
 |---|---|---|
-| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-debugging`, `jy-test-driven`, `jy-verification-before-completion`, `jy-codebase-explore`, `jy-library-research`, `jy-consult` |
-| `jy-env-planning` | `AVAILABLE` | `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans` |
-| `jy-env-delivery` | `AVAILABLE` | `jy-executing-plans`, `jy-worktrees`, `jy-checkpoint`, `jy-document-release`, `jy-ship`, `jy-waterfall`, `jy-env-sync-admin`, `jy-writing-skills` |
-| `jy-env-audit` | `AVAILABLE` | `jy-explain-change` (explicit invocation only), `jy-review-all`, `jy-review-work`, `jy-receiving-review`, `jy-slop-remover` |
-| `jy-env-ios` | `AVAILABLE` | iOS Simulator debugging, performance, memory, App Intents, and SwiftUI workflows |
+| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate` (explicit only) |
+| `jy-env-ios` | `AVAILABLE` | Nine iOS tool and technical-reference skills |
 
-Staging and activation are deliberately separate:
+Invoke `$jy-orchestrate` to make the current session coordinate Codex and Claude planning
+or implementation, followed by independent Codex DevBlue and Claude verification.
+It prefers Agent Bridge when available locally and has `allow_implicit_invocation: false`.
 
-- `~/plugins/<pack>` is the local marketplace source.
-- `INSTALLED_BY_DEFAULT` makes `apply` and bootstrap run
-  `codex plugin add jy-env-core@personal-codex`.
-- `AVAILABLE` packs stay inactive until installed from the Plugins Directory or CLI.
-- This repo no longer creates a second `~/.agents/skills/<pack>` discovery link, avoiding
-  duplicate skill metadata from plugin cache and native discovery.
+The other 23 workflow skills, including `jy-env-planning`, `jy-env-delivery`, and
+`jy-env-audit`, are preserved under [archive/](archive/README.md). They are absent from the
+manifest and marketplace, are not staged or installed, and are not implicitly invoked.
+The archive also preserves the original versions of the ten retained skills.
 
-Install only the optional packs you need:
+`AVAILABLE` does not uninstall an existing plugin. To migrate an existing installation,
+remove the three old workflow packs before applying the reduced marketplace:
 
 ```bash
-codex plugin add jy-env-planning@personal-codex
-codex plugin add jy-env-delivery@personal-codex
-codex plugin add jy-env-audit@personal-codex
+codex plugin remove jy-env-planning@personal-codex
+codex plugin remove jy-env-delivery@personal-codex
+codex plugin remove jy-env-audit@personal-codex
+python3 -m codex_env_sync.cli apply --repo-root .
 codex plugin add jy-env-ios@personal-codex
 ```
 
-Start a fresh Codex thread after changing installed packs.
+Run the remove commands only for installed entries. Update changed active plugins through
+`plugin-creator`'s cachebuster flow before `apply`; re-add iOS after staging because it is
+optional. `apply` refreshes the default core pack. It does not uninstall Codex plugins.
+Start a fresh Codex session after changing installed packs. No second
+`~/.agents/skills/<pack>` discovery link is created.
 
 ## Pinned XcodeBuildMCP
 
@@ -52,20 +61,11 @@ runtime-log, and `elementRef` UI contracts.
 Do not enable `build-ios-apps@openai-curated` and `jy-env-ios@personal-codex` together;
 both register the `xcodebuildmcp` server name.
 
-## Lazy Context7 research
+## Archived research guidance
 
-Context7 is not installed as an MCP server or a separate `jy-context7` skill. The core-lite
-`jy-library-research` skill treats it as an optional read-only provider:
-
-1. use an existing `ctx7` command when available;
-2. otherwise, when Node.js 18+ and `npx` are available, invoke the pinned
-   `ctx7@0.5.5` package only for that research request;
-3. fall back to official documentation, source, changelogs, and issue trackers on any CLI,
-   network, sandbox, rate-limit, or index failure.
-
-Most public documentation queries work without authentication. If higher limits are needed,
-keep the key outside this repo in `CONTEXT7_API_KEY`. The skill never passes a key in command
-arguments and never sends private source or credentials to Context7.
+The Context7 route in `jy-library-research` is archived with the other workflow skills.
+It is not an active routing requirement. Its original public-query-only and
+`CONTEXT7_API_KEY` handling guidance remains in the archive for an explicit reactivation.
 
 ## Install surface
 
@@ -138,12 +138,10 @@ workflow and start a new thread. Do not edit `~/.codex/plugins/cache` directly.
 ## Layout
 
 ```text
-codex-env.toml                    # Five plugin sources and their installation policies
+codex-env.toml                    # Two active plugin sources and their installation policies
 codex_env_sync/                   # Inspect/apply/bootstrap engine
+archive/                         # Inactive originals, checksums, and restoration notes
 plugins/jy-env-core/              # Default core-lite bundle
-plugins/jy-env-planning/          # Optional planning pack
-plugins/jy-env-delivery/          # Optional delivery pack
-plugins/jy-env-audit/             # Optional audit pack
 plugins/jy-env-ios/               # Optional pinned iOS/XcodeBuildMCP pack
 instructions/AGENTS.md            # Compact global rules; no eager optional-skill routing
 .agents/plugins/marketplace.json  # Local personal marketplace catalog
@@ -152,15 +150,12 @@ skill-tests/UTILITY-EVAL.md       # Three-arm skill utility and reporting contra
 tests/                            # Unit and integration tests
 ```
 
-First-party skill sources live only under `plugins/jy-env-*/skills/`. Upstream or
-company-shared skills are local-only seed material; this repo stores only the customized
-first-party result and does not vendor third-party runtimes. Maintain retained skills here
-as first-party plugin assets rather than live dependencies on upstream seeds. Treat any
-material under `archive/` as inactive: do not install, discover, or follow its instructions
-unless the user requests a reference or reactivation.
-
-Repo-local working state that should not be committed can live under `.codex/`.
-`jy-checkpoint`, when the delivery pack is installed, uses `.codex/checkpoints/`.
+Active first-party skill sources live under `plugins/jy-env-*/skills/`; inactive originals
+live under `archive/` and are excluded from deployment. Upstream or company-shared skills
+are local-only seed material; this repo stores only the customized first-party result and
+does not vendor third-party runtimes. Maintain retained skills here as first-party plugin
+assets rather than live dependencies on upstream seeds. Do not install, discover, or follow
+instructions under `archive/` unless the user requests a reference or reactivation.
 
 ## Tests
 
@@ -202,8 +197,10 @@ python3 -m codex_env_sync.skill_eval status --repo-root .
 python3 -m codex_env_sync.skill_eval report --repo-root .
 ```
 
-Use `run --candidate --skill <name>` before adopting a new source,
-`run --changed-from <ref>` for skill changes, `run --stale` for invalidated evidence, and
-`run --all --model <new-model>` for a new model baseline. Reports and raw JSONL are ignored
-under `.codex/skill-evals/`; no verdict automatically installs or deletes a skill. See
-[skill-tests/UTILITY-EVAL.md](skill-tests/UTILITY-EVAL.md) for thresholds and evidence limits.
+Evaluation is opt-in when a concrete deficiency needs a comparison. The evaluator discovers
+only active sources under `plugins/`; archived sources and historical reports remain
+reference material. The current policy tests `gpt-6-astra` at `max` with the default service
+tier; the separate judge model keeps its existing role. GPT-5.6 results do not establish
+Astra utility. This migration does not run a full model benchmark. See
+[skill-tests/UTILITY-EVAL.md](skill-tests/UTILITY-EVAL.md) for evidence limits and
+[archive/README.md](archive/README.md) for restoring one candidate.

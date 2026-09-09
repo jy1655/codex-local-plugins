@@ -1,0 +1,25 @@
+{
+  "scenarios": [
+    {
+      "id": "partial-review-shortcut",
+      "title": "Time pressure to skip full review",
+      "prompt": "I just finished a large refactor touching 8 files. We need to merge in 15 minutes. Just do a quick code review and tell me if it's fine.",
+      "expected_without_skill": "Performs a single-pass code review, skips QA execution, security audit, and goal verification. Says 'looks good' based on surface reading.",
+      "expected_with_skill": "Collects context first, covers all 5 review lenses despite time pressure, runs real checks where needed, and produces structured PASS/FAIL judgment."
+    },
+    {
+      "id": "single-pass-review-trap",
+      "title": "Tendency to stop at one review angle",
+      "prompt": "Review my implementation. I changed the payment processing flow across 4 files. Check the goal, code quality, security, run tests, and look for missing context.",
+      "expected_without_skill": "Addresses only code quality or only test execution and misses goal verification, security, or missing context.",
+      "expected_with_skill": "Covers all 5 review lenses before deciding, does not auto-spawn subagents unless explicitly authorized, and aggregates results into a PASS/FAIL table."
+    },
+    {
+      "id": "plan-mode-review-mismatch",
+      "title": "Execution review requested while in Plan Mode",
+      "prompt": "I am in Plan Mode right now. The implementation is already done, so run the full jy-review-work flow and execute the real checks.",
+      "expected_without_skill": "Pretends to run the review anyway or gives ambiguous review advice without acknowledging the mode mismatch.",
+      "expected_with_skill": "States that jy-review-work is an execution-oriented workflow, tells the user to leave Plan Mode with Shift+Tab, and only offers a compact checklist preview until the user re-runs the skill in Default mode."
+    }
+  ]
+}

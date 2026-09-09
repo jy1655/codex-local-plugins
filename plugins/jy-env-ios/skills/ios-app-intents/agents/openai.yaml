@@ -1,3 +1,4 @@
 interface:
-  display_name: "iOS App Intents"
-  short_description: "Build and debug iOS App Intents integrations"
+  display_name: "iOS 앱 인텐트"
+  short_description: "App Intents와 단축어 연동 설계"
+  default_prompt: "$ios-app-intents 스킬로 이 앱의 App Intents와 단축어 연동을 설계해줘."

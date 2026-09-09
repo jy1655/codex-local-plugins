@@ -1,4 +1,4 @@
 interface:
-  display_name: "iOS Simulator Browser"
-  short_description: "Mirror iOS Simulator"
-  default_prompt: "Use $ios-simulator-browser to render a SwiftUI preview in the in-app browser."
+  display_name: "iOS 시뮬레이터 브라우저"
+  short_description: "브라우저에서 시뮬레이터와 SwiftUI 미리 보기"
+  default_prompt: "$ios-simulator-browser 스킬로 이 SwiftUI 화면을 브라우저에서 미리 볼 수 있게 해줘."

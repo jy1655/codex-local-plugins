@@ -1,0 +1,4 @@
+interface:
+  display_name: "JY Change Guardrails"
+  short_description: "Guard ambiguous or over-scoped code changes"
+  default_prompt: "Use $jy-change-guardrails when a non-trivial code change risks hidden assumptions, overengineering, or unrelated edits."

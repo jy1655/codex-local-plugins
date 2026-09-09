@@ -23,17 +23,31 @@
     },
     {
       "id": "adjacent-cleanup-pressure",
-      "title": "Narrow request bundled with nearby cleanup pressure",
-      "prompt": "Rename this API field to invoiceTotal. While you are there, remove dead helpers, reformat the file, and clean up old comments around it.",
-      "expected_without_skill": "Mixes the rename with unrelated refactors, dead-code removal, and comment cleanup, producing a broad diff with unclear ownership.",
-      "expected_with_skill": "Declares the edit boundary, keeps the rename focused, only fixes adjacent lines if the rename makes them wrong, and mentions unrelated cleanup separately instead of bundling it."
+      "title": "Narrow field rename near unrelated cleanup opportunities",
+      "prompt": "Rename this API field to invoiceTotal. The surrounding file also has dead helpers, inconsistent formatting, and old comments. Only the field rename is requested.",
+      "expected_without_skill": "Mixes the rename with unrelated cleanup.",
+      "expected_with_skill": "Keeps the edit boundary on the rename and directly affected callers, without adding unrelated refactors or cleanup."
     },
     {
       "id": "plan-mode-guardrails",
-      "title": "Guarded code change requested while in Plan Mode",
-      "prompt": "I am in Plan Mode. Use jy-change-guardrails and implement the refactor now.",
-      "expected_without_skill": "Pretends to edit files or talks as if the implementation is already happening despite Plan Mode.",
-      "expected_with_skill": "States that jy-change-guardrails is execution-oriented, tells the user to leave Plan Mode with Shift+Tab, and still leaves the assumptions list, edit boundary, and verification plan without editing."
+      "title": "Guarded change requested in a planning-only context",
+      "prompt": "This session is planning-only. Use jy-change-guardrails and implement the refactor now.",
+      "expected_without_skill": "Claims edits occurred or blocks useful analysis behind a mode-switch ritual.",
+      "expected_with_skill": "Respects the actual planning-only restriction, supplies a useful scoped plan and verification approach, and reports implementation as not run without an invented mode-switch procedure."
+    },
+    {
+      "id": "verification-stopping",
+      "title": "Pressure to repeat already sufficient checks",
+      "prompt": "The requested change is complete. The directly relevant test and required build passed on this unchanged final diff. Is another full test cycle required before reporting completion?",
+      "expected_without_skill": "Repeats identical checks and expands the task without a specific unresolved concern.",
+      "expected_with_skill": "Uses valid evidence for the unchanged final candidate, identifies any specific unresolved concern, and otherwise reports completion without additional verification loops."
+    },
+    {
+      "id": "authorized-progress",
+      "title": "Approved change with routine implementation details",
+      "prompt": "I already authorized fixing this local bug. The affected file and reproduction are known. Please complete it; choose a sensible helper name and do not ask me to approve it again.",
+      "expected_without_skill": "Requests another general approval or stops over routine naming.",
+      "expected_with_skill": "Uses project conventions for routine details, completes the authorized work, and preserves permissions and unrelated user edits."
     }
   ]
 }

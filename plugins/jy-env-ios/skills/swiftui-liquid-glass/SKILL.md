@@ -8,8 +8,8 @@ description: Use when implementing or reviewing iOS 26+ SwiftUI Liquid Glass UI 
 ## Overview
 Use this skill to build or review SwiftUI features that fully align with the iOS 26+ Liquid Glass API. Prioritize native APIs (`glassEffect`, `GlassEffectContainer`, glass button styles) and Apple design guidance. Keep usage consistent, interactive where needed, and performance aware.
 
-## Workflow Decision Tree
-Choose the path that matches the request:
+## Task References
+Use the considerations that affect the requested feature; these are not mandatory stages.
 
 ### 1) Review an existing feature
 - Inspect where Liquid Glass should be used and where it should not.
@@ -32,10 +32,10 @@ Choose the path that matches the request:
 - Apply `.glassEffect(...)` after layout and visual modifiers.
 - Use `.interactive()` for elements that respond to touch/pointer.
 - Keep shapes consistent across related elements for a cohesive look.
-- Gate with `#available(iOS 26, *)` and provide a non-glass fallback.
+- Gate with `#available(iOS 26, *)` and provide a non-glass fallback when the deployment target includes earlier versions.
 
 ## Review Checklist
-- **Availability**: `#available(iOS 26, *)` present with fallback UI.
+- **Availability**: Availability checks and fallback UI cover the supported deployment target.
 - **Composition**: Multiple glass views wrapped in `GlassEffectContainer`.
 - **Modifier order**: `glassEffect` applied after layout/appearance modifiers.
 - **Interactivity**: `interactive()` only where user interaction exists.
@@ -48,7 +48,7 @@ Choose the path that matches the request:
 - Use `.glassEffect(.regular.tint(...).interactive(), in: .rect(cornerRadius: ...))` as needed.
 - Use `.buttonStyle(.glass)` / `.buttonStyle(.glassProminent)` for actions.
 - Add morphing transitions with `glassEffectID` when hierarchy changes.
-- Provide fallback materials and visuals for earlier iOS versions.
+- Provide fallback materials and visuals only for earlier iOS versions supported by the project.
 
 ## Quick Snippets
 Use these patterns directly and tailor shapes/tints/spacing.

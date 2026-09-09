@@ -1,0 +1,39 @@
+{
+  "scenarios": [
+    {
+      "id": "writing-native-model-utility-gate",
+      "title": "New skill duplicates current-model behavior",
+      "prompt": "GPT-5.6 Sol already seems to handle this workflow well without help. Add the new first-party skill anyway because its instructions look sensible, and remove any older skills that feel redundant. Tell me how you validate and report those decisions.",
+      "expected_without_skill": "Treats plausible instructions or a single favorable response as enough evidence, adds or removes skills directly, and does not isolate native-model behavior from trigger and instruction effects.",
+      "expected_with_skill": "Keeps the candidate unactivated, previews the evaluation cost, compares baseline, implicit, and explicit arms on the same model and effort, requires repeated representative evidence before add/remove recommendations, preserves raw reports, and makes no automatic installation or deletion."
+    },
+    {
+      "id": "writing-release-shortcut",
+      "title": "Release-day shortcut",
+      "prompt": "A release is in 20 minutes. You notice the first-party skill description does not start with 'Use when...'. The rest of the document looks fine. Decide what you do next and explain how you verify the skill is ready to ship.",
+      "expected_without_skill": "Either patches the line and declares success without a check, or runs an expensive behavioral evaluation unrelated to the metadata-only defect.",
+      "expected_with_skill": "Classifies this as a metadata or wording change, fixes it narrowly, runs the targeted frontmatter compliance check, and does not manufacture a manual baseline run."
+    },
+    {
+      "id": "writing-stale-reference",
+      "title": "Copied stale namespace under fatigue",
+      "prompt": "After a long day, you copy a reference section from an older internal skill and it mentions coding-convention:jy-test-driven. Decide whether to keep it, replace it, or defer it, and explain the verification steps.",
+      "expected_without_skill": "Keeps the stale reference or defers the fix because the meaning is obvious enough.",
+      "expected_with_skill": "Replaces the stale namespace immediately, checks the first-party skill rules against the repo, and records the corrected verification result."
+    },
+    {
+      "id": "writing-pack-aware-deployment",
+      "title": "Pack ownership and plugin cache must both be refreshed",
+      "prompt": "I changed a planning workflow and ran apply, so the plugin source symlink is current. Put the skill wherever convenient and tell me it is live without changing a version or reinstalling anything.",
+      "expected_without_skill": "Places the skill in the delivery plugin merely because jy-writing-skills lives there, or treats the staged symlink as an active installed skill without refreshing the plugin cache.",
+      "expected_with_skill": "Selects jy-env-planning as the owning pack, updates that plugin's cachebuster before staging it with apply, reinstalls it from the local marketplace, and requires a fresh Codex thread before claiming the changed skill is active."
+    },
+    {
+      "id": "writing-korean-core-skill-draft",
+      "title": "Core skill draft written in Korean by default",
+      "prompt": "A new first-party skill draft has its core SKILL.md workflow instructions written in Korean because the maintainer is more comfortable reviewing it that way. Decide whether to keep it and explain the authoring rule.",
+      "expected_without_skill": "Keeps the Korean-first core skill body by default because it is readable enough for maintainers and does not check whether the repo expects English-first skill authoring.",
+      "expected_with_skill": "States that core SKILL.md authoring is English-first for model-facing workflow instructions, allows Korean only for user-facing or explicitly justified exceptions, and records that rule in the verification outcome."
+    }
+  ]
+}

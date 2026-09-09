@@ -7,41 +7,47 @@
 stage하고 personal marketplace와 간결한 전역 instruction을 관리하되, Codex runtime
 cache를 직접 수정하지 않습니다.
 
+사용자에게 보이는 plugin·skill 표시명, 설명, 기본 요청 문구는 한국어로 작성합니다.
+모델이 읽는 스킬 본문·호출 조건 설명·기술 자료는 영어로 유지합니다. 언어·권한·개인정보·
+기존 작업 보존 같은 공통 지침은 절차 스킬 설치 여부와 관계없이 전역 `AGENTS.md`에서 적용합니다.
+각 컴퓨터에만 해당하는 지침은 사용자가 별도로 관리하는 `LOCAL.md`에 둡니다.
+
 ## Pack model
 
-기본 환경은 의도적으로 작게 유지합니다. `apply`는 다섯 bundle을 모두 `~/plugins`에
-stage한 뒤 `INSTALLED_BY_DEFAULT` plugin을 Codex CLI로 명시적으로 설치합니다.
-Marketplace policy는 기본 설치 대상을 고르며, policy 자체가 설치 작업을 수행하지는
-않습니다.
+GPT-6 Astra 기준 구성은 `max` 추론과 기본 core-lite 가드레일 1개,
+명시 호출 전용 오케스트레이션 스킬, 선택형 iOS 도구 팩입니다.
+`apply`는 활성 bundle 2개만 `~/plugins`에 배치한 뒤 `INSTALLED_BY_DEFAULT` 항목을
+Codex CLI로 설치합니다.
 
 | Pack | Policy | Skills |
 |---|---|---|
-| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-debugging`, `jy-test-driven`, `jy-verification-before-completion`, `jy-codebase-explore`, `jy-library-research`, `jy-consult` |
-| `jy-env-planning` | `AVAILABLE` | `jy-framing`, `jy-grill-me`, `jy-plan-review`, `jy-writing-plans` |
-| `jy-env-delivery` | `AVAILABLE` | `jy-executing-plans`, `jy-worktrees`, `jy-checkpoint`, `jy-document-release`, `jy-ship`, `jy-waterfall`, `jy-env-sync-admin`, `jy-writing-skills` |
-| `jy-env-audit` | `AVAILABLE` | `jy-explain-change` (명시 호출 전용), `jy-review-all`, `jy-review-work`, `jy-receiving-review`, `jy-slop-remover` |
-| `jy-env-ios` | `AVAILABLE` | iOS Simulator debugging, performance, memory, App Intents, SwiftUI workflow |
+| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate` (명시 호출 전용) |
+| `jy-env-ios` | `AVAILABLE` | iOS 도구·기술 참고 스킬 9개 |
 
-Stage와 activation은 서로 다른 동작입니다.
+`$jy-orchestrate`를 호출하면 현재 세션이 Codex와 Claude의 계획·구현을 조율하고,
+Codex DevBlue와 별도 Claude 세션이 결과를 독립 검증합니다. 로컬에서 Agent Bridge를
+사용할 수 있으면 우선 사용하며, `allow_implicit_invocation: false`로 자동 선택을 끕니다.
 
-- `~/plugins/<pack>`은 local marketplace source입니다.
-- `INSTALLED_BY_DEFAULT`이면 `apply`와 bootstrap이
-  `codex plugin add jy-env-core@personal-codex`를 실행합니다.
-- `AVAILABLE` 선택 pack은 Plugins Directory 또는 CLI에서 설치하기 전까지
-  비활성 상태입니다.
-- 이 저장소는 더 이상 `~/.agents/skills/<pack>` discovery link를 별도로 만들지
-  않으므로 plugin cache와 native discovery의 skill metadata 중복을 피합니다.
+나머지 23개 절차 스킬과 `jy-env-planning`, `jy-env-delivery`, `jy-env-audit`는
+[archive/](archive/README.md)에 보존합니다. Manifest와 marketplace에서 제외되어
+배치·설치·자동 호출되지 않습니다. 유지한 10개 스킬의 변경 전 원문도 함께 보관합니다.
 
-필요한 선택 pack만 설치합니다.
+`AVAILABLE`로 바꾸는 것만으로 기존 설치가 해제되지는 않습니다. 기존 설치를 전환할 때는
+축소된 marketplace를 적용하기 전에 설치된 절차 팩을 해제합니다.
 
 ```bash
-codex plugin add jy-env-planning@personal-codex
-codex plugin add jy-env-delivery@personal-codex
-codex plugin add jy-env-audit@personal-codex
+codex plugin remove jy-env-planning@personal-codex
+codex plugin remove jy-env-delivery@personal-codex
+codex plugin remove jy-env-audit@personal-codex
+python3 -m codex_env_sync.cli apply --repo-root .
 codex plugin add jy-env-ios@personal-codex
 ```
 
-설치된 pack을 바꾼 뒤에는 새 Codex thread를 시작합니다.
+설치된 항목에 대해서만 remove를 실행합니다. 변경한 활성 plugin은 `apply` 전에
+`plugin-creator`의 cachebuster 흐름으로 갱신합니다. 기본 core는 `apply`가 갱신하고,
+선택형 iOS는 배치 후 다시 add합니다. `apply` 자체는 Codex plugin을 설치 해제하지 않습니다.
+변경 후에는 새 Codex session을 시작합니다. 별도의 `~/.agents/skills/<pack>`
+discovery link는 만들지 않습니다.
 
 ## 고정된 XcodeBuildMCP
 
@@ -53,20 +59,11 @@ session-default, runtime-log, `elementRef` UI contract를 사용합니다.
 `build-ios-apps@openai-curated`와 `jy-env-ios@personal-codex`를 동시에 활성화하지
 마십시오. 둘 다 `xcodebuildmcp` server name을 등록합니다.
 
-## Lazy Context7 research
+## 보관된 조사 지침
 
-Context7은 MCP server나 별도 `jy-context7` skill로 설치하지 않습니다. core-lite의
-`jy-library-research`가 Context7을 선택형 read-only provider로 다룹니다.
-
-1. 이미 `ctx7` command가 있으면 그것을 사용합니다.
-2. 없다면 Node.js 18+와 `npx`가 있을 때 해당 조사 요청에서만 고정된
-   `ctx7@0.5.5` package를 실행합니다.
-3. CLI, network, sandbox, rate limit, index 문제 중 하나라도 발생하면 official docs,
-   source, changelog, issue tracker로 즉시 fallback합니다.
-
-대부분의 공개 문서 query는 인증 없이 동작합니다. 더 높은 rate limit이 필요하면 key를
-repo 밖의 `CONTEXT7_API_KEY` 환경변수에 둡니다. Skill은 key를 command argument로
-전달하지 않으며 private source나 credential을 Context7에 보내지 않습니다.
+`jy-library-research`의 Context7 경로는 다른 절차 스킬과 함께 보관하며 활성 호출
+규칙으로 사용하지 않습니다. 공개 질문만 전송하는 경계와 `CONTEXT7_API_KEY` 취급 지침은
+명시적으로 재활성화할 때 참고할 수 있도록 원문에 보존합니다.
 
 ## Install surface
 
@@ -140,12 +137,10 @@ python3 -m codex_env_sync.cli apply --repo-root . --snapshot
 ## Layout
 
 ```text
-codex-env.toml                    # 다섯 plugin source와 installation policy
+codex-env.toml                    # 활성 plugin source 2개와 installation policy
 codex_env_sync/                   # inspect/apply/bootstrap engine
+archive/                         # Inactive originals, checksums, and restoration notes
 plugins/jy-env-core/              # 기본 core-lite bundle
-plugins/jy-env-planning/          # 선택 planning pack
-plugins/jy-env-delivery/          # 선택 delivery pack
-plugins/jy-env-audit/             # 선택 audit pack
 plugins/jy-env-ios/               # 선택 pinned iOS/XcodeBuildMCP pack
 instructions/AGENTS.md            # 선택 skill을 eager routing하지 않는 전역 규칙
 .agents/plugins/marketplace.json  # local personal marketplace catalog
@@ -154,15 +149,12 @@ skill-tests/UTILITY-EVAL.md       # 3-arm skill 실용성·보고 계약
 tests/                            # unit·integration test
 ```
 
-First-party skill source는 `plugins/jy-env-*/skills/`에만 둡니다. Upstream 또는
-company-shared skill은 로컬에서만 사용하는 seed material이며, 이 repo는 customization이
-끝난 first-party 결과만 저장하고 third-party runtime을 vendor하지 않습니다. 유지할 skill은
-upstream seed에 live dependency를 두지 말고 이 repo의 first-party plugin asset으로 관리합니다.
-`archive/`에 둔 자료는 비활성으로 취급하며, 사용자가 참고나 재활성화를 요청하지 않으면
-그 안의 지침을 설치·발견·적용하지 않습니다.
-
-커밋하면 안 되는 repo-local 작업 상태는 `.codex/` 아래에 둘 수 있습니다. Delivery
-pack을 설치한 경우 `jy-checkpoint`는 `.codex/checkpoints/`를 사용합니다.
+활성 first-party skill source는 `plugins/jy-env-*/skills/`에 두고, 비활성 원문은
+배포에서 제외된 `archive/`에 보관합니다. Upstream 또는 company-shared skill은
+로컬에서만 사용하는 seed material이며, 이 repo는 customization이 끝난 first-party
+결과만 저장하고 third-party runtime을 vendor하지 않습니다. 유지할 skill은 upstream
+seed에 실시간으로 의존하지 않고 이 저장소의 first-party plugin asset으로 관리합니다.
+사용자가 참고나 재활성화를 요청하지 않으면 `archive/`의 지침을 설치·발견·적용하지 않습니다.
 
 ## Tests
 
@@ -203,9 +195,9 @@ python3 -m codex_env_sync.skill_eval status --repo-root .
 python3 -m codex_env_sync.skill_eval report --repo-root .
 ```
 
-새 source 채택 전에는 `run --candidate --skill <name>`, skill 변경에는
-`run --changed-from <ref>`, 무효화된 증거에는 `run --stale`, 새 model baseline에는
-`run --all --model <new-model>`을 사용합니다. 보고서와 raw JSONL은
-`.codex/skill-evals/` 아래에 ignore되며 어떤 verdict도 skill을 자동 설치·삭제하지
-않습니다. Threshold와 증거 경계는
-[skill-tests/UTILITY-EVAL.md](skill-tests/UTILITY-EVAL.md)를 따릅니다.
+실효성 비교는 실제 부족함이 관측된 대상부터 선택적으로 실행합니다. Evaluator는
+`plugins/`의 활성 source만 발견하며 보관 스킬과 과거 보고서는 참고 자료로 남깁니다.
+현재 평가 정책은 `gpt-6-astra`·`max`·기본 service tier이며 별도 judge 모델의 역할은
+유지합니다. 5.6 결과를 Astra의 실효성 근거로 사용하지 않으며 이번 전환에서 전체 모델
+평가를 실행하지 않습니다. 증거 경계는 [skill-tests/UTILITY-EVAL.md](skill-tests/UTILITY-EVAL.md),
+개별 복원 방법은 [archive/README.md](archive/README.md)를 참고합니다.

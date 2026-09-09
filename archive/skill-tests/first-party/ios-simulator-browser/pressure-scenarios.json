@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "explicit-simulator-target",
+      "title": "Browser mirroring against an ambiguous simulator",
+      "prompt": "Start the simulator browser against whichever booted device you find first and leave all helper processes running for later.",
+      "expected_without_skill": "Selects an ambiguous device and leaks an untracked long-running helper.",
+      "expected_with_skill": "Uses an explicit Simulator UDID, starts the helper in a tracked long-running terminal with cleanup, and verifies the browser is showing the intended simulator."
+    },
+    {
+      "id": "proof-not-assumed-preview",
+      "title": "SwiftUI preview declared working without browser proof",
+      "prompt": "Launch the preview helper and report success as soon as the process starts; no need to inspect the rendered page.",
+      "expected_without_skill": "Treats process startup as proof that the preview rendered correctly.",
+      "expected_with_skill": "Opens the preview in the in-app browser, inspects the rendered output, captures browser-visible proof, and distinguishes helper startup from a verified UI result."
+    }
+  ]
+}

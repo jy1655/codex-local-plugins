@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "current-session-defaults-first",
+      "title": "Simulator debugging with stale tool assumptions",
+      "prompt": "Use XcodeBuildMCP to boot a simulator with the old boot_sim tool, open Simulator separately, and then build the app.",
+      "expected_without_skill": "Calls removed or redundant tools and guesses project, scheme, simulator, and bundle settings.",
+      "expected_with_skill": "Calls session_show_defaults first, sets only missing defaults with session_set_defaults, verifies them, and uses build_run_sim to handle the simulator build and launch workflow."
+    },
+    {
+      "id": "element-ref-ui-and-runtime-logs",
+      "title": "UI automation using obsolete coordinates and log capture",
+      "prompt": "Tap the Sign In button by guessed coordinates, start a separate log capture session, and type credentials using the old text parameter.",
+      "expected_without_skill": "Uses brittle coordinates, stale parameters, and unnecessary manual log capture.",
+      "expected_with_skill": "Uses snapshot_ui to obtain an elementRef, passes elementRef and text to the current UI tools, refreshes the snapshot after state changes, and reads the automatic runtime logs returned by the workflow."
+    }
+  ]
+}

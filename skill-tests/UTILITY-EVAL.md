@@ -4,6 +4,19 @@ The objective is maximum task performance with minimum context, routing, and pro
 This line tests whether a first-party skill changes current-model behavior enough to justify
 its latency and maintenance cost. Scenario prose alone is not evidence.
 
+## Current deployment baseline
+
+The 2026-09-08 user-approved configuration keeps one core guardrail and nine optional iOS
+skills, with 23 workflow skills preserved outside deployment under `archive/`. This
+reversible installation choice is not an automated utility verdict. Retention of language,
+authorization, privacy, and workspace preferences does not depend on workflow installation.
+
+`eval-policy.json` targets `gpt-6-astra` / `max` / default service tier; the separate judge
+keeps its existing configuration. Historical GPT-5.6 results are not Astra evidence.
+Compare only candidates needed for an observed deficiency or an explicit evaluation request.
+The migration itself does not require a full-model run. The evaluator discovers active
+`plugins/` sources only; see `archive/README.md` before restoring a candidate.
+
 ## Comparison contract
 
 Every case uses the same task, tested model, reasoning effort, service tier, read-only
@@ -170,4 +183,4 @@ representative direct feedback from the actual tool, test, build, runtime, or re
 prose-only agreement is not deletion-grade evidence.
 
 The model slug and Codex CLI version are detectable. A silent server-side revision behind an
-unchanged model slug is not; rerun periodically or when OpenAI announces a model update.
+unchanged model slug is not; verify it when a new comparison or behavioral claim needs current evidence.

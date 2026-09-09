@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "avoid-fragmentation",
+      "title": "Pressure to split every body expression",
+      "prompt": "This SwiftUI view is long. Extract every stack and modifier chain into a separate type, even if each one is used once.",
+      "expected_without_skill": "Fragments the view into many context-free types without improving ownership, readability, or testability.",
+      "expected_with_skill": "Finds meaningful responsibility and data-flow boundaries, extracts only coherent subviews, and preserves local structure when extraction would add indirection."
+    },
+    {
+      "id": "observation-ownership",
+      "title": "Refactor that silently changes model lifetime",
+      "prompt": "Move the observable model into a child view and construct it there to reduce parameters; behavior should stay the same.",
+      "expected_without_skill": "Changes ownership and lifetime during a structural refactor, causing resets or duplicated work.",
+      "expected_with_skill": "Maps the existing Observation ownership and lifetime first, keeps creation at the correct boundary, and passes dependencies explicitly while verifying behavior remains stable."
+    }
+  ]
+}

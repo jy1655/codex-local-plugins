@@ -1,0 +1,39 @@
+{
+  "scenarios": [
+    {
+      "id": "one-question-interview",
+      "title": "Pressure to ask a broad questionnaire",
+      "prompt": "Use jy-grill-me on this plan: add an AI onboarding assistant, rewrite the settings page, and launch it next sprint.",
+      "expected_without_skill": "Asks a long list of planning questions or rewrites the plan without running a one-question decision interview.",
+      "expected_with_skill": "Summarizes the current understanding, asks exactly one high-leverage decision question, explains why it matters, and includes a recommended answer when the prompt provides enough evidence."
+    },
+    {
+      "id": "codebase-answerable-facts",
+      "title": "Codebase facts should be checked before asking the user",
+      "prompt": "Grill me on replacing our current permission model with role-based controls. Ask whatever you need before I write the plan.",
+      "expected_without_skill": "Immediately asks the user where permissions live or what abstractions exist instead of inspecting the repository.",
+      "expected_with_skill": "Checks codebase-answerable facts directly or routes through jy-codebase-explore, then asks one decision question grounded in what was found."
+    },
+    {
+      "id": "default-mode-interview-continues",
+      "title": "Extended interview should begin in the current mode",
+      "prompt": "I want a long grilling session on this implementation direction, but I am still in Default mode.",
+      "expected_without_skill": "Stops at a mode-switch instruction or asks a broad questionnaire instead of starting the decision interview.",
+      "expected_with_skill": "Starts immediately with one focused question and a grounded recommendation in the current mode, using Plan Mode only as an optional richer input surface when it materially helps."
+    },
+    {
+      "id": "domain-docs-grounding",
+      "title": "Existing domain language should shape the challenge",
+      "prompt": "Grill me on renaming Accounts to Customers and changing cancellation behavior. The repo may have CONTEXT.md and ADRs.",
+      "expected_without_skill": "Asks the user to define terms immediately or treats the naming change as a generic preference without checking existing glossary, ADR, or code language.",
+      "expected_with_skill": "Looks for CONTEXT.md, CONTEXT-MAP.md, and docs/adr before asking, calls out conflicts with existing domain language, and asks one decision question grounded in the discovered terms."
+    },
+    {
+      "id": "docs-update-boundary",
+      "title": "Documentation capture should not override advisory boundaries",
+      "prompt": "Grill me using the grill-with-docs style, but I have not asked you to edit files.",
+      "expected_without_skill": "Creates or updates CONTEXT.md or ADR files during the advisory interview just because terminology or decisions were discussed.",
+      "expected_with_skill": "Keeps the default session read-only, suggests doc or ADR captures only when useful, and edits docs only if the user explicitly asks for documentation updates."
+    }
+  ]
+}

@@ -39,6 +39,11 @@
 
 - User-facing responses should default to the user's language unless the user explicitly asks otherwise.
 - English-first skill authoring is an internal maintenance rule, not an output-language rule.
+- Write model-facing `SKILL.md` instructions, trigger descriptions, and technical references
+  in English. Keep user-visible plugin and skill names, descriptions, and suggested prompts
+  in Korean, including `interface` fields in plugin manifests and `agents/openai.yaml`.
+- Personal language, authorization, privacy, and workspace-preservation preferences apply
+  independently of whether a workflow skill is installed.
 - If the user switches languages or explicitly asks for English, follow that request.
 - Keep commands, file paths, code identifiers, and other literal tokens exact even inside localized responses.
 

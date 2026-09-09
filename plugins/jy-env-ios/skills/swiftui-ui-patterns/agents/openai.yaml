@@ -1,4 +1,4 @@
 interface:
-  display_name: "SwiftUI UI Patterns"
-  short_description: "Apply practical SwiftUI UI patterns"
-  default_prompt: "Use $swiftui-ui-patterns to design or refactor this SwiftUI UI with strong default patterns."
+  display_name: "SwiftUI UI 패턴"
+  short_description: "상태·탐색·화면 구성의 기술 참고"
+  default_prompt: "$swiftui-ui-patterns 스킬로 프로젝트 관례에 맞게 이 SwiftUI 화면을 설계하거나 수정해줘."

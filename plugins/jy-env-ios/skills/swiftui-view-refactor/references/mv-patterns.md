@@ -4,6 +4,12 @@ Distilled guidance for deciding whether a SwiftUI feature should stay as plain M
 
 Inspired by the user's provided source, "SwiftUI in 2025: Forget MVVM" (Thomas Ricouard), but rewritten here as a practical refactoring reference.
 
+## When this reference applies
+
+Use these patterns when the requested feature or refactor calls for MV. Preserve an existing
+MVVM design, model lifetime, and coherent file structure during unrelated changes. The
+examples and checklist do not independently authorize architecture or style changes.
+
 ## Default stance
 
 - Default to MV: views are lightweight state expressions and orchestration points.

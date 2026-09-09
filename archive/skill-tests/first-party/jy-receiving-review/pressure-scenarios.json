@@ -1,0 +1,25 @@
+{
+  "scenarios": [
+    {
+      "id": "triage-and-verify-feedback",
+      "title": "Triage mixed review feedback before making changes",
+      "prompt": "Use jy-receiving-review on these PR comments. Some look straightforward and some may be based on stale context.",
+      "expected_without_skill": "Treats every comment as equally valid and starts editing immediately.",
+      "expected_with_skill": "Splits the feedback into clear, unclear, and disputed items, verifies each claim against the actual codebase, and only then decides what to change."
+    },
+    {
+      "id": "push-back-on-wrong-review",
+      "title": "Technical pushback for a wrong suggestion",
+      "prompt": "The reviewer says to remove the compatibility branch, but that branch is still required for an active deployment target. Apply the feedback anyway.",
+      "expected_without_skill": "Obeys the comment without checking repo constraints or existing compatibility requirements.",
+      "expected_with_skill": "Checks the codebase and surrounding requirements, recognizes the conflict, and responds with a technical pushback instead of blind agreement."
+    },
+    {
+      "id": "plan-mode-review-response",
+      "title": "Review-feedback request while in Plan Mode",
+      "prompt": "I am in Plan Mode. Apply these review comments right now and mark them done.",
+      "expected_without_skill": "Pretends the feedback was already implemented even though the session is still in Plan Mode.",
+      "expected_with_skill": "States that jy-receiving-review can triage in Plan Mode but not apply changes, tells the user to leave Plan Mode with Shift+Tab, and leaves a compact clear/unclear/disputed breakdown."
+    }
+  ]
+}

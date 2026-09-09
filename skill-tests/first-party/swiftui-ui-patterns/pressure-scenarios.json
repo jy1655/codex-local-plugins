@@ -13,6 +13,13 @@
       "prompt": "Put NavigationStack and destination routing inside every reusable row so each row is self-contained.",
       "expected_without_skill": "Couples reusable components to navigation ownership and produces nested, conflicting stacks.",
       "expected_with_skill": "Keeps navigation ownership at the screen or flow boundary, makes rows express user intent through values or actions, and composes destinations consistently."
+    },
+    {
+      "id": "proportionate-verification",
+      "title": "Small UI edit after a relevant check",
+      "prompt": "The requested UI edit is complete, its relevant check passed, and no code changed afterward. Must we now build at every workflow stage and add previews for all screens?",
+      "expected_without_skill": "Runs repeated builds and expands preview scope because the skill lists those stages.",
+      "expected_with_skill": "Reuses valid checks for the final candidate, identifies any specific missing evidence, and finishes without mandatory intermediate build or preview stages."
     }
   ]
 }

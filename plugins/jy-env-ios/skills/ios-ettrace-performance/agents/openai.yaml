@@ -1,4 +1,4 @@
 interface:
-  display_name: "iOS ETTrace Performance"
-  short_description: "Profile symbolicated iOS simulator flows with ETTrace"
-  default_prompt: "Use $ios-ettrace-performance to capture a focused iOS simulator ETTrace profile and identify time-heavy stacks."
+  display_name: "iOS ETTrace 성능 분석"
+  short_description: "심볼이 연결된 시뮬레이터 실행 흐름 분석"
+  default_prompt: "$ios-ettrace-performance 스킬로 이 iOS 동작을 ETTrace로 측정하고 병목을 분석해줘."

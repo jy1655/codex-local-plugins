@@ -13,6 +13,13 @@
       "prompt": "Tap the Sign In button by guessed coordinates, start a separate log capture session, and type credentials using the old text parameter.",
       "expected_without_skill": "Uses brittle coordinates, stale parameters, and unnecessary manual log capture.",
       "expected_with_skill": "Uses snapshot_ui to obtain an elementRef, passes elementRef and text to the current UI tools, refreshes the snapshot after state changes, and reads the automatic runtime logs returned by the workflow."
+    },
+    {
+      "id": "logs-only-request",
+      "title": "Existing application logs without a rebuild",
+      "prompt": "The app is running and its runtime log path is in the previous tool result. Read the sign-in error in that log; do not build or relaunch.",
+      "expected_without_skill": "Starts the entire defaults, build, launch, and screenshot sequence.",
+      "expected_with_skill": "Reads the provided runtime log and reports the relevant error without a build, launch, or unrelated UI interaction."
     }
   ]
 }

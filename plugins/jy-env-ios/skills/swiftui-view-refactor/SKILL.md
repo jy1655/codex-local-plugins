@@ -6,12 +6,14 @@ description: Use when refactoring SwiftUI view files into stable, testable struc
 # SwiftUI View Refactor
 
 ## Overview
-Refactor SwiftUI views toward small, explicit, stable view types. Default to vanilla SwiftUI: local state in the view, shared dependencies in the environment, business logic in services/models, and view models only when the request or existing code clearly requires one.
+Refactor the requested SwiftUI surface while preserving behavior, state ownership, and
+project conventions. Use the patterns below when they address an observed problem;
+they do not require an architectural migration or cosmetic reordering.
 
 ## Core Guidelines
 
 ### 1) View ordering (top → bottom)
-- Enforce this ordering unless the existing file has a stronger local convention you must preserve.
+- This ordering is a reference when a file needs organization; preserve coherent local ordering during a narrow change.
 - Environment
 - `private`/`public` `let`
 - `@State` / other stored properties
@@ -21,17 +23,17 @@ Refactor SwiftUI views toward small, explicit, stable view types. Default to van
 - computed view builders / other view helpers
 - helper / async functions
 
-### 2) Default to MV, not MVVM
+### 2) Choose state and model boundaries to fit the project
 - Views should be lightweight state expressions and orchestration points, not containers for business logic.
 - Favor `@State`, `@Environment`, `@Query`, `.task`, `.task(id:)`, and `onChange` before reaching for a view model.
 - Inject services and shared models via `@Environment`; keep domain logic in services/models, not in the view body.
 - Do not introduce a view model just to mirror local view state or wrap environment dependencies.
-- If a screen is getting large, split the UI into subviews before inventing a new view model layer.
+- If a screen mixes responsibilities, consider coherent subviews or the project's existing model pattern according to the actual boundary.
 
-### 3) Strongly prefer dedicated subview types over computed `some View` helpers
-- Flag `body` properties that are longer than roughly one screen or contain multiple logical sections.
+### 3) Extract subviews when a responsibility or state boundary benefits
+- Consider extraction where independent responsibilities make a view hard to understand or maintain.
 - Prefer extracting dedicated `View` types for non-trivial sections, especially when they have state, async work, branching, or deserve their own preview.
-- Keep computed `some View` helpers rare and small. Do not build an entire screen out of `private var header: some View`-style fragments.
+- Small computed `some View` helpers are reasonable when they improve local readability without obscuring ownership.
 - Pass small, explicit inputs (data, bindings, callbacks) into extracted subviews instead of handing down the entire parent state.
 - If an extracted subview becomes reusable or independently meaningful, move it to its own file.
 
@@ -159,11 +161,10 @@ var documentsListView: some View {
 ```
 
 ### 5) View model handling (only if already present or explicitly requested)
-- Treat view models as a legacy or explicit-need pattern, not the default.
+- Preserve an existing view model architecture unless the requested change calls for a different ownership model.
 - Do not introduce a view model unless the request or existing code clearly calls for one.
-- If a view model exists, make it non-optional when possible.
-- Pass dependencies to the view via `init`, then create the view model in the view's `init`.
-- Avoid `bootstrapIfNeeded` patterns and other delayed setup workarounds.
+- Preserve optionality when it represents a real loading or lifecycle state.
+- Use `init` for dependencies known at construction time. Change delayed initialization only when the task or lifecycle evidence requires it.
 
 Example (Observation-based):
 
@@ -180,15 +181,13 @@ init(dependency: Dependency) {
 - Pass observables down explicitly; avoid optional state unless the UI genuinely needs it.
 - If the deployment target includes iOS 16 or earlier, use `@StateObject` at the owner and `@ObservedObject` when injecting legacy observable models.
 
-## Workflow
+## Scope and Verification
 
-1. Reorder the view to match the ordering rules.
-2. Remove inline actions and side effects from `body`; move business logic into services/models and keep only thin orchestration in the view.
-3. Shorten long bodies by extracting dedicated subview types; avoid rebuilding the screen out of many computed `some View` helpers.
-4. Ensure stable view structure: avoid top-level `if`-based branch swapping; move conditions to localized sections/modifiers.
-5. If a view model exists or is explicitly required, replace optional view models with a non-optional `@State` view model initialized in `init`.
-6. Confirm Observation usage: `@State` for root `@Observable` models on iOS 17+, legacy wrappers only when the deployment target requires them.
-7. Keep behavior intact: do not change layout or business logic unless requested.
+Select only transformations that solve the requested problem. Preserve model lifetime,
+navigation, layout, and business behavior unless changing them is part of the request.
+Verify the affected behavior with a relevant build, test, preview, or runtime check and
+report its limits. Do not add another refactor or repeat a passed check without a new
+change, failure, or unresolved concern.
 
 ## Notes
 
@@ -200,4 +199,6 @@ init(dependency: Dependency) {
 
 ## Large-view handling
 
-When a SwiftUI view file exceeds ~300 lines, split it aggressively. Extract meaningful sections into dedicated `View` types instead of hiding complexity in many computed properties. Use `private` extensions with `// MARK: -` comments for actions and helpers, but do not treat extensions as a substitute for breaking a giant screen into smaller view types. If an extracted subview is reused or independently meaningful, move it into its own file.
+Line count alone does not justify splitting a view. Extract a dedicated `View` type or
+file when a coherent responsibility, ownership boundary, or reuse need makes it useful.
+Keep a focused one-off edit local when extraction would only add indirection.

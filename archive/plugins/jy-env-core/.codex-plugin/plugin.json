@@ -1,0 +1,37 @@
+{
+  "name": "jy-env-core",
+  "version": "0.1.0+codex.20260831021246",
+  "description": "Minimal default skill pack for safe implementation, debugging, verification, and evidence-based research.",
+  "author": {
+    "name": "JaeYoung Hwang",
+    "url": "https://github.com/jy1655"
+  },
+  "homepage": "https://github.com/jy1655/codex-local-plugins",
+  "repository": "https://github.com/jy1655/codex-local-plugins",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "skills",
+    "core-lite"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "JY Core Lite",
+    "shortDescription": "Minimal default workflows for everyday Codex work",
+    "longDescription": "Provides a compact default set of implementation guardrails, debugging, test-first development, verification, codebase exploration, library research, and architecture consultation.",
+    "developerName": "JaeYoung Hwang",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/jy1655/codex-local-plugins",
+    "defaultPrompt": [
+      "Explore this codebase and identify the smallest safe change.",
+      "Diagnose this bug from reproduction through root-cause verification.",
+      "Research this dependency using current official sources."
+    ],
+    "brandColor": "#2563EB"
+  }
+}

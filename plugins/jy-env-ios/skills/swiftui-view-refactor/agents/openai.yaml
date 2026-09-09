@@ -1,4 +1,4 @@
 interface:
-  display_name: "SwiftUI View Refactor"
-  short_description: "Refactor large SwiftUI view files"
-  default_prompt: "Use $swiftui-view-refactor to clean up and split this SwiftUI view without changing its behavior."
+  display_name: "SwiftUI 뷰 리팩터링"
+  short_description: "동작과 상태 소유권을 보존하는 구조 개선"
+  default_prompt: "$swiftui-view-refactor 스킬로 동작과 상태 소유권을 보존하면서 요청한 SwiftUI 뷰 구조를 개선해줘."

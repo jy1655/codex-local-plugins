@@ -10,10 +10,10 @@ SCENARIO_ROOT = REPO_ROOT / "skill-tests" / "first-party"
 
 
 def first_party_skill_dirs() -> list[Path]:
-    return sorted(
-        path.parent
-        for path in REPO_ROOT.glob("plugins/jy-env-*/skills/*/SKILL.md")
-    )
+    # Keep historical input assets addressable without deploying archived skills.
+    originals = {path.parent.name: path.parent for path in REPO_ROOT.glob("archive/plugins/jy-env-*/skills/*/SKILL.md")}
+    originals.update({path.parent.name: path.parent for path in REPO_ROOT.glob("plugins/jy-env-*/skills/*/SKILL.md")})
+    return sorted(originals.values())
 
 
 def scenario_dirs() -> list[Path]:

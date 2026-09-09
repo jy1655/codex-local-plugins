@@ -1,7 +1,9 @@
 # First-Party Skill Pressure Scenarios
 
 This directory stores evaluation inputs for the first-party skills under
-`plugins/jy-env-*/skills/`. Each skill has one `pressure-scenarios.json` file.
+`plugins/jy-env-*/skills/` and the historical skills under `archive/plugins/`. Each skill
+name has one `pressure-scenarios.json` file here. The evaluator selects only active skills;
+unchanged historical inputs stay available for an explicitly restored candidate.
 
 These files are not proof that an agent run passed. CI validates only their presence and
 schema. The controlled evaluator records actual model runs under the ignored

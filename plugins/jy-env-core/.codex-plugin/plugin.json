@@ -1,7 +1,7 @@
 {
   "name": "jy-env-core",
-  "version": "0.1.0+codex.20260831021246",
-  "description": "Minimal default skill pack for safe implementation, debugging, verification, and evidence-based research.",
+  "version": "0.1.0+codex.20260908040732",
+  "description": "\ubcc0\uacbd \uac00\ub4dc\ub808\uc77c\uacfc \uba85\uc2dc \ud638\ucd9c \uc804\uc6a9 \ub2e4\uc911 \uc5d0\uc774\uc804\ud2b8 \uc791\uc5c5 \uc9c0\ud718",
   "author": {
     "name": "JaeYoung Hwang",
     "url": "https://github.com/jy1655"
@@ -16,9 +16,9 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "JY Core Lite",
-    "shortDescription": "Minimal default workflows for everyday Codex work",
-    "longDescription": "Provides a compact default set of implementation guardrails, debugging, test-first development, verification, codebase exploration, library research, and architecture consultation.",
+    "displayName": "\uac1c\uc778 \uc791\uc5c5 \ub3c4\uad6c",
+    "shortDescription": "\ubcc0\uacbd \uac00\ub4dc\ub808\uc77c\uacfc \uba85\uc2dc \ud638\ucd9c \uc804\uc6a9 \ub2e4\uc911 \uc5d0\uc774\uc804\ud2b8 \uc791\uc5c5 \uc9c0\ud718",
+    "longDescription": "\uc694\uccad \ubc94\uc704\uc640 \ud544\uc694\ud55c \uac80\uc99d\uc744 \uad00\ub9ac\ud558\ub294 \uae30\ubcf8 \uac00\ub4dc\ub808\uc77c\uacfc, \uba85\uc2dc\uc801\uc73c\ub85c \ud638\ucd9c\ud560 \ub54c Codex\u00b7Claude\uc758 \uc791\uc5c5 \ubc0f DevBlue\u00b7Claude\uc758 \ub3c5\ub9bd \uac80\uc99d\uc744 \uc870\uc728\ud558\ub294 \uc2a4\ud0ac\uc744 \uc81c\uacf5\ud569\ub2c8\ub2e4.",
     "developerName": "JaeYoung Hwang",
     "category": "Productivity",
     "capabilities": [
@@ -28,9 +28,7 @@
     ],
     "websiteURL": "https://github.com/jy1655/codex-local-plugins",
     "defaultPrompt": [
-      "Explore this codebase and identify the smallest safe change.",
-      "Diagnose this bug from reproduction through root-cause verification.",
-      "Research this dependency using current official sources."
+      "\uc694\uccad\uc744 \ucda9\uc871\ud558\ub294 \ucd5c\uc18c \ubcc0\uacbd\uc744 \uad6c\ud604\ud558\uace0 \ud544\uc694\ud55c \uac80\uc99d\uc744 \uc218\ud589\ud574\uc918."
     ],
     "brandColor": "#2563EB"
   }

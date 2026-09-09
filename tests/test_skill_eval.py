@@ -48,7 +48,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 class SkillEvalDiscoveryTests(unittest.TestCase):
     def test_repository_policy_pins_current_model_and_evidence_floor(self) -> None:
         policy = load_eval_policy(REPO_ROOT)
-        self.assertEqual(policy.model, "gpt-5.6-sol")
+        self.assertEqual(policy.model, "gpt-6-astra")
         self.assertEqual(policy.reasoning_effort, "max")
         self.assertEqual(policy.repetitions, 3)
         self.assertEqual(policy.minimum_scenarios, 2)
@@ -82,8 +82,7 @@ class SkillEvalDiscoveryTests(unittest.TestCase):
         self.assertEqual(plan.total_model_calls, 7)
         pack_names = {path.name for path in plan.pack_skill_dirs["jy-change-guardrails"]}
         self.assertIn("jy-change-guardrails", pack_names)
-        self.assertIn("jy-debugging", pack_names)
-        self.assertEqual(len(pack_names), 7)
+        self.assertEqual(pack_names, {"jy-change-guardrails", "jy-orchestrate"})
 
         baseline_names = {
             path.name for path in skill_dirs_for_arm(plan, "jy-change-guardrails", "baseline")
@@ -92,7 +91,7 @@ class SkillEvalDiscoveryTests(unittest.TestCase):
             path.name for path in skill_dirs_for_arm(plan, "jy-change-guardrails", "implicit")
         }
         self.assertNotIn("jy-change-guardrails", baseline_names)
-        self.assertIn("jy-debugging", baseline_names)
+        self.assertEqual(baseline_names, {"jy-orchestrate"})
         self.assertIn("jy-change-guardrails", implicit_names)
 
     def test_changed_paths_select_only_affected_skills_or_all_for_harness(self) -> None:
@@ -114,21 +113,21 @@ class SkillEvalDiscoveryTests(unittest.TestCase):
             {"*"},
         )
 
-        peers = expand_skill_names_to_pack_peers(REPO_ROOT, {"jy-debugging"})
-        self.assertEqual(len(peers), 7)
-        self.assertIn("jy-change-guardrails", peers)
-        self.assertNotIn("ios-debugger-agent", peers)
+        peers = expand_skill_names_to_pack_peers(REPO_ROOT, {"ios-debugger-agent"})
+        self.assertEqual(len(peers), 9)
+        self.assertIn("ios-memgraph-leaks", peers)
+        self.assertNotIn("jy-change-guardrails", peers)
 
         source_change = skill_names_for_changed_paths(
-            ["plugins/jy-env-core/skills/jy-debugging/SKILL.md"],
+            ["plugins/jy-env-ios/skills/ios-debugger-agent/SKILL.md"],
             repo_root=REPO_ROOT,
         )
         scenario_change = skill_names_for_changed_paths(
-            ["skill-tests/first-party/jy-debugging/pressure-scenarios.json"],
+            ["skill-tests/first-party/ios-debugger-agent/pressure-scenarios.json"],
             repo_root=REPO_ROOT,
         )
         self.assertEqual(source_change, peers)
-        self.assertEqual(scenario_change, {"jy-debugging"})
+        self.assertEqual(scenario_change, {"ios-debugger-agent"})
 
 
 class SkillEvalEvidenceTests(unittest.TestCase):
@@ -562,7 +561,7 @@ class SkillEvalEvidenceTests(unittest.TestCase):
             REPO_ROOT,
             model="gpt-5.6-sol",
             reasoning_effort="max",
-            skill_names=["jy-codebase-explore"],
+            skill_names=["swiftui-ui-patterns"],
             repetitions=3,
             max_scenarios_per_skill=2,
         )
@@ -631,9 +630,9 @@ class SkillEvalEvidenceTests(unittest.TestCase):
         implicit_context = next(
             names for _, arm, names in backend.task_calls if arm == "implicit"
         )
-        self.assertNotIn("jy-codebase-explore", baseline_context)
-        self.assertIn("jy-debugging", baseline_context)
-        self.assertIn("jy-codebase-explore", implicit_context)
+        self.assertNotIn("swiftui-ui-patterns", baseline_context)
+        self.assertIn("ios-debugger-agent", baseline_context)
+        self.assertIn("swiftui-ui-patterns", implicit_context)
         result = outcome.report["results"][0]
         self.assertEqual(result["verdict"], "REMOVE_CANDIDATE")
         self.assertEqual(result["baseline_input_tokens"], 100)
@@ -827,17 +826,17 @@ class SkillEvalFreshnessAndReportTests(unittest.TestCase):
         report = {
             "run_id": "run-1",
             "results": [
-                {"skill_name": "jy-debugging", "verdict": "KEEP"},
-                {"skill_name": "jy-test-driven", "verdict": "INSUFFICIENT"},
+                {"skill_name": "jy-change-guardrails", "verdict": "KEEP"},
+                {"skill_name": "ios-debugger-agent", "verdict": "INSUFFICIENT"},
             ],
         }
 
         state = advance_state(current, previous_state={}, report=report)
 
-        self.assertIn("jy-debugging", state["snapshot"]["skills"])
-        self.assertNotIn("jy-test-driven", state["snapshot"]["skills"])
+        self.assertIn("jy-change-guardrails", state["snapshot"]["skills"])
+        self.assertNotIn("ios-debugger-agent", state["snapshot"]["skills"])
         self.assertEqual(
-            state["evaluations"]["jy-debugging"]["last_run_id"], "run-1"
+            state["evaluations"]["jy-change-guardrails"]["last_run_id"], "run-1"
         )
 
     def test_plan_cli_is_cost_preview_only(self) -> None:
@@ -859,7 +858,7 @@ class SkillEvalFreshnessAndReportTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 0)
         output = stdout.getvalue()
-        self.assertIn("gpt-5.6-sol", output)
+        self.assertIn("gpt-6-astra", output)
         self.assertIn("task_calls: 3", output)
         self.assertIn("judge_calls: 1", output)
         self.assertIn("total_model_calls: 4", output)

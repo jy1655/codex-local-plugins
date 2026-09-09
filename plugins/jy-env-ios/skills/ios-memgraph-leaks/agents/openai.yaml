@@ -1,4 +1,4 @@
 interface:
-  display_name: "iOS Memgraph Leaks"
-  short_description: "Capture and prove iOS simulator memory leaks"
-  default_prompt: "Use $ios-memgraph-leaks to capture an iOS simulator memgraph, identify retention paths, and verify leak fixes."
+  display_name: "iOS 메모리 누수 분석"
+  short_description: "메모리 그래프와 객체 보유 경로 확인"
+  default_prompt: "$ios-memgraph-leaks 스킬로 이 iOS 앱의 메모리 누수를 측정하고 원인을 확인해줘."

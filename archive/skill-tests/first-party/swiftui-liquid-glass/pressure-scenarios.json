@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "native-api-and-availability",
+      "title": "Fake Liquid Glass with no availability boundary",
+      "prompt": "Recreate Liquid Glass with custom blur overlays everywhere and assume every deployment target supports the newest APIs.",
+      "expected_without_skill": "Builds an imitation effect, ignores availability, and spreads expensive overlays across the view hierarchy.",
+      "expected_with_skill": "Uses native Liquid Glass APIs where available, adds an intentional fallback for older targets, and limits effects to surfaces where the design and interaction benefit."
+    },
+    {
+      "id": "review-interaction-and-performance",
+      "title": "Visual-only review of an interactive glass control",
+      "prompt": "The glass button looks close enough in a screenshot. Approve it without checking hit behavior, state changes, or rendering cost.",
+      "expected_without_skill": "Approves a static appearance while missing interaction, accessibility, and performance problems.",
+      "expected_with_skill": "Checks the native interactive treatment, pressed and enabled states, accessibility, container usage, and the performance impact of the chosen glass composition."
+    }
+  ]
+}

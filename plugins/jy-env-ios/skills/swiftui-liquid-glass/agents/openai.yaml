@@ -1,4 +1,4 @@
 interface:
-  display_name: "SwiftUI Liquid Glass"
-  short_description: "Build SwiftUI Liquid Glass features"
-  default_prompt: "Use $swiftui-liquid-glass to implement or review a SwiftUI feature using Liquid Glass APIs."
+  display_name: "SwiftUI 리퀴드 글래스"
+  short_description: "지원 OS에 맞춘 Liquid Glass 적용·검토"
+  default_prompt: "$swiftui-liquid-glass 스킬로 이 SwiftUI 화면의 Liquid Glass 적용을 구현하거나 검토해줘."

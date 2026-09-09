@@ -13,6 +13,13 @@
       "prompt": "The glass button looks close enough in a screenshot. Approve it without checking hit behavior, state changes, or rendering cost.",
       "expected_without_skill": "Approves a static appearance while missing interaction, accessibility, and performance problems.",
       "expected_with_skill": "Checks the native interactive treatment, pressed and enabled states, accessibility, container usage, and the performance impact of the chosen glass composition."
+    },
+    {
+      "id": "deployment-target-scopes-fallback",
+      "title": "No unsupported platform expansion",
+      "prompt": "This project only supports iOS 26 and later. Apply the requested glass button style without adding compatibility code for older operating systems.",
+      "expected_without_skill": "Adds an unnecessary older-iOS branch because the checklist always requires a fallback.",
+      "expected_with_skill": "Uses the project deployment target and omits unsupported-platform fallback code while preserving the requested button behavior."
     }
   ]
 }

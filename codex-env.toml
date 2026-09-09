@@ -8,24 +8,6 @@ install_mode = "symlink"
 installation_policy = "INSTALLED_BY_DEFAULT"
 
 [[plugins]]
-name = "jy-env-planning"
-source = "plugins/jy-env-planning"
-install_mode = "symlink"
-installation_policy = "AVAILABLE"
-
-[[plugins]]
-name = "jy-env-delivery"
-source = "plugins/jy-env-delivery"
-install_mode = "symlink"
-installation_policy = "AVAILABLE"
-
-[[plugins]]
-name = "jy-env-audit"
-source = "plugins/jy-env-audit"
-install_mode = "symlink"
-installation_policy = "AVAILABLE"
-
-[[plugins]]
 name = "jy-env-ios"
 source = "plugins/jy-env-ios"
 install_mode = "symlink"

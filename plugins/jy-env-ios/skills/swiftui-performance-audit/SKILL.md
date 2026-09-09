@@ -7,15 +7,18 @@ description: Use when auditing SwiftUI runtime performance to diagnose slow rend
 
 ## Quick start
 
-Use this skill to diagnose SwiftUI performance issues from code first, then request profiling evidence when code review alone cannot explain the symptoms.
+Use the most relevant available evidence to diagnose the requested SwiftUI performance
+issue. Start from a supplied trace when present, or inspect the affected code and symptoms.
 
-## Workflow
+## Evidence Selection
 
-1. Classify the symptom: slow rendering, janky scrolling, high CPU, memory growth, hangs, or excessive view updates.
-2. If code is available, start with a code-first review using `references/code-smells.md`.
-3. If code is not available, ask for the smallest useful slice: target view, data flow, reproduction steps, and deployment target.
-4. If code review is inconclusive or runtime evidence is required, guide the user through profiling with `references/profiling-intake.md`.
-5. Summarize likely causes, evidence, remediation, and validation steps using `references/report-template.md`.
+- Focus on the reported symptom: rendering, scrolling, CPU, memory, hangs, or view updates.
+- Consult `references/code-smells.md` for a relevant source question and
+  `references/profiling-intake.md` when a runtime capture is needed.
+- Collect evidence with available, authorized tools. Ask the user only for material context
+  or device access that cannot be obtained from the current workspace or tools.
+- Use `references/report-template.md` when its structure helps; a narrow finding can be
+  reported directly with its evidence and limits.
 
 ## 1. Intake
 
@@ -25,14 +28,14 @@ Collect:
 - Data flow: `@State`, `@Binding`, environment dependencies, and observable models.
 - Whether the issue shows up on device or simulator, and whether it was observed in Debug or Release.
 
-Ask the user to classify the issue if possible:
+Use the reported symptoms to distinguish:
 - CPU spike or battery drain
 - Janky scrolling or dropped frames
 - High memory or image pressure
 - Hangs or unresponsive interactions
 - Excessive or unexpectedly broad view updates
 
-For the full profiling intake checklist, read `references/profiling-intake.md`.
+Read `references/profiling-intake.md` when additional capture context is needed.
 
 ## 2. Code-First Review
 
@@ -53,7 +56,7 @@ Provide:
 
 ## 3. Guide the User to Profile
 
-If code review does not explain the issue, ask for runtime evidence:
+When runtime evidence is needed, collect it with available tools or request the missing input:
 - A trace export or screenshots of the SwiftUI timeline and Time Profiler call tree.
 - Device/OS/build configuration.
 - The exact interaction being profiled.
@@ -82,8 +85,10 @@ Use `references/code-smells.md` for examples, Observation-specific fan-out guida
 
 ## 6. Verify
 
-Ask the user to re-run the same capture and compare with baseline metrics.
-Summarize the delta (CPU, frame drops, memory peak) if provided.
+For a performance fix, compare the same affected flow with its baseline using available
+tools, or report which measurement still needs the user's device. Summarize the observed
+delta (CPU, frame drops, memory peak). An unchanged, valid capture can be reused; repeat
+only when a change or unresolved uncertainty requires new evidence.
 
 ## Outputs
 
@@ -92,7 +97,7 @@ Provide:
 - Top issues (ordered by impact).
 - Proposed fixes with estimated effort.
 
-Use `references/report-template.md` when formatting the final audit.
+Use `references/report-template.md` when a full audit report is requested.
 
 ## References
 

@@ -1,4 +1,4 @@
 interface:
-  display_name: "JY Change Guardrails"
-  short_description: "Guard ambiguous or over-scoped code changes"
-  default_prompt: "Use $jy-change-guardrails when a non-trivial code change risks hidden assumptions, overengineering, or unrelated edits."
+  display_name: "변경 범위 가드레일"
+  short_description: "요청 범위를 지키고 필요한 검증까지만 수행"
+  default_prompt: "$jy-change-guardrails 스킬로 이 변경의 범위를 지키고 불필요한 반복 없이 결과를 검증해줘."

@@ -1,4 +1,4 @@
 interface:
-  display_name: "SwiftUI Performance Audit"
-  short_description: "Audit SwiftUI runtime performance"
-  default_prompt: "Use $swiftui-performance-audit to review this SwiftUI code for performance issues and suggest concrete fixes."
+  display_name: "SwiftUI 성능 점검"
+  short_description: "측정과 소스 근거로 렌더링 성능 분석"
+  default_prompt: "$swiftui-performance-audit 스킬로 이 SwiftUI 화면의 성능 문제를 근거에 따라 분석해줘."

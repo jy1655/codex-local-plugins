@@ -1,108 +1,35 @@
 ---
 name: jy-change-guardrails
-description: Use when implementing or reviewing a non-trivial code change that risks hidden assumptions, overengineering, or unrelated edits.
+description: Use when a non-trivial code change risks hidden assumptions, overengineering, unrelated edits, or unnecessary verification loops.
 ---
 
 # JY Change Guardrails
 
-## Overview
+Choose the smallest valid change that satisfies the user's request. These are decision
+boundaries, not a required sequence or a reason to invoke other skills.
 
-Apply lightweight execution guardrails before and during a non-trivial code change.
-Surface risky assumptions, choose the smallest valid change, keep edits inside a declared
-boundary, prefer available native capabilities over new scaffolding, and tie the work to
-direct verification.
+- Make consequential assumptions and competing interpretations explicit. Resolve routine
+  details from the request and current source; ask only when the answer materially changes
+  correctness, scope, authority, or a hard-to-reverse outcome. Continue independent work.
+- Keep the edit boundary tied to the requested outcome. Reuse project conventions and
+  avoid unrequested abstractions, configuration, fallbacks, and adjacent cleanup. When the
+  user requests broader work, include it in scope and choose the simplest implementation
+  that meets that request.
+- Use native session state and context handling first. Add orchestration or persistent
+  state when an explicit requirement, concrete handoff boundary, or reproduced failure
+  justifies it; keep ownership and lifetime clear.
+- Proceed with work already authorized by the user. User instructions take precedence
+  over skill guidelines; do not invent an additional approval or mode-switch procedure.
+  Respect actual read-only restrictions, permissions, secret protection, safety invariants,
+  and unrelated user work.
+- Select verification proportional to the change. Use current source, relevant tests,
+  builds, or runtime readback to support the claim. Reuse results for the unchanged final
+  candidate; repeat or broaden checks only after new changes, failures, or unresolved
+  concerns. A harmless wording edit does not require a new test or a full build.
+- Finish when the requested outcome and necessary checks are satisfied. Report what the
+  evidence establishes, including checks not run. Do not promote a partial test, another
+  agent's report, or simulator evidence to proof of a broader runtime or device claim.
 
-This skill is execution-oriented. In Default mode it can clarify, implement, and verify.
-In Plan Mode it only leaves the guarded execution approach.
-
-## When to Use
-
-- A coding request has multiple plausible interpretations
-- The change risks overengineering or speculative abstraction
-- The work must stay tightly scoped with no drive-by cleanup
-- A review or implementation request is clear enough to proceed but still needs guardrails
-
-Do not use it when:
-
-- The task is trivial and unambiguous
-- The task is pure planning; use the matching planning skill such as `jy-framing` when the planning pack is installed
-- The main job is bug investigation and belongs in `jy-debugging`
-- The work already follows a written implementation plan; use `jy-executing-plans` when the delivery pack is installed
-- The main input is review feedback; use `jy-receiving-review` when the audit pack is installed
-
-Optional-pack handoffs are capability-aware. If the named pack is unavailable, do not
-pretend the skill exists; handle the request directly with the core-lite guardrails that
-still apply.
-
-## Quick Reference
-
-| Guardrail | Required Action | Failure Signal |
-|-----------|-----------------|----------------|
-| assumptions | separate explicit requirements from inferred ones | silent guessing |
-| interpretations | name competing readings when they matter | choosing one without saying so |
-| smallest valid change | prefer the simplest code that fits the request | one-off abstraction or speculative flexibility |
-| native leverage | use available model, API, and project capabilities first | new state or orchestration without a concrete boundary |
-| edit boundary | declare what is in and out of scope | drive-by cleanup |
-| verification | pick the most direct proving command | "should work" with no evidence |
-
-## Guardrail Protocol
-
-### 1. Surface assumptions
-
-- List the requirements that are explicit in the request
-- List inferred assumptions that affect behavior, data shape, or interfaces
-- If an assumption is blocking and cannot be resolved from the codebase, ask before editing
-
-### 2. Name competing interpretations
-
-- If two or more reasonable interpretations exist, state them briefly
-- Pick the safest interpretation only when the request or codebase clearly supports it
-- Otherwise ask instead of guessing
-
-### 3. Choose the smallest valid change
-
-- Reuse the current project pattern before inventing a new abstraction
-- Treat future-proofing, configurability, and fallback code as out of scope unless requested
-- Before adding agent orchestration, registries, checkpoints, or persistence, check whether
-  available model- or API-native session state and context handling already cover the task
-- Add external state only for a concrete boundary such as a new thread, another actor, an audit
-  requirement, or a reproduced state-loss failure; make ownership, lifetime, freshness, and
-  recovery explicit
-- Use `jy-test-driven` when the change adds or changes behavior
-
-### 4. Declare the edit boundary
-
-- State which files, modules, or surfaces are in scope
-- Do not refactor adjacent code, comments, or formatting unless your change makes them wrong
-- If you notice unrelated issues, mention them without fixing them
-
-### 5. Anchor verification
-
-- Select the smallest command that proves the change
-- For reproducible bugs, start with `jy-debugging`
-- Before claiming success, finish with `jy-verification-before-completion`
-
-## Mode-Aware Behavior
-
-### If current collaboration mode is Default
-
-- This is the normal execution mode
-- Apply the guardrails, implement the smallest justified change, and verify it for real
-
-### If current collaboration mode is Plan
-
-- Do not edit files or claim implementation progress
-- Route like this:
-  - "This is an execution-oriented guarded change workflow. Leave Plan Mode with `Shift+Tab`, then run `/jy-change-guardrails` again."
-- Still leave the assumptions list, interpretations, edit boundary, and verification plan
-- Do not pretend the guarded change is already happening in Plan Mode
-
-## Common Mistakes
-
-- Silently guessing across ambiguous requirements
-- Building a generic framework for a one-off change
-- Building agent-state scaffolding before proving that native context cannot cross a required boundary
-- Expanding the diff into adjacent refactors or comment cleanup
-- Adding speculative error handling for scenarios nobody asked about
-- Claiming success without a direct proving command
-- Acting as if Plan Mode can perform the real change
+In planning or read-only work, provide the useful analysis allowed by that boundary and
+label implementation and runtime checks as not run. Effort settings govern reasoning;
+these guardrails govern observable scope, actions, and completion claims.

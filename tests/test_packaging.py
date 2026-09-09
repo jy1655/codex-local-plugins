@@ -2,45 +2,19 @@ from __future__ import annotations
 
 from pathlib import Path
 import json
+import hashlib
 import re
+import shutil
+import tempfile
 import unittest
+
+from codex_env_sync.apply import apply_environment
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 EXPECTED_PACKS = {
-    "jy-env-core": {
-        "jy-change-guardrails",
-        "jy-debugging",
-        "jy-test-driven",
-        "jy-verification-before-completion",
-        "jy-codebase-explore",
-        "jy-library-research",
-        "jy-consult",
-    },
-    "jy-env-planning": {
-        "jy-framing",
-        "jy-grill-me",
-        "jy-plan-review",
-        "jy-writing-plans",
-    },
-    "jy-env-delivery": {
-        "jy-executing-plans",
-        "jy-worktrees",
-        "jy-checkpoint",
-        "jy-document-release",
-        "jy-ship",
-        "jy-waterfall",
-        "jy-env-sync-admin",
-        "jy-writing-skills",
-    },
-    "jy-env-audit": {
-        "jy-explain-change",
-        "jy-review-all",
-        "jy-review-work",
-        "jy-receiving-review",
-        "jy-slop-remover",
-    },
+    "jy-env-core": {"jy-change-guardrails", "jy-orchestrate"},
     "jy-env-ios": {
         "ios-app-intents",
         "ios-debugger-agent",
@@ -56,6 +30,54 @@ EXPECTED_PACKS = {
 
 
 class PackagingTests(unittest.TestCase):
+    def test_original_archive_payloads_match_recorded_checksums(self) -> None:
+        archive = REPO_ROOT / "archive"
+        recorded = {}
+        for line in (archive / "SHA256SUMS").read_text().splitlines():
+            digest, relative = line.split("  ", 1)
+            recorded[relative] = digest
+        actual = {
+            path.relative_to(archive).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+            for directory in [archive / "plugins", archive / "skill-tests"]
+            for path in directory.rglob("*") if path.is_file()
+        }
+        self.assertEqual(actual, recorded)
+        original_names = {path.parent.name for path in archive.glob("plugins/*/skills/*/SKILL.md")}
+        active_names = {name for names in EXPECTED_PACKS.values() for name in names}
+        self.assertEqual(len(original_names), 33)
+        self.assertEqual(len(original_names - active_names), 23)
+
+    def test_ios_runtime_assets_are_preserved(self) -> None:
+        active = REPO_ROOT / "plugins" / "jy-env-ios"
+        original = REPO_ROOT / "archive" / "plugins" / "jy-env-ios"
+        runtime_paths = [Path(".mcp.json")]
+        runtime_paths.extend(path.relative_to(original) for path in original.glob("skills/*/scripts/**/*") if path.is_file())
+        self.assertGreater(len(runtime_paths), 1)
+        for relative in runtime_paths:
+            with self.subTest(path=relative):
+                self.assertEqual((active / relative).read_bytes(), (original / relative).read_bytes())
+
+    def test_apply_migrates_old_sources_without_deploying_archive(self) -> None:
+        for os_name in ["darwin", "windows"]:
+            with self.subTest(os_name=os_name), tempfile.TemporaryDirectory() as tmp:
+                old_repo = Path(tmp) / "old-repo"
+                home = Path(tmp) / "home"
+                shutil.copytree(REPO_ROOT / "archive" / "plugins", old_repo / "plugins")
+                entries = ['schema_version = 1\nname = "migration-fixture"\n']
+                for pack in sorted((old_repo / "plugins").iterdir()):
+                    entries.append(f'[[plugins]]\nname = "{pack.name}"\nsource = "plugins/{pack.name}"\ninstall_mode = "copy"\n')
+                (old_repo / "codex-env.toml").write_text("\n".join(entries))
+                apply_environment(old_repo, home=home, os_name=os_name)
+                self.assertTrue((home / "plugins" / "jy-env-planning").exists())
+                for _ in range(2):
+                    apply_environment(REPO_ROOT, home=home, os_name=os_name)
+                    self.assertEqual({path.name for path in (home / "plugins").iterdir()}, set(EXPECTED_PACKS))
+                    staged = {path.parent.name for path in (home / "plugins").glob("*/skills/*/SKILL.md")}
+                    self.assertEqual(staged, {name for names in EXPECTED_PACKS.values() for name in names})
+                    catalog = json.loads((home / ".agents" / "plugins" / "marketplace.json").read_text())
+                    self.assertEqual({entry["name"] for entry in catalog["plugins"]}, set(EXPECTED_PACKS))
+                    self.assertFalse((home / "archive").exists())
+
     def test_first_party_skills_are_partitioned_without_duplication(self) -> None:
         actual: dict[str, set[str]] = {}
         for plugin_name in EXPECTED_PACKS:
@@ -82,9 +104,6 @@ class PackagingTests(unittest.TestCase):
             policies,
             {
                 "jy-env-core": "INSTALLED_BY_DEFAULT",
-                "jy-env-planning": "AVAILABLE",
-                "jy-env-delivery": "AVAILABLE",
-                "jy-env-audit": "AVAILABLE",
                 "jy-env-ios": "AVAILABLE",
             },
         )
@@ -146,6 +165,7 @@ class PackagingTests(unittest.TestCase):
     def test_library_research_uses_lazy_pinned_context7_cli(self) -> None:
         skill_path = (
             REPO_ROOT
+            / "archive"
             / "plugins"
             / "jy-env-core"
             / "skills"

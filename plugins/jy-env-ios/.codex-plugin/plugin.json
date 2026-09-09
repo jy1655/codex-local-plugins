@@ -1,7 +1,7 @@
 {
   "name": "jy-env-ios",
-  "version": "0.1.0",
-  "description": "Optional first-party iOS development pack with pinned XcodeBuildMCP workflows and focused SwiftUI tooling.",
+  "version": "0.1.0+codex.20260908005340",
+  "description": "\uc2dc\ubbac\ub808\uc774\ud130 \ub3c4\uad6c\uc640 iOS \uae30\uc220 \ucc38\uace0",
   "author": {
     "name": "JaeYoung Hwang",
     "url": "https://github.com/jy1655"
@@ -18,9 +18,9 @@
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
-    "displayName": "JY iOS Pack",
-    "shortDescription": "Pinned XcodeBuildMCP and focused iOS workflows",
-    "longDescription": "Adds a pinned XcodeBuildMCP server plus first-party workflows for simulator build, launch, debugging, UI automation, performance profiling, memory investigation, App Intents, and SwiftUI implementation.",
+    "displayName": "iOS \uac1c\ubc1c \ub3c4\uad6c",
+    "shortDescription": "\uc2dc\ubbac\ub808\uc774\ud130 \ub3c4\uad6c\uc640 iOS \uae30\uc220 \ucc38\uace0",
+    "longDescription": "\uace0\uc815\ub41c XcodeBuildMCP\uc640 \uc2dc\ubbac\ub808\uc774\ud130, \uc131\ub2a5, \uba54\ubaa8\ub9ac, App Intents, SwiftUI \ucc38\uace0 \uc2a4\ud0ac\uc744 \uc81c\uacf5\ud569\ub2c8\ub2e4. \uc694\uccad\ud55c \uc791\uc5c5\uc5d0 \ud544\uc694\ud55c \ub3c4\uad6c\uc640 \uac80\uc99d\uc744 \uc120\ud0dd\ud569\ub2c8\ub2e4.",
     "developerName": "JaeYoung Hwang",
     "category": "Developer Tools",
     "capabilities": [
@@ -30,9 +30,9 @@
     ],
     "websiteURL": "https://github.com/jy1655/codex-local-plugins",
     "defaultPrompt": [
-      "Build, launch, and inspect this iOS app on Simulator.",
-      "Profile this iOS flow and identify its performance bottleneck.",
-      "Refactor this SwiftUI screen without changing its behavior."
+      "iOS \uc571\uc5d0\uc11c \uc694\uccad\ud55c \ub3d9\uc791\uc744 \uc2dc\ubbac\ub808\uc774\ud130\ub85c \ud655\uc778\ud574\uc918.",
+      "\uc774 iOS \ub3d9\uc791\uc758 \uc131\ub2a5 \ubcd1\ubaa9\uc744 \uce21\uc815\ud574\uc918.",
+      "\uae30\uc874 \ub3d9\uc791\uc744 \ubcf4\uc874\ud558\uba74\uc11c SwiftUI \ud654\uba74\uc744 \uac1c\uc120\ud574\uc918."
     ],
     "brandColor": "#0A84FF"
   }

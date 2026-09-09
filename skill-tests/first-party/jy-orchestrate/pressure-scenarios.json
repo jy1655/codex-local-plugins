@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "explicit-planning-only",
+      "title": "Explicit orchestration must preserve a planning-only boundary",
+      "prompt": "Use jy-orchestrate to plan a portable configuration migration. Do not edit repository files or implement the plan. Codex and Claude should contribute to the plan, and Codex DevBlue and Claude should verify it independently. Agent Bridge is available locally; use the machine's existing launch preferences.",
+      "expected_without_skill": "The session may do all planning itself, start implementation, or treat the planning Claude session's self-review as independent verification.",
+      "expected_with_skill": "The invoking session coordinates Codex and Claude planning through the locally available Agent Bridge and sends the same plan to separate Codex DevBlue and Claude reviewer sessions. The user's no-edit boundary and local session rules continue to apply without a skill-specific procedure."
+    },
+    {
+      "id": "shared-candidate-review",
+      "title": "Overlapping implementation and reviewer disagreement require a stable candidate",
+      "prompt": "Use jy-orchestrate to fix the configuration loader and update its CLI tests. Both changes touch loader.py, and unrelated user edits are present. Codex reports its work complete while Claude is still editing. After integration, DevBlue reports a defect that the Claude reviewer did not find. Finish the requested fix and verification.",
+      "expected_without_skill": "Concurrent workers may overwrite each other or unrelated edits, reviewers may inspect different working-tree states, and one clean review may be used to dismiss a supported defect.",
+      "expected_with_skill": "The session remains the orchestrator while Codex and Claude perform the implementation and necessary fixes. Separate Codex DevBlue and Claude sessions independently verify the same result. The model chooses how to coordinate edits and resolve findings under the existing workspace and verification rules."
+    }
+  ]
+}

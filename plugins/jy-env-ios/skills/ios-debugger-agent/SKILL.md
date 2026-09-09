@@ -8,9 +8,10 @@ description: Use when building, launching, inspecting, automating, or debugging 
 Use the `xcodebuildmcp` MCP server for simulator builds, launches, runtime logs, UI
 inspection, interaction, and LLDB debugging.
 
-## Core Workflow
+## Build and Launch
 
-Follow this sequence unless the user requests a narrower action.
+Use these operations when the request needs a build or launch. For logs, an existing
+screen, or a narrow debugger query, use that capability directly without rebuilding.
 
 1. Call `mcp__xcodebuildmcp__session_show_defaults` before the first build, run, or
    test request.
@@ -22,8 +23,8 @@ Follow this sequence unless the user requests a narrower action.
      `workspacePath`, `scheme`, and preferably `simulatorName`. Use `simulatorId` only
      for a machine-local selection. Set `configuration: "Debug"` and `useLatestOS:
      true` when those match the task.
-3. Call `mcp__xcodebuildmcp__session_show_defaults` again and verify the resolved
-   values.
+3. After changing defaults, call `mcp__xcodebuildmcp__session_show_defaults` to verify
+   the resolved values. Reuse unchanged defaults already verified in this session.
 4. Call `mcp__xcodebuildmcp__build_run_sim`. Do not call separate boot or open tools
    as prerequisites.
 5. Verify the launched UI with `mcp__xcodebuildmcp__snapshot_ui` or
@@ -64,5 +65,6 @@ the reported behavior. Relaunch the app when a clean log boundary is required.
 - On build failure, report the structured diagnostics before changing code or retrying.
 - If the wrong app launches, re-check the active defaults, scheme, and bundle ID.
 - If an `elementRef` becomes stale, capture a fresh `snapshot_ui` and use the new ref.
-- If the MCP tools are absent, stop and report that the optional jy-env-ios pack must
-  be installed and Codex restarted.
+- If the MCP tools are absent, report which requested operation cannot be performed
+  and continue any independent source analysis. Installing the optional jy-env-ios pack
+  and starting a fresh Codex session makes its tools available.

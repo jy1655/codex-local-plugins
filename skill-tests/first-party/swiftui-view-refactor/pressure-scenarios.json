@@ -13,6 +13,13 @@
       "prompt": "Move the observable model into a child view and construct it there to reduce parameters; behavior should stay the same.",
       "expected_without_skill": "Changes ownership and lifetime during a structural refactor, causing resets or duplicated work.",
       "expected_with_skill": "Maps the existing Observation ownership and lifetime first, keeps creation at the correct boundary, and passes dependencies explicitly while verifying behavior remains stable."
+    },
+    {
+      "id": "line-count-is-not-a-refactor-trigger",
+      "title": "A narrow edit in a long coherent view",
+      "prompt": "Change one accessibility label in this 340-line SwiftUI view. Its current computed helpers and MVVM ownership are coherent; preserve everything else.",
+      "expected_without_skill": "Splits the file, reorders members, and rewrites the model just because the view is long.",
+      "expected_with_skill": "Changes the requested label while preserving structure, lifetime, and project conventions; file size does not trigger additional refactoring."
     }
   ]
 }

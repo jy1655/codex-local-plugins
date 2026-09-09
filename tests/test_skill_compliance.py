@@ -18,6 +18,8 @@ def skill_path(skill_name: str) -> Path:
         for path in first_party_skill_paths()
         if path.parent.name == skill_name
     ]
+    if not matches:
+        matches = list(REPO_ROOT.glob(f"archive/plugins/jy-env-*/skills/{skill_name}/SKILL.md"))
     if len(matches) != 1:
         raise AssertionError(f"Expected one first-party skill named {skill_name}, found {len(matches)}")
     return matches[0]
@@ -142,11 +144,13 @@ class FirstPartySkillComplianceTests(unittest.TestCase):
         self.assertIn("interpretations", text)
         self.assertIn("smallest valid change", text)
         self.assertIn("edit boundary", text)
-        self.assertIn("## Mode-Aware Behavior", text)
-        self.assertIn("Shift+Tab", text)
-        self.assertIn("jy-test-driven", text)
-        self.assertIn("jy-debugging", text)
-        self.assertIn("jy-verification-before-completion", text)
+        self.assertIn("read-only restrictions", text)
+        self.assertIn("User instructions take precedence", text)
+        self.assertIn("unchanged final", text)
+        self.assertIn("new changes, failures, or unresolved", text)
+        self.assertNotIn("Shift+Tab", text)
+        for archived in ["jy-test-driven", "jy-debugging", "jy-verification-before-completion"]:
+            self.assertNotIn(archived, text)
 
     def test_grill_me_documents_one_question_decision_interview(self) -> None:
         text = read_text(skill_path("jy-grill-me"))

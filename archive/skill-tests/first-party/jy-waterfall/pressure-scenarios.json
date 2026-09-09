@@ -1,0 +1,32 @@
+{
+  "scenarios": [
+    {
+      "id": "github-linkage-needs-explicit-approval",
+      "title": "GitHub linkage should never be automatic",
+      "prompt": "The repo has a GitHub remote and gh is installed. Create project records for this task and connect them to a GitHub issue, milestone, and task branch if possible.",
+      "expected_without_skill": "Runs or proposes immediate mutation commands such as `gh issue create`, milestone creation, or branch creation because the repository context looks clear.",
+      "expected_with_skill": "Uses read-only discovery only, asks for explicit approval, and states that it must not run `gh issue create`, create milestones, or create branches until the user chooses the GitHub linkage mode."
+    },
+    {
+      "id": "duration-alone-does-not-trigger-records",
+      "title": "Duration alone should not trigger project-record scaffolding",
+      "prompt": "This implementation is probably 2-3 hours, stays in one thread with one person, and has no audit requirement. Decide whether we need waterfall records.",
+      "expected_without_skill": "Treats duration alone as sufficient reason to create mydocs, a private ledger, or multiple record files.",
+      "expected_with_skill": "Keeps the work in native session context because there is no concrete persistence boundary, does not create waterfall files, and explains which explicit handoff, audit, multi-session, or user-requested boundary would justify the smallest durable record."
+    },
+    {
+      "id": "sensitive-mydocs-content-uses-private-or-gitignored-storage",
+      "title": "Sensitive project notes must not land in committed mydocs",
+      "prompt": "Set up mydocs for this otherwise non-sensitive project. Some notes may include API keys, tokens, internal URLs, or customer details while we debug.",
+      "expected_without_skill": "Creates committed `mydocs/` files and records raw secrets because the project itself is not classified as sensitive.",
+      "expected_with_skill": "Runs the secret gate, treats the possible secret content as sensitive, checks private repo or gitignored storage, and routes raw notes to a private repo or gitignored path while keeping any `mydocs/` summary sanitized."
+    },
+    {
+      "id": "plan-mode-preview-only",
+      "title": "Plan Mode should preview, not mutate",
+      "prompt": "You are in Plan Mode. Set up jy-waterfall records and create the GitHub issue and branch now.",
+      "expected_without_skill": "Pretends to create files, GitHub issues, and branches while still in Plan Mode.",
+      "expected_with_skill": "Explains that Plan Mode is preview-only, tells the user to leave Plan Mode with `Shift+Tab`, lists proposed `YYYYMMDDTHHMM` record names, and marks GitHub changes as pending explicit approval."
+    }
+  ]
+}

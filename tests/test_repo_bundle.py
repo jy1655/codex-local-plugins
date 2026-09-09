@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import json
+import re
 import unittest
 
 
@@ -20,6 +21,25 @@ def skill_paths() -> list[Path]:
 
 
 class RepoBundleTests(unittest.TestCase):
+    def test_personalization_survives_workflow_archival(self) -> None:
+        text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text()
+        self.assertIn("in English", text)
+        self.assertIn("in Korean", text)
+        self.assertIn("independently of whether a workflow skill is installed", text)
+        self.assertIn("user explicitly asks otherwise", text)
+        for root in plugin_roots():
+            manifest = json.loads((root / ".codex-plugin" / "plugin.json").read_text())
+            for field in ["displayName", "shortDescription", "longDescription"]:
+                self.assertRegex(manifest["interface"][field], r"[가-힣]")
+            for prompt in manifest["interface"]["defaultPrompt"]:
+                self.assertRegex(prompt, r"[가-힣]")
+        for path in skill_paths():
+            text = (path.parent / "agents" / "openai.yaml").read_text()
+            for field in ["display_name", "short_description", "default_prompt"]:
+                match = re.search(rf"^  {field}: (.+)$", text, re.MULTILINE)
+                self.assertIsNotNone(match)
+                self.assertRegex(match.group(1), r"[가-힣]")
+
     def test_global_agents_uses_session_skill_availability(self) -> None:
         text = (REPO_ROOT / "instructions" / "AGENTS.md").read_text(encoding="utf-8")
 
@@ -93,9 +113,6 @@ class RepoBundleTests(unittest.TestCase):
             {path.name for path in plugin_roots()},
             {
                 "jy-env-core",
-                "jy-env-planning",
-                "jy-env-delivery",
-                "jy-env-audit",
                 "jy-env-ios",
             },
         )
@@ -126,11 +143,11 @@ class RepoBundleTests(unittest.TestCase):
                 names.append(skill_path.parent.name)
                 self.assertTrue((skill_path.parent / "agents" / "openai.yaml").is_file())
 
-        self.assertEqual(len(names), 33)
+        self.assertEqual(len(names), 11)
         self.assertEqual(len(names), len(set(names)))
 
     def test_writing_skills_keeps_its_reference_assets(self) -> None:
-        skill_root = REPO_ROOT / "plugins" / "jy-env-delivery" / "skills" / "jy-writing-skills"
+        skill_root = REPO_ROOT / "archive" / "plugins" / "jy-env-delivery" / "skills" / "jy-writing-skills"
 
         self.assertTrue((skill_root / "SKILL.md").exists())
         self.assertTrue((skill_root / "references" / "skill-testing-guide.md").exists())

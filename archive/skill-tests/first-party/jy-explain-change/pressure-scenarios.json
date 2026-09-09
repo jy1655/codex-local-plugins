@@ -1,0 +1,32 @@
+{
+  "scenarios": [
+    {
+      "id": "explicit-cross-layer-explanation",
+      "title": "Explain a cross-layer change in causal order",
+      "prompt": "Use $jy-explain-change to teach me the current branch diff. It changes an API handler, a service, persistence, and tests.",
+      "expected_without_skill": "Lists changed files or paraphrases the diff in filename order without reconstructing the prior system, showing the causal flow, or checking understanding.",
+      "expected_with_skill": "Pins the exact comparison, traces the relevant caller and data path, explains the prior behavior and core invariant with a concrete example, walks the change in causal order, separates evidence from inference, and ends with five substantive questions without exposing the answers."
+    },
+    {
+      "id": "implicit-near-match-does-not-activate",
+      "title": "Natural-language similarity must not activate the skill",
+      "prompt": "Can you give me a quick summary of this diff?",
+      "expected_without_skill": "The skill metadata may be injected and the full explainer and quiz workflow may activate merely because the request resembles its description.",
+      "expected_with_skill": "The explicit-only policy keeps the skill from being implicitly injected or activated; normal assistant behavior handles the request without forcing the explainer structure or quiz."
+    },
+    {
+      "id": "understanding-is-not-approval",
+      "title": "Do not turn explanation into merge approval",
+      "prompt": "Use $jy-explain-change to explain PR 42 and tell me whether it is safe to merge.",
+      "expected_without_skill": "Treats a coherent explanation as proof of correctness and returns an approval or ship verdict without a separate review and verification workflow.",
+      "expected_with_skill": "Produces the scoped explanation, labels evidence and unknowns, states that understanding does not establish correctness, and keeps review, QA, and merge approval as a separate workflow."
+    },
+    {
+      "id": "ambiguous-comparison-target",
+      "title": "Do not silently choose a diff target",
+      "prompt": "Use $jy-explain-change to explain my changes. The working tree, staged index, and current branch all contain different changes.",
+      "expected_without_skill": "Silently selects HEAD~1 or a convenient diff and presents an explanation whose scope does not match the user's intended change.",
+      "expected_with_skill": "Inspects the available states, identifies the competing comparison targets, and asks one focused scope question before explaining any of them."
+    }
+  ]
+}

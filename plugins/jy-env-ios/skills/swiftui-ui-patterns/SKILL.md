@@ -14,16 +14,14 @@ Choose a track based on your goal:
 - Identify the feature or screen and the primary interaction model (list, detail, editor, settings, tabbed).
 - Find a nearby example in the repo with `rg "TabView\("` or similar, then read the closest SwiftUI view.
 - Apply local conventions: prefer SwiftUI-native state, keep state local when possible, and use environment injection for shared dependencies.
-- Choose the relevant component reference from `references/components-index.md` and follow its guidance.
+- Consult a relevant component reference from `references/components-index.md` when it resolves a concrete design or API question.
 - If the interaction reveals secondary content by dragging or scrolling the primary content away, read `references/scroll-reveal.md` before implementing gestures manually.
 - Build the view with small, focused subviews and SwiftUI-native data flow.
 
 ### New project scaffolding
 
-- Start with `references/app-wiring.md` to wire TabView + NavigationStack + sheets.
-- Add a minimal `AppTab` and `RouterPath` based on the provided skeletons.
-- Choose the next component reference based on the UI you need first (TabView, NavigationStack, Sheets).
-- Expand the route and sheet enums as new screens are added.
+- Use `references/app-wiring.md` for examples when the requested app needs navigation or sheets.
+- Add only the navigation and state structure needed by the requested screens; the skeletons are examples, not required scaffolding.
 
 ## General rules to follow
 
@@ -33,7 +31,7 @@ Choose a track based on your goal:
 - Use async/await with `.task` and explicit loading/error states. For restart, cancellation, and debouncing guidance, read `references/async-state.md`.
 - Keep shared app services in `@Environment`, but prefer explicit initializer injection for feature-local dependencies and models. For root wiring patterns, read `references/app-wiring.md`.
 - Prefer the newest SwiftUI API that fits the deployment target and call out the minimum OS whenever a pattern depends on it.
-- Maintain existing legacy patterns only when editing legacy files.
+- Respect the project's architecture and deployment target; migrate existing patterns only when the requested change needs it.
 - Follow the project's formatter and style guide.
 - **Sheets**: Prefer `.sheet(item:)` over `.sheet(isPresented:)` when state represents a selected model. Avoid `if let` inside a sheet body. Sheets should own their actions and call `dismiss()` internally instead of forwarding `onCancel`/`onConfirm` closures.
 - **Scroll-driven reveals**: Prefer deriving a normalized progress value from scroll offset and driving the visual state from that single source of truth. Avoid parallel gesture state machines unless scroll alone cannot express the interaction.
@@ -76,10 +74,13 @@ Choose the ownership location first, then pick the wrapper. Do not introduce a r
 
 1. Define the view's state, ownership location, and minimum OS assumptions before writing UI code.
 2. Identify which dependencies belong in `@Environment` and which should stay as explicit initializer inputs.
-3. Sketch the view hierarchy, routing model, and presentation points; extract repeated parts into subviews. For complex navigation, read `references/navigationstack.md`, `references/sheets.md`, or `references/deeplinks.md`. **Build and verify no compiler errors before proceeding.**
+3. Shape the view hierarchy, routing, and presentation points as needed. For complex navigation, consult `references/navigationstack.md`, `references/sheets.md`, or `references/deeplinks.md`.
 4. Implement async loading with `.task` or `.task(id:)`, plus explicit loading and error states when needed. Read `references/async-state.md` when the work depends on changing inputs or cancellation.
-5. Add previews for the primary and secondary states, then add accessibility labels or identifiers when the UI is interactive. Read `references/previews.md` when the view needs fixtures or injected mock dependencies.
-6. Validate with a build: confirm no compiler errors, check that previews render without crashing, ensure state changes propagate correctly, and sanity-check that list identity and observation scope will not cause avoidable re-renders. Read `references/performance.md` if the screen is large, scroll-heavy, or frequently updated. For common SwiftUI compilation errors — missing `@State` annotations, ambiguous `ViewBuilder` closures, or mismatched generic types — resolve them before updating callsites. **If the build fails:** read the error message carefully, fix the identified issue, then rebuild before proceeding to the next step. If a preview crashes, isolate the offending subview, confirm its state initialisation is valid, and re-run the preview before continuing.
+5. Use previews and accessibility checks where they validate the affected UI. Read `references/previews.md` when fixtures or injected dependencies are needed.
+6. Verify the changed behavior with the relevant build, preview, test, or runtime check. Reuse checks for the unchanged final candidate. Repeat or broaden them only after a new change, failure, or unresolved concern; a text-only change does not imply a full build and preview cycle.
+
+These are design considerations, not mandatory stages. For a narrow edit, use only those
+that affect its correctness and preserve the surrounding structure.
 
 ## Component references
 

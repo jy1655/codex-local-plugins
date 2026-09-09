@@ -1,0 +1,39 @@
+{
+  "name": "jy-env-ios",
+  "version": "0.1.0",
+  "description": "Optional first-party iOS development pack with pinned XcodeBuildMCP workflows and focused SwiftUI tooling.",
+  "author": {
+    "name": "JaeYoung Hwang",
+    "url": "https://github.com/jy1655"
+  },
+  "homepage": "https://github.com/jy1655/codex-local-plugins",
+  "repository": "https://github.com/jy1655/codex-local-plugins",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "ios",
+    "swiftui",
+    "xcodebuildmcp"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "JY iOS Pack",
+    "shortDescription": "Pinned XcodeBuildMCP and focused iOS workflows",
+    "longDescription": "Adds a pinned XcodeBuildMCP server plus first-party workflows for simulator build, launch, debugging, UI automation, performance profiling, memory investigation, App Intents, and SwiftUI implementation.",
+    "developerName": "JaeYoung Hwang",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/jy1655/codex-local-plugins",
+    "defaultPrompt": [
+      "Build, launch, and inspect this iOS app on Simulator.",
+      "Profile this iOS flow and identify its performance bottleneck.",
+      "Refactor this SwiftUI screen without changing its behavior."
+    ],
+    "brandColor": "#0A84FF"
+  }
+}
