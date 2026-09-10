@@ -51,15 +51,15 @@ optional. `apply` refreshes the default core pack. It does not uninstall Codex p
 Start a fresh Codex session after changing installed packs. No second
 `~/.agents/skills/<pack>` discovery link is created.
 
-## Pinned XcodeBuildMCP
+## On-demand iOS CLI
 
-`jy-env-ios` replaces the upstream `build-ios-apps` plugin on this machine. It runs
-`xcodebuildmcp@2.7.0` through `npx` and enables only the `simulator`, `ui-automation`,
-and `debugging` workflows. The bundled debugger skill uses the current session-default,
-runtime-log, and `elementRef` UI contracts.
+`jy-env-ios` retains the iOS skills and uses `npx -y xcodebuildmcp@2.7.0` only when a
+task needs simulator builds, UI automation, runtime logs, or LLDB. It does not register
+an MCP server. Routine unit tests keep using the repository's existing scripts.
 
-Do not enable `build-ios-apps@openai-curated` and `jy-env-ios@personal-codex` together;
-both register the `xcodebuildmcp` server name.
+The CLI and MCP expose the same underlying tools. Stateful operations can start a
+workspace daemon on demand. See the [CLI documentation](https://www.xcodebuildmcp.com/docs/cli)
+and the bundled `ios-debugger-agent` skill for commands and current UI contracts.
 
 ## Archived research guidance
 
@@ -159,11 +159,16 @@ instructions under `archive/` unless the user requests a reference or reactivati
 
 ## Tests
 
-Run the full suite:
+Use Python 3.11 to match CI and run the full suite before pushing:
 
 ```bash
-python3 -m unittest discover -s tests -v
+python3 -X warn_default_encoding -W error::EncodingWarning -m unittest discover -s tests -q
+git diff --check
 ```
+
+The test command treats omitted text encodings as errors on every OS, catching locale
+dependencies locally before they fail on Windows. Keep explicit UTF-8 file I/O and the
+`.gitattributes` archive byte-preservation and plugin LF rules intact.
 
 Validate pressure-scenario assets:
 

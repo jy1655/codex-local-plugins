@@ -331,8 +331,8 @@ class SkillEvalEvidenceTests(unittest.TestCase):
             stage_skill_dirs((first, second), isolated_home)
 
             destination = isolated_home / ".agents" / "skills"
-            self.assertEqual((destination / "first" / "SKILL.md").read_text(), "first\n")
-            self.assertEqual((destination / "second" / "SKILL.md").read_text(), "second\n")
+            self.assertEqual((destination / "first" / "SKILL.md").read_text(encoding="utf-8"), "first\n")
+            self.assertEqual((destination / "second" / "SKILL.md").read_text(encoding="utf-8"), "second\n")
 
     def test_resume_reuses_only_matching_successful_task_artifact(self) -> None:
         plan = build_eval_plan(

@@ -1,70 +1,76 @@
 ---
 name: ios-debugger-agent
-description: Use when building, launching, inspecting, automating, or debugging an iOS app on Simulator with the pinned XcodeBuildMCP server.
+description: Use when building, launching, inspecting, automating, or debugging an iOS app on Simulator with the pinned XcodeBuildMCP CLI.
 ---
 
 # iOS Debugger Agent
 
-Use the `xcodebuildmcp` MCP server for simulator builds, launches, runtime logs, UI
-inspection, interaction, and LLDB debugging.
+Use XcodeBuildMCP 2.7.0 on demand through the CLI. This pack does not register an MCP
+server. Keep using the repository's normal test scripts for routine unit tests.
+
+```sh
+npx -y xcodebuildmcp@2.7.0 <workflow> <tool> [flags] --output json
+```
+
+Run commands from the app's repository so they share workspace defaults and any
+stateful daemon. Inspect existing `.xcodebuildmcp/config.yaml` defaults before reusing
+them; pass explicit flags for missing or incorrect values without rewriting project
+configuration. Use `<workflow> <tool> --help` for the exact arguments. `--json` supplies
+a JSON object of arguments; `--output json` selects structured results.
 
 ## Build and Launch
 
 Use these operations when the request needs a build or launch. For logs, an existing
 screen, or a narrow debugger query, use that capability directly without rebuilding.
 
-1. Call `mcp__xcodebuildmcp__session_show_defaults` before the first build, run, or
-   test request.
-2. If the project or workspace, scheme, or simulator is missing or wrong:
-   - Call `mcp__xcodebuildmcp__list_sims`.
-   - Prefer a booted matching simulator. Otherwise choose a canonical simulator name;
-     `build_run_sim` can boot it when needed.
-   - Call `mcp__xcodebuildmcp__session_set_defaults` with `projectPath` or
-     `workspacePath`, `scheme`, and preferably `simulatorName`. Use `simulatorId` only
-     for a machine-local selection. Set `configuration: "Debug"` and `useLatestOS:
-     true` when those match the task.
-3. After changing defaults, call `mcp__xcodebuildmcp__session_show_defaults` to verify
-   the resolved values. Reuse unchanged defaults already verified in this session.
-4. Call `mcp__xcodebuildmcp__build_run_sim`. Do not call separate boot or open tools
-   as prerequisites.
-5. Verify the launched UI with `mcp__xcodebuildmcp__snapshot_ui` or
-   `mcp__xcodebuildmcp__screenshot`.
+1. Resolve the project or workspace and scheme from repository instructions or existing
+   defaults. Use `simulator list` when selecting a simulator; prefer an available,
+   booted match. Pass `--simulator-id` for a machine-local selection.
+2. Use `simulator build-and-run` with `--project-path` or `--workspace-path`, `--scheme`,
+   and the chosen simulator. Use `--configuration Debug` when appropriate. It boots the
+   simulator when needed; separate boot or open commands are not prerequisites.
+3. Verify the launched UI with `ui-automation snapshot-ui` or `ui-automation screenshot`.
 
-If the app is already installed and only a launch is needed, set `bundleId` through
-`session_set_defaults` and call `mcp__xcodebuildmcp__launch_app_sim`. If the bundle ID
-is unknown, call `mcp__xcodebuildmcp__get_sim_app_path` with `platform: "iOS
-Simulator"`, then pass its app path to `mcp__xcodebuildmcp__get_app_bundle_id`.
+For an installed app, use `simulator launch-app --bundle-id <id>` with the chosen
+simulator. If the bundle ID is unknown, use `simulator get-app-path --platform 'iOS
+Simulator'`, then `simulator get-app-bundle-id` with the returned app path.
 
 ## UI Interaction
 
-- Call `snapshot_ui` before every interaction sequence.
-- Use the returned `elementRef` with `tap` and with `type_text`.
-- Pass both `elementRef` and `text` to `type_text`; use `replaceExisting: true` when
-  replacing a field value.
-- Use `gesture` with a documented preset for scrolling or edge swipes.
-- Refresh `snapshot_ui` after an action before relying on changed screen state.
-- Use `screenshot` when visual evidence matters.
+- Use the `ui-automation` workflow and pass `--simulator-id` when not set in defaults.
+- Capture `snapshot-ui` before an interaction sequence. Use its `elementRef` as
+  `--element-ref` for `tap` or `type-text`; never invent a target.
+- Pass both `--element-ref` and `--text` to `type-text`; use `--replace-existing` when
+  replacing a field value. Quote user text safely for the shell.
+- Use `gesture` with a documented preset, or `swipe` with `--within-element-ref` for a
+  scrollable target from the current snapshot.
+- Refresh `snapshot-ui` after navigation, scrolling, or layout changes before relying
+  on changed screen state. Use `screenshot` when visual evidence matters.
 
 ## Runtime Logs
 
-`build_run_sim` and `launch_app_sim` capture runtime logs automatically. Read the
+`simulator build-and-run` and `simulator launch-app` capture runtime logs automatically. Read the
 runtime log path returned in the tool result and summarize only the lines relevant to
 the reported behavior. Relaunch the app when a clean log boundary is required.
 
 ## Debugging
 
-- Set `preferXcodebuild: true` through `session_set_defaults` only when incremental
-  build behavior is suspected or the user requests standard `xcodebuild`.
-- Attach LLDB with `debug_attach_sim` only after the app is running.
+- Pass `--prefer-xcodebuild` only when incremental build behavior is suspected or the
+  user requests standard `xcodebuild`.
+- Use `debugging attach` only after the app is running.
 - Use breakpoints, stack inspection, variable inspection, and raw LLDB commands in the
   narrowest sequence needed for the diagnosis.
-- Detach the debugger when the investigation is complete.
+- Use `debugging detach` when the investigation is complete.
+
+Stateful log, video, and LLDB operations can start a workspace daemon on demand; CLI
+use does not mean every process exits after each command. Do not stop another task's
+daemon or simulator.
 
 ## Failure Handling
 
 - On build failure, report the structured diagnostics before changing code or retrying.
-- If the wrong app launches, re-check the active defaults, scheme, and bundle ID.
-- If an `elementRef` becomes stale, capture a fresh `snapshot_ui` and use the new ref.
-- If the MCP tools are absent, report which requested operation cannot be performed
-  and continue any independent source analysis. Installing the optional jy-env-ios pack
-  and starting a fresh Codex session makes its tools available.
+- If the wrong app launches, re-check the effective flags, defaults, scheme, and bundle ID.
+- If an `elementRef` becomes stale, capture a fresh `snapshot-ui` and use the new ref.
+- If the CLI fails, inspect its diagnostics and report the unperformed operation.
+  Continue independent source analysis; do not enable a persistent MCP server as a
+  prerequisite.

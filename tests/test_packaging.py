@@ -33,7 +33,7 @@ class PackagingTests(unittest.TestCase):
     def test_original_archive_payloads_match_recorded_checksums(self) -> None:
         archive = REPO_ROOT / "archive"
         recorded = {}
-        for line in (archive / "SHA256SUMS").read_text().splitlines():
+        for line in (archive / "SHA256SUMS").read_text(encoding="utf-8").splitlines():
             digest, relative = line.split("  ", 1)
             recorded[relative] = digest
         actual = {
@@ -50,9 +50,11 @@ class PackagingTests(unittest.TestCase):
     def test_ios_runtime_assets_are_preserved(self) -> None:
         active = REPO_ROOT / "plugins" / "jy-env-ios"
         original = REPO_ROOT / "archive" / "plugins" / "jy-env-ios"
-        runtime_paths = [Path(".mcp.json")]
-        runtime_paths.extend(path.relative_to(original) for path in original.glob("skills/*/scripts/**/*") if path.is_file())
-        self.assertGreater(len(runtime_paths), 1)
+        runtime_paths = [
+            path.relative_to(original)
+            for path in original.glob("skills/*/scripts/**/*") if path.is_file()
+        ]
+        self.assertGreater(len(runtime_paths), 0)
         for relative in runtime_paths:
             with self.subTest(path=relative):
                 self.assertEqual((active / relative).read_bytes(), (original / relative).read_bytes())
@@ -66,17 +68,19 @@ class PackagingTests(unittest.TestCase):
                 entries = ['schema_version = 1\nname = "migration-fixture"\n']
                 for pack in sorted((old_repo / "plugins").iterdir()):
                     entries.append(f'[[plugins]]\nname = "{pack.name}"\nsource = "plugins/{pack.name}"\ninstall_mode = "copy"\n')
-                (old_repo / "codex-env.toml").write_text("\n".join(entries))
+                (old_repo / "codex-env.toml").write_text("\n".join(entries), encoding="utf-8")
                 apply_environment(old_repo, home=home, os_name=os_name)
                 self.assertTrue((home / "plugins" / "jy-env-planning").exists())
+                self.assertTrue((home / "plugins" / "jy-env-ios" / ".mcp.json").is_file())
                 for _ in range(2):
                     apply_environment(REPO_ROOT, home=home, os_name=os_name)
                     self.assertEqual({path.name for path in (home / "plugins").iterdir()}, set(EXPECTED_PACKS))
                     staged = {path.parent.name for path in (home / "plugins").glob("*/skills/*/SKILL.md")}
                     self.assertEqual(staged, {name for names in EXPECTED_PACKS.values() for name in names})
-                    catalog = json.loads((home / ".agents" / "plugins" / "marketplace.json").read_text())
+                    catalog = json.loads((home / ".agents" / "plugins" / "marketplace.json").read_text(encoding="utf-8"))
                     self.assertEqual({entry["name"] for entry in catalog["plugins"]}, set(EXPECTED_PACKS))
                     self.assertFalse((home / "archive").exists())
+                    self.assertFalse((home / "plugins" / "jy-env-ios" / ".mcp.json").exists())
 
     def test_first_party_skills_are_partitioned_without_duplication(self) -> None:
         actual: dict[str, set[str]] = {}
@@ -117,50 +121,8 @@ class PackagingTests(unittest.TestCase):
                 )
                 self.assertEqual(manifest["name"], plugin_name)
                 self.assertEqual(manifest["skills"], "./skills/")
-                if plugin_name == "jy-env-ios":
-                    self.assertEqual(manifest["mcpServers"], "./.mcp.json")
-                    self.assertTrue((plugin_root / ".mcp.json").is_file())
-                else:
-                    self.assertNotIn("mcpServers", manifest)
-                    self.assertFalse((plugin_root / ".mcp.json").exists())
-
-    def test_ios_pack_pins_current_xcodebuildmcp_contract(self) -> None:
-        plugin_root = REPO_ROOT / "plugins" / "jy-env-ios"
-        mcp = json.loads((plugin_root / ".mcp.json").read_text(encoding="utf-8"))
-        server = mcp["mcpServers"]["xcodebuildmcp"]
-
-        self.assertEqual(server["command"], "npx")
-        self.assertEqual(server["args"], ["-y", "xcodebuildmcp@2.7.0", "mcp"])
-        self.assertEqual(
-            server["env"]["XCODEBUILDMCP_ENABLED_WORKFLOWS"],
-            "simulator,ui-automation,debugging",
-        )
-        self.assertNotIn("@latest", json.dumps(server))
-        self.assertNotIn(
-            "logging",
-            server["env"]["XCODEBUILDMCP_ENABLED_WORKFLOWS"].split(","),
-        )
-
-        skill_text = (
-            plugin_root / "skills" / "ios-debugger-agent" / "SKILL.md"
-        ).read_text(encoding="utf-8")
-        for current_name in [
-            "session_show_defaults",
-            "session_set_defaults",
-            "snapshot_ui",
-            "build_run_sim",
-            "launch_app_sim",
-        ]:
-            self.assertIn(current_name, skill_text)
-        for retired_name in [
-            "session-set-defaults",
-            "describe_ui",
-            "start_sim_log_cap",
-            "stop_sim_log_cap",
-        ]:
-            self.assertNotIn(retired_name, skill_text)
-        self.assertIn("elementRef", skill_text)
-        self.assertIn("runtime log", skill_text.lower())
+                self.assertNotIn("mcpServers", manifest)
+                self.assertFalse((plugin_root / ".mcp.json").exists())
 
     def test_library_research_uses_lazy_pinned_context7_cli(self) -> None:
         skill_path = (

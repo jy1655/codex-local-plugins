@@ -49,15 +49,16 @@ codex plugin add jy-env-ios@personal-codex
 변경 후에는 새 Codex session을 시작합니다. 별도의 `~/.agents/skills/<pack>`
 discovery link는 만들지 않습니다.
 
-## 고정된 XcodeBuildMCP
+## 필요할 때 호출하는 iOS CLI
 
-`jy-env-ios`는 이 머신에서 upstream `build-ios-apps` plugin을 대체합니다.
-`npx`로 `xcodebuildmcp@2.7.0`을 실행하고 `simulator`, `ui-automation`,
-`debugging` workflow만 활성화합니다. 포함된 debugger skill은 현재
-session-default, runtime-log, `elementRef` UI contract를 사용합니다.
+`jy-env-ios`는 iOS 스킬을 유지하고 시뮬레이터 빌드, UI 자동화, 실행 로그, LLDB가
+필요할 때만 `npx -y xcodebuildmcp@2.7.0`을 호출합니다. MCP 서버는 자동 등록하지
+않습니다. 일반 단위 테스트는 각 저장소의 기존 스크립트를 사용합니다.
 
-`build-ios-apps@openai-curated`와 `jy-env-ios@personal-codex`를 동시에 활성화하지
-마십시오. 둘 다 `xcodebuildmcp` server name을 등록합니다.
+CLI와 MCP는 같은 도구 구현을 사용합니다. 상태를 유지하는 작업에서는 프로젝트별
+daemon이 필요할 때 시작될 수 있습니다. 명령과 현재 UI 호출 규약은
+[CLI 문서](https://www.xcodebuildmcp.com/docs/cli)와 포함된 `ios-debugger-agent` 스킬을
+참고합니다.
 
 ## 보관된 조사 지침
 
@@ -158,11 +159,16 @@ seed에 실시간으로 의존하지 않고 이 저장소의 first-party plugin 
 
 ## Tests
 
-전체 suite:
+CI와 같은 Python 3.11로 push 전에 전체 suite를 실행합니다.
 
 ```bash
-python3 -m unittest discover -s tests -v
+python3 -X warn_default_encoding -W error::EncodingWarning -m unittest discover -s tests -q
+git diff --check
 ```
+
+이 명령은 모든 OS에서 텍스트 인코딩 누락을 오류로 처리해 Windows에서만 드러나던
+기본 인코딩 의존을 로컬에서도 잡습니다. 파일 입출력의 명시적 UTF-8 지정과
+`.gitattributes`의 archive 원본 바이트 보존·plugin LF 규칙을 유지합니다.
 
 Pressure-scenario asset 검증:
 

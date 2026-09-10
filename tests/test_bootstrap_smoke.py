@@ -196,6 +196,7 @@ class BootstrapSmokeTests(unittest.TestCase):
                 env=env,
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
             )
             self.assertEqual(result.returncode, 0, result.stderr)
 

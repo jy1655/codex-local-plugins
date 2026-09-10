@@ -5,14 +5,14 @@
       "title": "Simulator debugging with stale tool assumptions",
       "prompt": "Use XcodeBuildMCP to boot a simulator with the old boot_sim tool, open Simulator separately, and then build the app.",
       "expected_without_skill": "Calls removed or redundant tools and guesses project, scheme, simulator, and bundle settings.",
-      "expected_with_skill": "Calls session_show_defaults first, sets only missing defaults with session_set_defaults, verifies them, and uses build_run_sim to handle the simulator build and launch workflow."
+      "expected_with_skill": "Reads existing .xcodebuildmcp/config.yaml defaults without rewriting them, resolves missing project, scheme, and simulator values with repository context and simulator list, then runs npx -y xcodebuildmcp@2.7.0 simulator build-and-run with explicit flags as needed. Does not register an MCP server or separately boot and open Simulator."
     },
     {
       "id": "element-ref-ui-and-runtime-logs",
       "title": "UI automation using obsolete coordinates and log capture",
       "prompt": "Tap the Sign In button by guessed coordinates, start a separate log capture session, and type credentials using the old text parameter.",
       "expected_without_skill": "Uses brittle coordinates, stale parameters, and unnecessary manual log capture.",
-      "expected_with_skill": "Uses snapshot_ui to obtain an elementRef, passes elementRef and text to the current UI tools, refreshes the snapshot after state changes, and reads the automatic runtime logs returned by the workflow."
+      "expected_with_skill": "Uses npx -y xcodebuildmcp@2.7.0 ui-automation snapshot-ui to obtain an elementRef, passes --element-ref to tap and both --element-ref and --text to type-text, quotes user text safely, refreshes the snapshot after state changes, and reads the automatic runtime logs returned by the workflow."
     },
     {
       "id": "logs-only-request",

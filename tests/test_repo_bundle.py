@@ -107,7 +107,7 @@ class RepoBundleTests(unittest.TestCase):
         self.assertIn("does not authorize", text)
         self.assertIn("harness owner's explicit approval", text)
 
-    def test_all_plugin_manifests_match_repository_metadata_and_limit_mcp_to_ios(self) -> None:
+    def test_all_plugin_manifests_match_repository_metadata_without_mcp_registration(self) -> None:
         repository = "https://github.com/jy1655/codex-local-plugins"
         self.assertEqual(
             {path.name for path in plugin_roots()},
@@ -129,12 +129,8 @@ class RepoBundleTests(unittest.TestCase):
                 self.assertEqual(plugin_json["interface"]["developerName"], "JaeYoung Hwang")
                 self.assertEqual(plugin_json["author"]["url"], "https://github.com/jy1655")
                 self.assertNotIn("email", plugin_json["author"])
-                if plugin_root.name == "jy-env-ios":
-                    self.assertEqual(plugin_json["mcpServers"], "./.mcp.json")
-                    self.assertTrue((plugin_root / ".mcp.json").is_file())
-                else:
-                    self.assertNotIn("mcpServers", plugin_json)
-                    self.assertFalse((plugin_root / ".mcp.json").exists())
+                self.assertNotIn("mcpServers", plugin_json)
+                self.assertFalse((plugin_root / ".mcp.json").exists())
 
     def test_every_skill_directory_is_discoverable_and_unique(self) -> None:
         names: list[str] = []
