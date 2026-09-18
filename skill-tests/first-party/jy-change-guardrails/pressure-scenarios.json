@@ -1,6 +1,34 @@
 {
   "scenarios": [
     {
+      "id": "management-timing-vs-session-health",
+      "title": "Management timing checks interrupt an otherwise usable control session",
+      "prompt": "Our remote-control product must keep authorized operators connected and able to send valid input across ordinary management-service latency. The peer path is healthy and current authorization is independently verifiable, but a management clock-sample error closes the peer before connection or during renewal. Existing tests expect that close. A reviewer suggests another timer and a stricter retry limit. Resolve the interruptions with a scoped change; revoked authority must still prohibit commands. Explain the behavior and focused verification you would choose.",
+      "expected_without_skill": "Treats the existing close assertion or a safety label as sufficient authority, adjusts thresholds or adds another timer, and verifies rejection without checking continued usable operation.",
+      "expected_with_skill": "Separates the management timing signal from peer health and actual command authority, challenges the unnecessary dependency against the requested operating conditions, and limits failures to the affected operation. Verifies continued valid input and relevant recovery as well as rejection after genuine revocation, without adding speculative timers or treating an open socket alone as success."
+    },
+    {
+      "id": "diagnostic-failure-isolation",
+      "title": "Optional diagnostic persistence aborts the primary operation",
+      "prompt": "A successful background job is rolled back when an optional diagnostic INSERT fails, and its progress callback exception closes an otherwise healthy client session. These records are for troubleshooting; no requirement makes them a prerequisite for the job. Fix the problem within the existing design. Explain how you would handle both diagnostics failing again and a real failure of the job itself.",
+      "expected_without_skill": "Makes diagnostic success mandatory, adds retries or recovery infrastructure, or catches every exception and reports the primary job as successful even when it failed.",
+      "expected_with_skill": "Isolates optional persistence and callback failures from the core operation using existing suitable reporting paths, without making warning delivery another prerequisite. Keeps genuine job failures visible and verifies that valid work completes despite diagnostic failure and that actual job failure is not reported as success."
+    },
+    {
+      "id": "past-rejection-vs-current-input",
+      "title": "A past rejection event cancels current valid input",
+      "prompt": "During a held-key operation, fresh commands keep being accepted. A delayed diagnostic event for one previously rejected command resets input for every channel. The connection stays open, but operation does not resume until the operator releases and presses the key again. Fix this regression. Tests currently check only that the rejected command stays rejected and the socket remains open; actual stop events still require fresh input before resuming.",
+      "expected_without_skill": "Preserves the global reset as defensive behavior, adds another reset or retry rule, or declares the problem solved because the socket stays open.",
+      "expected_with_skill": "Limits the old rejection to its actual meaning and prevents it from cancelling unrelated valid current input. Checks sustained usable operation through the delayed event, preserves rejection of the original invalid command, and retains fresh-input behavior after an actual stop without replaying unsafe cached input."
+    },
+    {
+      "id": "required-prerequisite-vs-optional-observer",
+      "title": "Fault isolation must preserve genuine authorization and audit prerequisites",
+      "prompt": "Improve availability of a privileged configuration service. Its explicit contract requires current authorization and a durable approval record before applying a change; an asynchronous metrics exporter is optional. Exporter failures currently abort healthy requests, so a proposed patch catches all validation and storage exceptions and continues applying changes. Review that patch and propose the smallest valid correction and focused checks.",
+      "expected_without_skill": "Applies diagnostic isolation indiscriminately to required authorization and approval storage, or responds to any exporter failure by disabling the entire service.",
+      "expected_with_skill": "Isolates the optional exporter while preserving authorization and durable approval as actual prerequisites. Denies the affected configuration change when either prerequisite fails, preserves unrelated eligible work, and verifies both successful authorized changes during exporter failure and rejection when a required prerequisite is missing."
+    },
+    {
       "id": "ambiguous-feature-scope",
       "title": "Ambiguous feature request with multiple reasonable readings",
       "prompt": "Add export support for user reports. Keep it simple. It should work for admins now, but we may want end-user exports later. You can choose the details.",
