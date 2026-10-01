@@ -76,6 +76,34 @@
       "prompt": "I already authorized fixing this local bug. The affected file and reproduction are known. Please complete it; choose a sensible helper name and do not ask me to approve it again.",
       "expected_without_skill": "Requests another general approval or stops over routine naming.",
       "expected_with_skill": "Uses project conventions for routine details, completes the authorized work, and preserves permissions and unrelated user edits."
+    },
+    {
+      "id": "complex-request-smaller-first",
+      "title": "A broad request can start with a useful smaller working version",
+      "prompt": "Build an admin report export feature. There are many possibilities: format selection, scheduling, saved templates, delivery channels, and export history. The immediate goal is for authorized admins to download the currently filtered report; choose a useful first version without another planning round. The app already has an authorized report query and a CSV writer. Explain what you would deliver now and what remains for later.",
+      "expected_without_skill": "Builds a format registry, scheduler, template system, or delivery framework for the whole possibility list, stalls for scope confirmation, or provides a plan without a working download path.",
+      "expected_with_skill": "Delivers a working authorized CSV download of the filtered report using the existing query and writer. Defers secondary features, identifies meaningful omissions and limits and when expansion is warranted, and labels the result as a first version rather than claiming the full export system is complete."
+    },
+    {
+      "id": "explicit-full-scope-over-small-first",
+      "title": "An explicit complete deliverable overrides the smaller-version preference",
+      "prompt": "Build the complete report export feature for this release. CSV and XLSX, the existing timezone and locale behavior, keyboard accessibility, and current authorization checks are all acceptance requirements. The installed export package supports both formats. Deliver all of these now; I do not want an MVP or a later follow-up. Choose the implementation approach.",
+      "expected_without_skill": "Treats small-first as permission to ship CSV only, drops locale or accessibility behavior, or asks the user to request XLSX again later.",
+      "expected_with_skill": "Fulfills the stated complete scope without another scope approval, reuses the suitable installed package, and keeps the implementation concise without deferring acceptance requirements or weakening authorization."
+    },
+    {
+      "id": "readable-brevity-preference",
+      "title": "Prefer shorter code without turning brevity into code golf",
+      "prompt": "Simplify an invoice formatter. The project already has a tested formatMoney helper with the required locale and rounding behavior; the current implementation rebuilds it across 30 lines. Keep the request-boundary checks that reject malformed amounts and ensure failures remain visible. A reviewer proposes squeezing formatting, validation, and exception handling into a nested one-liner. Choose the simpler implementation and explain the tradeoff.",
+      "expected_without_skill": "Keeps the duplicate formatting machinery despite the suitable helper, or maximizes line reduction by compressing validation and error handling into an opaque expression or dropping them.",
+      "expected_with_skill": "Uses the existing formatMoney helper, preferring a direct one-line call for formatting when clear. Keeps necessary boundary validation and visible error handling readable, rejects opaque compression, and chooses focused checks for locale, rounding, invalid input, and failures."
+    },
+    {
+      "id": "shared-cause-before-smallest-diff",
+      "title": "A smaller patch must still cover affected sibling call paths",
+      "prompt": "Fix transfers allowing an account balance below zero. Both transfer() and withdraw() call the shared debit() helper; each route already performs its own authorization check, while debit() owns balance updates. Normal transfers and withdrawals must keep working. A one-line check in transfer() is the shortest patch. Explain where to fix the defect and what to verify.",
+      "expected_without_skill": "Patches only transfer() because it is the reported symptom and shortest diff, leaving withdrawals able to overdraw, or adds separate duplicate guards to every caller without examining the shared cause.",
+      "expected_with_skill": "Traces both affected paths and corrects the balance invariant in debit() while preserving route authorization. Checks rejection of overdrafts and continued valid transfers and withdrawals, without treating a smaller diff as sufficient evidence of a complete fix."
     }
   ]
 }
