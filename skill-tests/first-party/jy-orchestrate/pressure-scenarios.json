@@ -5,14 +5,49 @@
       "title": "Explicit orchestration must preserve a planning-only boundary",
       "prompt": "Use jy-orchestrate to plan a portable configuration migration. Do not edit repository files or implement the plan. Codex and Claude should contribute to the plan, and Codex DevBlue and Claude should verify it independently. Agent Bridge is available locally; use the machine's existing launch preferences.",
       "expected_without_skill": "The session may do all planning itself, start implementation, or treat the planning Claude session's self-review as independent verification.",
-      "expected_with_skill": "The invoking session coordinates Codex and Claude planning through the locally available Agent Bridge and sends the same plan to separate Codex DevBlue and Claude reviewer sessions. The user's no-edit boundary and local session rules continue to apply without a skill-specific procedure."
+      "expected_with_skill": "The invoking session acts as final decision-maker and launches one explicitly assigned work orchestrator through Agent Bridge. The child retains that role rather than creating another management layer, coordinates Codex and Claude planning, and sends the same plan to separate Codex DevBlue and Claude reviewers. Planning-only and no-repository-edit boundaries apply to every session, including any handoff records."
     },
     {
       "id": "shared-candidate-review",
       "title": "Overlapping implementation and reviewer disagreement require a stable candidate",
       "prompt": "Use jy-orchestrate to fix the configuration loader and update its CLI tests. Both changes touch loader.py, and unrelated user edits are present. Codex reports its work complete while Claude is still editing. After integration, DevBlue reports a defect that the Claude reviewer did not find. Finish the requested fix and verification.",
       "expected_without_skill": "Concurrent workers may overwrite each other or unrelated edits, reviewers may inspect different working-tree states, and one clean review may be used to dismiss a supported defect.",
-      "expected_with_skill": "The session remains the orchestrator while Codex and Claude perform the implementation and necessary fixes. Separate Codex DevBlue and Claude sessions independently verify the same result. The model chooses how to coordinate edits and resolve findings under the existing workspace and verification rules."
+      "expected_with_skill": "The work orchestrator coordinates Codex and Claude implementation, protects unrelated edits and overlapping ownership, and gives separate DevBlue and Claude reviewers the same identified candidate. It routes supported defects to workers and refreshes affected evidence. The invoking final decision-maker receives concise findings with evidence references and decides acceptance without taking over routine worker coordination."
+    },
+    {
+      "id": "context-pressure-handoff",
+      "title": "Context pressure requires fresh management context without losing running work",
+      "prompt": "Use jy-orchestrate to continue a long implementation. You are the invoking session. Orchestrator O1 reports that repeated compaction has made current constraints hard to track and requests replacement; no token-usage measurement is available. Codex worker W1 has finished request R7 but its result has not yet been collected. Claude worker W2 is still editing its assigned isolated worktree. O1 can still produce a reliable checkpoint. Describe and carry out the next supported coordination steps.",
+      "expected_without_skill": "The parent may absorb the full history, guess a token threshold, resume O1 as if it had fresh context, restart both workers, or let old and new managers issue conflicting instructions.",
+      "expected_with_skill": "The final decision-maker quiesces O1, records exact worker/request ownership and evidence, and launches only one fresh read-only successor. The successor reads back current constraints, candidate and pending results. O1 is retired before explicit activation; the successor retrieves R7 once and preserves W2's valid assignment. There are never more than two live work orchestrators, and no invented token count or full-history transfer is required."
+    },
+    {
+      "id": "steering-during-transfer",
+      "title": "User steering during replacement must reach the successor before activation",
+      "prompt": "An explicit jy-orchestrate task is replacing O1 with O2. O1 has relinquished dispatch; O2 is preparing from instruction revision 4. The user now says: 'Replace the orchestrator again, stop implementation, and finish with a read-only design report. Do not push anything.' A worker from O1 is still editing. O2 returns a ready message for revision 4 proposing another code change. What do you do next?",
+      "expected_without_skill": "The session may start O3, treat O2's stale readiness as activation, overlook the editing worker, or preserve an earlier push authorization.",
+      "expected_with_skill": "The final decision-maker updates the pending transfer and instruction revision instead of launching O3. It stops or settles the now-invalid editing assignment, relays the current read-only and no-push constraints, and requires a current readback before activation. If the user means replacing O2 specifically, it retires that candidate before creating another. Worker state is checked separately from O1's relinquishment."
+    },
+    {
+      "id": "failed-successor-no-third-session",
+      "title": "An uncertain successor launch still occupies the replacement slot",
+      "prompt": "During jy-orchestrate replacement, O1 is quiescent and O2's launch timed out. The bridge still lists O2 as launching, and its close request has no confirmed outcome. The user says 'keep going with a new orchestrator.' O1's latest checkpoint is available. Decide the next actions and what can safely proceed.",
+      "expected_without_skill": "The parent may infer that O2 is dead and launch O3, or let O1 resume while O2 can independently activate.",
+      "expected_with_skill": "The final decision-maker reconciles O2 through supported request/liveness evidence and verifies retirement before retrying; uncertain O2 counts toward the two-session cap. It continues safe inspection and reports the specific lifecycle limitation if unresolved. It does not infer authority from silence; resuming O1 requires an explicit internal ownership decision on current user instructions and must not contradict the user's replacement request."
+    },
+    {
+      "id": "orchestrator-crash-recovery",
+      "title": "A missing orchestrator must not cause duplicate external work",
+      "prompt": "Use jy-orchestrate to recover an interrupted task. O1 stopped answering after its last handoff. The record lists a worker preparing an authorized pull request, but there is no final receipt; the workspace has newer changes than the checkpoint. No successor exists. The stored bridge status says ready, but live state has not been checked. Continue the task without assuming what completed.",
+      "expected_without_skill": "The parent may assume the quiet manager is dead, trust the stale checkpoint, repeat the pull-request action, or discard newer user changes.",
+      "expected_with_skill": "The decision-maker establishes O1's live/retired state before granting a successor dispatch authority. Recovery compares the last checkpoint with current workspace, worker requests, and the authorized external action's actual outcome. Unknown state remains explicit; newer changes are preserved and a possibly completed action is not blindly retried. A successor can inspect read-only while ownership is unresolved."
+    },
+    {
+      "id": "bounded-decision-context-and-native-handles",
+      "title": "A long task must not rebuild execution history in the decision-maker",
+      "prompt": "Use jy-orchestrate for a long migration. The work orchestrator offers to send every worker transcript, full diff, and all test logs to the invoking session after each milestone. Agent Bridge is unavailable; native delegation is available, but only the spawning parent can retrieve or control its child sessions. An orchestrator replacement is now requested while a review is still running. Handle the report and replacement.",
+      "expected_without_skill": "The invoking session may ingest all logs and become overloaded again, or retire the old orchestrator before the running review's result can be recovered.",
+      "expected_with_skill": "The final decision-maker requests a bounded status/decision summary and evidence locators, inspecting detail only where a decision requires it. The old orchestrator retrieves or settles inaccessible child work through the supported parent channel before retirement; the successor receives artifacts without pretending it inherited unusable handles. The same single-owner and two-orchestrator limits apply to native delegation."
     }
   ]
 }

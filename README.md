@@ -25,9 +25,16 @@ an explicitly invoked orchestration skill, and an optional iOS tool pack.
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate` (explicit only) |
 | `jy-env-ios` | `AVAILABLE` | Nine iOS tool and technical-reference skills |
 
-Invoke `$jy-orchestrate` to make the current session coordinate Codex and Claude planning
-or implementation, followed by independent Codex DevBlue and Claude verification.
+Invoke `$jy-orchestrate` to keep the current session as the final decision-maker and
+delegate execution management to one work orchestrator. That session coordinates Codex
+and Claude planning or implementation, followed by independent Codex DevBlue and Claude
+verification. On context pressure or a replacement instruction, a fresh orchestrator
+reads a compact handoff before taking over. At most two work orchestrators coexist during
+transfer, with only one authorized to dispatch work. Detailed results stay in task
+artifacts; the decision-maker receives concise progress and decision requests.
 It prefers Agent Bridge when available locally and has `allow_implicit_invocation: false`.
+Replacement is a skill procedure using available session controls, not an automatic
+token monitor or runtime-enforced lock.
 
 The other 23 workflow skills, including `jy-env-planning`, `jy-env-delivery`, and
 `jy-env-audit`, are preserved under [archive/](archive/README.md). They are absent from the

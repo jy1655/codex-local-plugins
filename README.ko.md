@@ -24,9 +24,14 @@ Codex CLI로 설치합니다.
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate` (명시 호출 전용) |
 | `jy-env-ios` | `AVAILABLE` | iOS 도구·기술 참고 스킬 9개 |
 
-`$jy-orchestrate`를 호출하면 현재 세션이 Codex와 Claude의 계획·구현을 조율하고,
-Codex DevBlue와 별도 Claude 세션이 결과를 독립 검증합니다. 로컬에서 Agent Bridge를
+`$jy-orchestrate`를 호출하면 현재 세션은 최종결정자를 맡고 작업 오케스트레이터 1개가
+Codex·Claude의 계획·구현과 Codex DevBlue·별도 Claude 세션의 독립 검증을 조율합니다.
+컨텍스트 부담이나 교체 지시가 있으면 새 오케스트레이터가 요약된 상태를 인수인계받습니다.
+교체 중에만 최대 2개가 공존하며 실제 작업 지휘권은 하나만 유지합니다. 상세 결과는 작업
+기록에 두고 최종결정자에게는 진행 요약과 결정 요청을 전달합니다. 로컬에서 Agent Bridge를
 사용할 수 있으면 우선 사용하며, `allow_implicit_invocation: false`로 자동 선택을 끕니다.
+교체는 사용 가능한 세션 제어 도구를 따르는 스킬 절차이며 자동 토큰 감시나 런타임 잠금을
+추가하는 방식은 아닙니다.
 
 나머지 23개 절차 스킬과 `jy-env-planning`, `jy-env-delivery`, `jy-env-audit`는
 [archive/](archive/README.md)에 보존합니다. Manifest와 marketplace에서 제외되어
