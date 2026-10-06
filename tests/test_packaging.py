@@ -15,17 +15,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 EXPECTED_PACKS = {
     "jy-env-core": {"jy-change-guardrails", "jy-orchestrate"},
-    "jy-env-ios": {
-        "ios-app-intents",
-        "ios-debugger-agent",
-        "ios-ettrace-performance",
-        "ios-memgraph-leaks",
-        "ios-simulator-browser",
-        "swiftui-liquid-glass",
-        "swiftui-performance-audit",
-        "swiftui-ui-patterns",
-        "swiftui-view-refactor",
-    },
+    "jy-env-ios": {"ios-memgraph-leaks"},
 }
 
 
@@ -45,16 +35,16 @@ class PackagingTests(unittest.TestCase):
         original_names = {path.parent.name for path in archive.glob("plugins/*/skills/*/SKILL.md")}
         active_names = {name for names in EXPECTED_PACKS.values() for name in names}
         self.assertEqual(len(original_names), 33)
-        self.assertEqual(len(original_names - active_names), 23)
+        self.assertEqual(len(original_names - active_names), 31)
 
-    def test_ios_runtime_assets_are_preserved(self) -> None:
+    def test_ios_pack_keeps_only_the_memgraph_analysis_helper(self) -> None:
         active = REPO_ROOT / "plugins" / "jy-env-ios"
         original = REPO_ROOT / "archive" / "plugins" / "jy-env-ios"
         runtime_paths = [
-            path.relative_to(original)
-            for path in original.glob("skills/*/scripts/**/*") if path.is_file()
+            path.relative_to(active)
+            for path in active.glob("skills/*/scripts/**/*") if path.is_file()
         ]
-        self.assertGreater(len(runtime_paths), 0)
+        self.assertEqual(runtime_paths, [Path("skills/ios-memgraph-leaks/scripts/summarize_memgraph_leaks.py")])
         for relative in runtime_paths:
             with self.subTest(path=relative):
                 self.assertEqual((active / relative).read_bytes(), (original / relative).read_bytes())

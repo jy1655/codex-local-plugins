@@ -113,21 +113,23 @@ class SkillEvalDiscoveryTests(unittest.TestCase):
             {"*"},
         )
 
-        peers = expand_skill_names_to_pack_peers(REPO_ROOT, {"ios-debugger-agent"})
-        self.assertEqual(len(peers), 9)
-        self.assertIn("ios-memgraph-leaks", peers)
-        self.assertNotIn("jy-change-guardrails", peers)
+        peers = expand_skill_names_to_pack_peers(REPO_ROOT, {"jy-change-guardrails"})
+        self.assertEqual(peers, {"jy-change-guardrails", "jy-orchestrate"})
+        self.assertEqual(
+            expand_skill_names_to_pack_peers(REPO_ROOT, {"ios-memgraph-leaks"}),
+            {"ios-memgraph-leaks"},
+        )
 
         source_change = skill_names_for_changed_paths(
-            ["plugins/jy-env-ios/skills/ios-debugger-agent/SKILL.md"],
+            ["plugins/jy-env-core/skills/jy-change-guardrails/SKILL.md"],
             repo_root=REPO_ROOT,
         )
         scenario_change = skill_names_for_changed_paths(
-            ["skill-tests/first-party/ios-debugger-agent/pressure-scenarios.json"],
+            ["skill-tests/first-party/jy-change-guardrails/pressure-scenarios.json"],
             repo_root=REPO_ROOT,
         )
         self.assertEqual(source_change, peers)
-        self.assertEqual(scenario_change, {"ios-debugger-agent"})
+        self.assertEqual(scenario_change, {"jy-change-guardrails"})
 
 
 class SkillEvalEvidenceTests(unittest.TestCase):
@@ -561,7 +563,7 @@ class SkillEvalEvidenceTests(unittest.TestCase):
             REPO_ROOT,
             model="gpt-5.6-sol",
             reasoning_effort="max",
-            skill_names=["swiftui-ui-patterns"],
+            skill_names=["jy-change-guardrails"],
             repetitions=3,
             max_scenarios_per_skill=2,
         )
@@ -630,9 +632,9 @@ class SkillEvalEvidenceTests(unittest.TestCase):
         implicit_context = next(
             names for _, arm, names in backend.task_calls if arm == "implicit"
         )
-        self.assertNotIn("swiftui-ui-patterns", baseline_context)
-        self.assertIn("ios-debugger-agent", baseline_context)
-        self.assertIn("swiftui-ui-patterns", implicit_context)
+        self.assertNotIn("jy-change-guardrails", baseline_context)
+        self.assertIn("jy-orchestrate", baseline_context)
+        self.assertIn("jy-change-guardrails", implicit_context)
         result = outcome.report["results"][0]
         self.assertEqual(result["verdict"], "REMOVE_CANDIDATE")
         self.assertEqual(result["baseline_input_tokens"], 100)
@@ -827,14 +829,14 @@ class SkillEvalFreshnessAndReportTests(unittest.TestCase):
             "run_id": "run-1",
             "results": [
                 {"skill_name": "jy-change-guardrails", "verdict": "KEEP"},
-                {"skill_name": "ios-debugger-agent", "verdict": "INSUFFICIENT"},
+                {"skill_name": "ios-memgraph-leaks", "verdict": "INSUFFICIENT"},
             ],
         }
 
         state = advance_state(current, previous_state={}, report=report)
 
         self.assertIn("jy-change-guardrails", state["snapshot"]["skills"])
-        self.assertNotIn("ios-debugger-agent", state["snapshot"]["skills"])
+        self.assertNotIn("ios-memgraph-leaks", state["snapshot"]["skills"])
         self.assertEqual(
             state["evaluations"]["jy-change-guardrails"]["last_run_id"], "run-1"
         )

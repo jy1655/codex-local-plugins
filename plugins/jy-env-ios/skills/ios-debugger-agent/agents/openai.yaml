@@ -1,4 +1,0 @@
-interface:
-  display_name: "iOS 시뮬레이터 디버깅"
-  short_description: "시뮬레이터 빌드·실행·화면·로그 확인"
-  default_prompt: "$ios-debugger-agent 스킬로 현재 iOS 앱에서 요청한 동작을 시뮬레이터로 확인해줘."

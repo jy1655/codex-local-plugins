@@ -1,5 +1,9 @@
 # Inactive skill archive
 
+As of 2026-10-06, the active iOS pack contains only `ios-memgraph-leaks`, adapted to
+physical-device captures. The other eight iOS skills and the simulator capture helper
+were deleted from the active pack. The original payloads below remain historical data.
+
 On 2026-09-08 the user approved a GPT-6 Astra / `max` baseline with one core guardrail
 and nine iOS skills. The 23 general workflow skills below are not staged, installed, or
 discovered. This is a reversible configuration decision; their Astra utility has not been
@@ -19,9 +23,9 @@ also have originals here so their removed procedures remain inspectable.
 | `jy-env-audit` | `jy-explain-change`, `jy-review-all`, `jy-review-work`, `jy-receiving-review`, `jy-slop-remover` |
 
 The active core keeps scope, authorization, and evidence boundaries without routing through
-the archived skills. The active iOS pack keeps XcodeBuildMCP, scripts, references, and tool
-correctness rules; file-size thresholds, mandatory architectural rewrites, repeated build
-stages, and unnecessary user handoffs are reduced in its instructions.
+the archived skills. The active iOS pack keeps the memory graph summary script and ownership
+analysis guidance for physical-device captures. Archived simulator and UI workflows are not
+deployed.
 
 Personalization remains active through global `AGENTS.md`: Korean user-visible interface
 text, English model-facing skill instructions, user language overrides, authorization,
@@ -45,9 +49,10 @@ codex plugin list
 ```
 
 The manifest and marketplace contain only `jy-env-core` and `jy-env-ios`. A fresh install
-activates only core; iOS remains an explicit optional installation. On the user's migrated
-Mac, both are installed and enabled. Check a fresh Codex session for one core skill and
-nine iOS skills; installed state and schema tests alone do not prove behavioral utility.
+activates only core; iOS remains an explicit optional installation. Inspect the current
+machine's installed plugins rather than inferring them from historical migration records.
+The active sources contain two core skills and one iOS skill; installed state and schema
+tests alone do not prove behavioral utility.
 
 ## Restore one candidate
 

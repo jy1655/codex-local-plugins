@@ -16,14 +16,14 @@ user-maintained `LOCAL.md`.
 ## Pack model
 
 The GPT-6 Astra baseline keeps `max` reasoning with one default core-lite guardrail,
-an explicitly invoked orchestration skill, and an optional iOS tool pack.
+an explicitly invoked orchestration skill, and an optional iOS memory-analysis pack.
 `apply` stages only the two active bundles under `~/plugins`, then installs
 `INSTALLED_BY_DEFAULT` entries through the Codex CLI.
 
 | Pack | Policy | Skills |
 |---|---|---|
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate` (explicit only) |
-| `jy-env-ios` | `AVAILABLE` | Nine iOS tool and technical-reference skills |
+| `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — physical-device memory graph analysis |
 
 Invoke `$jy-orchestrate` to keep the current session as the final decision-maker and
 delegate execution management to one work orchestrator. That session coordinates Codex
@@ -39,7 +39,10 @@ token monitor or runtime-enforced lock.
 The other 23 workflow skills, including `jy-env-planning`, `jy-env-delivery`, and
 `jy-env-audit`, are preserved under [archive/](archive/README.md). They are absent from the
 manifest and marketplace, are not staged or installed, and are not implicitly invoked.
-The archive also preserves the original versions of the ten retained skills.
+The archive also preserves the original versions of the ten skills retained in the
+2026-09-08 migration. On 2026-10-06, the active iOS pack was reduced to memory leak
+analysis for physical-device development; the other eight iOS skills were deleted
+from the active pack. Existing historical archives and evaluation inputs remain reference data.
 
 `AVAILABLE` does not uninstall an existing plugin. To migrate an existing installation,
 remove the three old workflow packs before applying the reduced marketplace:
@@ -58,15 +61,17 @@ optional. `apply` refreshes the default core pack. It does not uninstall Codex p
 Start a fresh Codex session after changing installed packs. No second
 `~/.agents/skills/<pack>` discovery link is created.
 
-## On-demand iOS CLI
+## iOS memory analysis on physical devices
 
-`jy-env-ios` retains the iOS skills and uses `npx -y xcodebuildmcp@2.7.0` only when a
-task needs simulator builds, UI automation, runtime logs, or LLDB. It does not register
-an MCP server. Routine unit tests keep using the repository's existing scripts.
+`jy-env-ios` contains only `ios-memgraph-leaks` and its memory graph summary script.
+Capture a `.memgraph` from the connected iPhone or iPad through Xcode's Debug Memory
+Graph and File > Export Memory Graph, then analyze the exported file on macOS with
+`leaks` and the bundled helper. An existing capture can be used directly.
 
-The CLI and MCP expose the same underlying tools. Stateful operations can start a
-workspace daemon on demand. See the [CLI documentation](https://www.xcodebuildmcp.com/docs/cli)
-and the bundled `ios-debugger-agent` skill for commands and current UI contracts.
+The skill focuses on object lifetimes, retaining paths, and comparable before/after
+evidence. It does not install simulator tooling or register an MCP server. General
+builds, debugging, and UI work use the app repository's existing tools and instructions.
+See the [skill](plugins/jy-env-ios/skills/ios-memgraph-leaks/SKILL.md) for the workflow.
 
 ## Archived research guidance
 
@@ -149,7 +154,7 @@ codex-env.toml                    # Two active plugin sources and their installa
 codex_env_sync/                   # Inspect/apply/bootstrap engine
 archive/                         # Inactive originals, checksums, and restoration notes
 plugins/jy-env-core/              # Default core-lite bundle
-plugins/jy-env-ios/               # Optional pinned iOS/XcodeBuildMCP pack
+plugins/jy-env-ios/               # Optional physical-device memory-analysis pack
 instructions/AGENTS.md            # Compact global rules; no eager optional-skill routing
 .agents/plugins/marketplace.json  # Local personal marketplace catalog
 skill-tests/first-party/          # Skill utility pressure scenarios

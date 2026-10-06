@@ -15,14 +15,14 @@ cache를 직접 수정하지 않습니다.
 ## Pack model
 
 GPT-6 Astra 기준 구성은 `max` 추론과 기본 core-lite 가드레일 1개,
-명시 호출 전용 오케스트레이션 스킬, 선택형 iOS 도구 팩입니다.
+명시 호출 전용 오케스트레이션 스킬, 선택형 iOS 메모리 분석 팩입니다.
 `apply`는 활성 bundle 2개만 `~/plugins`에 배치한 뒤 `INSTALLED_BY_DEFAULT` 항목을
 Codex CLI로 설치합니다.
 
 | Pack | Policy | Skills |
 |---|---|---|
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate` (명시 호출 전용) |
-| `jy-env-ios` | `AVAILABLE` | iOS 도구·기술 참고 스킬 9개 |
+| `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — 실기기 메모리 그래프 분석 |
 
 `$jy-orchestrate`를 호출하면 현재 세션은 최종결정자를 맡고 작업 오케스트레이터 1개가
 Codex·Claude의 계획·구현과 Codex DevBlue·별도 Claude 세션의 독립 검증을 조율합니다.
@@ -35,7 +35,10 @@ Codex·Claude의 계획·구현과 Codex DevBlue·별도 Claude 세션의 독립
 
 나머지 23개 절차 스킬과 `jy-env-planning`, `jy-env-delivery`, `jy-env-audit`는
 [archive/](archive/README.md)에 보존합니다. Manifest와 marketplace에서 제외되어
-배치·설치·자동 호출되지 않습니다. 유지한 10개 스킬의 변경 전 원문도 함께 보관합니다.
+배치·설치·자동 호출되지 않습니다. 2026-09-08 전환 당시 유지한 10개 스킬의 변경 전
+원문도 함께 보관합니다. 2026-10-06에는 실기기 개발 방식에 맞춰 활성 iOS 팩에
+메모리 누수 분석만 남기고 나머지 8개 스킬을 삭제했습니다. 기존 archive와 과거 평가
+입력은 이력 자료로 남습니다.
 
 `AVAILABLE`로 바꾸는 것만으로 기존 설치가 해제되지는 않습니다. 기존 설치를 전환할 때는
 축소된 marketplace를 적용하기 전에 설치된 절차 팩을 해제합니다.
@@ -54,16 +57,17 @@ codex plugin add jy-env-ios@personal-codex
 변경 후에는 새 Codex session을 시작합니다. 별도의 `~/.agents/skills/<pack>`
 discovery link는 만들지 않습니다.
 
-## 필요할 때 호출하는 iOS CLI
+## 실기기 iOS 메모리 분석
 
-`jy-env-ios`는 iOS 스킬을 유지하고 시뮬레이터 빌드, UI 자동화, 실행 로그, LLDB가
-필요할 때만 `npx -y xcodebuildmcp@2.7.0`을 호출합니다. MCP 서버는 자동 등록하지
-않습니다. 일반 단위 테스트는 각 저장소의 기존 스크립트를 사용합니다.
+`jy-env-ios`에는 `ios-memgraph-leaks`와 메모리 그래프 요약 스크립트만 있습니다.
+연결한 iPhone·iPad에서 Xcode의 Debug Memory Graph와 File > Export Memory Graph로
+`.memgraph`를 내보낸 뒤, Mac의 `leaks`와 포함된 스크립트로 분석합니다.
+이미 확보한 메모리 그래프가 있으면 바로 분석할 수 있습니다.
 
-CLI와 MCP는 같은 도구 구현을 사용합니다. 상태를 유지하는 작업에서는 프로젝트별
-daemon이 필요할 때 시작될 수 있습니다. 명령과 현재 UI 호출 규약은
-[CLI 문서](https://www.xcodebuildmcp.com/docs/cli)와 포함된 `ios-debugger-agent` 스킬을
-참고합니다.
+스킬은 객체 수명·보유 경로·동일 조건의 수정 전후 증거에 집중합니다. 시뮬레이터 도구를
+설치하거나 MCP 서버를 등록하지 않습니다. 일반 빌드·디버깅·UI 작업은 앱 저장소의 기존
+도구와 지침을 사용합니다. 상세 절차는
+[스킬 본문](plugins/jy-env-ios/skills/ios-memgraph-leaks/SKILL.md)을 참고합니다.
 
 ## 보관된 조사 지침
 
@@ -147,7 +151,7 @@ codex-env.toml                    # 활성 plugin source 2개와 installation po
 codex_env_sync/                   # inspect/apply/bootstrap engine
 archive/                         # Inactive originals, checksums, and restoration notes
 plugins/jy-env-core/              # 기본 core-lite bundle
-plugins/jy-env-ios/               # 선택 pinned iOS/XcodeBuildMCP pack
+plugins/jy-env-ios/               # 선택형 실기기 메모리 분석 팩
 instructions/AGENTS.md            # 선택 skill을 eager routing하지 않는 전역 규칙
 .agents/plugins/marketplace.json  # local personal marketplace catalog
 skill-tests/first-party/          # skill 실용성 pressure scenario

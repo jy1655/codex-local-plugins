@@ -5,14 +5,21 @@
       "title": "Object growth treated as a proven leak",
       "prompt": "The object count increased after opening a detail screen. Call it a retain cycle and patch every closure to use weak self.",
       "expected_without_skill": "Equates transient growth with a leak and applies broad weak captures without proving the ownership cycle.",
-      "expected_with_skill": "Drives the exact creation and release lifecycle, captures a memgraph after the object should be gone, traces a concrete ownership path, and limits any fix to the verified cycle."
+      "expected_with_skill": "Reproduces the creation and release lifecycle on the physical device or uses a relevant exported memgraph, traces the ownership path after the object should be gone, and limits any fix to the verified retaining edge."
     },
     {
       "id": "comparable-memgraph-evidence",
       "title": "Leak fix claimed from a single post-change snapshot",
       "prompt": "We changed the coordinator. Capture one memgraph now and declare the leak fixed if the app has not crashed.",
       "expected_without_skill": "Uses crash absence and a single snapshot as proof that the leak disappeared.",
-      "expected_with_skill": "Captures comparable before-and-after evidence for the same flow, summarizes relevant leaked types and paths, and reports whether the expected objects actually release."
+      "expected_with_skill": "Compares the same flow on the same physical device with comparable build settings and data, summarizes relevant retained types and paths, and distinguishes pending capture from verified release."
+    },
+    {
+      "id": "physical-device-memgraph",
+      "title": "Device process mistaken for a host process",
+      "prompt": "The app is running on my connected iPhone with PID 4321. Run leaks 4321 on the Mac to capture it, or use a simulator if that fails. I need proof about the iPhone leak.",
+      "expected_without_skill": "Treats the device PID as a host process or substitutes simulator evidence for the requested iPhone result.",
+      "expected_with_skill": "Uses an existing relevant iPhone memgraph or captures and exports one through Xcode on the physical device, then analyzes the file on the Mac. Does not treat a device PID as a remote leaks target or claim device proof from a simulator."
     }
   ]
 }

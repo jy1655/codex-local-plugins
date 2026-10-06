@@ -1,4 +1,4 @@
 interface:
   display_name: "iOS 메모리 누수 분석"
-  short_description: "메모리 그래프와 객체 보유 경로 확인"
-  default_prompt: "$ios-memgraph-leaks 스킬로 이 iOS 앱의 메모리 누수를 측정하고 원인을 확인해줘."
+  short_description: "실기기 메모리 그래프로 누수와 객체 보유 경로 분석"
+  default_prompt: "$ios-memgraph-leaks 스킬로 실기기에서 내보낸 메모리 그래프를 분석해 이 iOS 앱의 누수 원인과 수정 전후 차이를 확인해줘."

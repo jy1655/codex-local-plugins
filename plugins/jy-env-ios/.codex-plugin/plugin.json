@@ -1,7 +1,7 @@
 {
   "name": "jy-env-ios",
-  "version": "0.1.0+codex.20260909020623",
-  "description": "\uc2dc\ubbac\ub808\uc774\ud130 \ub3c4\uad6c\uc640 iOS \uae30\uc220 \ucc38\uace0",
+  "version": "0.1.0+codex.20261006025243",
+  "description": "\uc2e4\uae30\uae30 \uba54\ubaa8\ub9ac \uadf8\ub798\ud504 \uae30\ubc18 iOS \ub204\uc218 \ubd84\uc11d",
   "author": {
     "name": "JaeYoung Hwang",
     "url": "https://github.com/jy1655"
@@ -12,14 +12,15 @@
   "keywords": [
     "codex",
     "ios",
-    "swiftui",
-    "xcodebuildmcp"
+    "memory",
+    "memgraph",
+    "leaks"
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "iOS \uac1c\ubc1c \ub3c4\uad6c",
-    "shortDescription": "\uc2dc\ubbac\ub808\uc774\ud130 \ub3c4\uad6c\uc640 iOS \uae30\uc220 \ucc38\uace0",
-    "longDescription": "\ud544\uc694\ud560 \ub54c \uace0\uc815 \ubc84\uc804 XcodeBuildMCP CLI\ub97c \ud638\ucd9c\ud558\ub294 \uc2dc\ubbac\ub808\uc774\ud130 \uc2a4\ud0ac\uacfc \uc131\ub2a5, \uba54\ubaa8\ub9ac, App Intents, SwiftUI \ucc38\uace0 \uc2a4\ud0ac\uc744 \uc81c\uacf5\ud569\ub2c8\ub2e4. MCP \uc11c\ubc84\ub97c \uc790\ub3d9 \ub4f1\ub85d\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4.",
+    "displayName": "iOS \uba54\ubaa8\ub9ac \ubd84\uc11d",
+    "shortDescription": "\uc2e4\uae30\uae30 \uba54\ubaa8\ub9ac \uadf8\ub798\ud504 \uae30\ubc18 iOS \ub204\uc218 \ubd84\uc11d",
+    "longDescription": "\uc5f0\uacb0\ub41c iPhone\u00b7iPad\uc5d0\uc11c Xcode\ub85c \ub0b4\ubcf4\ub0b8 \uba54\ubaa8\ub9ac \uadf8\ub798\ud504\ub97c \ubd84\uc11d\ud574 \ub204\uc218\uc640 \uac1d\uccb4 \ubcf4\uc720 \uacbd\ub85c\ub97c \ud655\uc778\ud558\uace0 \uc218\uc815 \uc804\ud6c4\ub97c \ube44\uad50\ud558\ub294 \uc2a4\ud0ac\uacfc \uc694\uc57d \uc2a4\ud06c\ub9bd\ud2b8\ub97c \uc81c\uacf5\ud569\ub2c8\ub2e4.",
     "developerName": "JaeYoung Hwang",
     "category": "Developer Tools",
     "capabilities": [
@@ -29,9 +30,7 @@
     ],
     "websiteURL": "https://github.com/jy1655/codex-local-plugins",
     "defaultPrompt": [
-      "iOS \uc571\uc5d0\uc11c \uc694\uccad\ud55c \ub3d9\uc791\uc744 \uc2dc\ubbac\ub808\uc774\ud130\ub85c \ud655\uc778\ud574\uc918.",
-      "\uc774 iOS \ub3d9\uc791\uc758 \uc131\ub2a5 \ubcd1\ubaa9\uc744 \uce21\uc815\ud574\uc918.",
-      "\uae30\uc874 \ub3d9\uc791\uc744 \ubcf4\uc874\ud558\uba74\uc11c SwiftUI \ud654\uba74\uc744 \uac1c\uc120\ud574\uc918."
+      "\uc2e4\uae30\uae30\uc5d0\uc11c \ub0b4\ubcf4\ub0b8 \uba54\ubaa8\ub9ac \uadf8\ub798\ud504\ub97c \ubd84\uc11d\ud574 \ub204\uc218 \uc6d0\uc778\uacfc \uc218\uc815 \uc804\ud6c4 \ucc28\uc774\ub97c \ud655\uc778\ud574\uc918."
     ],
     "brandColor": "#0A84FF"
   }

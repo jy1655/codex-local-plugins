@@ -1,48 +1,44 @@
 ---
 name: ios-memgraph-leaks
-description: Use when capturing or inspecting iOS leaks and memgraphs to debug leaked objects, retain cycles, memory growth, or before-and-after leak evidence.
+description: Use when analyzing iOS memory leaks, retain cycles, or unexpectedly retained objects using memory graphs exported from physical devices and before-and-after ownership evidence.
 ---
 
 # iOS Memgraph Leaks
 
-Use this skill to prove iOS leaks from a live simulator process or an existing `.memgraph`. Pair it with `../ios-debugger-agent/SKILL.md` when the task also needs simulator build, install, launch, UI driving, logs, or screenshots.
+Analyze a physical-device `.memgraph` with the bundled summary helper and Apple's
+`leaks` tool on macOS. Start from an existing capture when it covers the reported
+object lifecycle; capture again when the build, flow, or unresolved question requires it.
 
 ## Core Workflow
 
-1. Build, launch, and drive the exact flow that should release objects.
-2. Capture a memgraph from the running simulator process with `scripts/capture_sim_memgraph.sh`.
-3. Summarize leaks with `scripts/summarize_memgraph_leaks.py`.
-4. For each app-owned leaked type, inspect ownership with `leaks --traceTree=<address> <file.memgraph>` and grouped leak evidence.
-5. Make the smallest root-cause patch, then recapture the same flow on the same simulator when possible.
-6. Report proof: before/after leak counts, disappeared root types, remaining leaks, memgraph paths, and test/build results.
+1. Identify the object that should be released and the action that ends its lifetime.
+2. Use a capture taken after that action, recording the device, OS, app build, and flow.
+3. Summarize reported leaks and inspect the relevant app-owned types and retaining paths.
+4. If a fix is requested, remove the evidenced retaining edge and compare the same
+   lifecycle on the same physical device with comparable build settings and data.
 
-Do not claim a leak fix from a smaller memgraph alone. A credible fix explains the ownership path that kept the object alive and shows that the same path or type disappears after the patch.
+## Capture from a physical device
 
-## Capture
+Run or attach to the app on the connected iPhone or iPad in Xcode. Reproduce the
+creation and release flow, click **Debug Memory Graph**, then choose
+**File > Export Memory Graph** to save a `.memgraph` on the Mac.
 
-Prefer capturing from the simulator already used for the reproduction. Resolve the simulator UDID and app bundle identifier, then capture the running app:
+Enable **Malloc Stack Logging** in the scheme's Run diagnostics before reproducing
+only when allocation backtraces are needed. Record changed diagnostics and restore
+temporary settings after capture. Store artifacts in a task-owned or user-chosen
+folder outside the skill directory.
 
-```bash
-SKILL_DIR="<absolute path to this loaded skill folder>"
-SIM="<simulator-udid>"
-BUNDLE_ID="<app.bundle.identifier>"
-MEMGRAPH_DIR="$(mktemp -d "${TMPDIR:-/tmp}/codex-ios-memgraph.XXXXXX")"
-
-"$SKILL_DIR/scripts/capture_sim_memgraph.sh" \
-  --udid "$SIM" \
-  --bundle-id "$BUNDLE_ID" \
-  --out-dir "$MEMGRAPH_DIR"
-```
-
-Do not derive `SKILL_DIR` from the target app repo's `pwd`; installed plugins usually live outside the app being debugged. Store captures in a run-specific temp or user-chosen folder, not under `SKILL_DIR`.
-
-If the process cannot be found, confirm the bundle identifier and use `xcrun simctl spawn "$SIM" launchctl list` to inspect running labels.
+Host `leaks <pid>` inspects a Mac process; a device PID is not a remote capture target.
+Pass the exported file to the analysis tools. If device or Xcode access is unavailable,
+request the missing capture or access and continue source analysis without claiming
+runtime proof.
 
 ## Summarize
 
 Summarize an existing memgraph:
 
 ```bash
+SKILL_DIR="<absolute path to this loaded skill folder>"
 "$SKILL_DIR/scripts/summarize_memgraph_leaks.py" \
   /path/to/app.memgraph \
   --trace-limit 5 \
@@ -55,10 +51,15 @@ Use `--trace-limit` sparingly. Trace trees are useful root-cause evidence, but l
 
 - Identify the first app-owned leaked type in the leak output or trace.
 - Determine the intended lifetime: process, session, account, view, request, or task.
+- Zero reported leaks does not rule out reachable but unwanted retained objects.
+  Inspect their references in Xcode's memory graph or use Instruments Allocations
+  when the symptom is persistent growth rather than unreachable allocations.
 - Treat lazy or deferred allocation as a scope reduction, not a leak fix, unless the original eager allocation itself violated the intended lifetime.
 - Prove retain-cycle claims with either a `traceTree` ownership path or an isolated reproduction.
 - For unreachable/self-cycle leaks, `traceTree` may have no root path; use `leaks --groupByType` plus source verification to find the self-retaining edge.
-- Do not claim success just because total leak count went down; prove the specific type or path disappeared.
+- Do not claim success from a smaller file, lower total count, or lack of crashes;
+  show that the affected object lifetime or retaining path is corrected. Compare types
+  and ownership paths across captures, not raw addresses.
 - Separate real root-cause branches from candidate/noise branches.
 - Prefer deleting the retaining edge over adding broad cleanup code.
 
@@ -66,7 +67,7 @@ Use `--trace-limit` sparingly. Trace trees are useful root-cause evidence, but l
 
 A useful leak report includes:
 
-- the exact flow and simulator/app build
+- the exact flow, physical device, OS, app build, and capture diagnostics
 - the memgraph and summary paths
 - app-owned leaked types and counts
 - at least one ownership path, or grouped leak tree evidence when the object is unreachable from roots
@@ -74,3 +75,8 @@ A useful leak report includes:
 - before/after evidence when a fix was made
 
 If the memgraph shows only framework/runtime noise, say that and recommend the next narrower capture rather than inventing an app leak.
+
+## References
+
+- [Gathering information about memory use](https://developer.apple.com/documentation/xcode/gathering-information-about-memory-use): Xcode capture, export, and allocation backtraces.
+- [Analyze heap memory](https://developer.apple.com/videos/play/wwdc2024/10173/): reachability, retained objects, and memory analysis tools.
