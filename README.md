@@ -25,16 +25,17 @@ an explicitly invoked orchestration skill, and an optional iOS memory-analysis p
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate` (explicit only) |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — physical-device memory graph analysis |
 
-Invoke `$jy-orchestrate` to keep the current session as the final decision-maker and
-delegate execution management to one work orchestrator. That session coordinates Codex
-and Claude planning or implementation, followed by independent Codex DevBlue and Claude
-verification. On context pressure or a replacement instruction, a fresh orchestrator
-reads a compact handoff before taking over. At most two work orchestrators coexist during
-transfer, with only one authorized to dispatch work. Detailed results stay in task
-artifacts; the decision-maker receives concise progress and decision requests.
-It prefers Agent Bridge when available locally and has `allow_implicit_invocation: false`.
-Replacement is a skill procedure using available session controls, not an automatic
-token monitor or runtime-enforced lock.
+Invoke `$jy-orchestrate` for the current session to directly coordinate Codex and Claude
+planning or implementation, followed by independent Codex DevBlue and Claude verification
+of the same candidate. Workers receive bounded assignments and return concise results;
+supported findings go back to workers for fixes and review of the affected changes.
+There is no separate manager session or manager-replacement count. Independent work can
+run concurrently within the runtime's capabilities, while overlapping edits are isolated
+or sequenced. It prefers Agent Bridge locally and has `allow_implicit_invocation: false`.
+Native context compression is the default; a compact record serves actual handoff or
+recovery needs. The invoking session remains responsible for durable Wiki updates under
+global/local policy, verifies they were saved, and closes task-owned sessions after results
+and follow-ups are complete. No machine-specific Wiki path is embedded in the skill.
 
 The other 23 workflow skills, including `jy-env-planning`, `jy-env-delivery`, and
 `jy-env-audit`, are preserved under [archive/](archive/README.md). They are absent from the
@@ -123,6 +124,21 @@ Windows PowerShell:
 
 Both commands require the `codex` CLI, clone once, install a stable snapshot, and activate
 core-lite.
+
+## Update an existing machine
+
+From that machine's clone of this repository, pull the published changes and apply them:
+
+```bash
+git pull --ff-only
+python3 -m codex_env_sync.cli apply --repo-root .
+codex plugin list --marketplace personal-codex --json
+```
+
+Use the machine's configured Python 3.11+ interpreter (`python` on Windows if needed).
+`apply` updates the default core plugin, including `jy-orchestrate`; confirm the installed
+version matches `plugins/jy-env-core/.codex-plugin/plugin.json`, then start a fresh Codex
+session. Machine-local `LOCAL.md` remains separately managed.
 
 ## Local development
 

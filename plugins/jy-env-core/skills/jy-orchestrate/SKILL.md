@@ -1,99 +1,91 @@
 ---
 name: jy-orchestrate
-description: Use when the user explicitly requests jy-orchestrate for Codex and Claude planning or implementation, with a final decision-maker, replaceable work orchestrator, and independent Codex DevBlue and Claude verification.
+description: Use when the user explicitly requests jy-orchestrate for directly coordinated Codex and Claude planning or implementation with independent Codex DevBlue and Claude verification.
 ---
 
 # JY Orchestrate
 
-Keep the invoking session as the **final decision-maker**. It delegates execution
-management to one **work orchestrator**, which coordinates the workers and reviewers.
-Keep detailed execution context in that replaceable session so long tasks do not turn
-the decision-maker into another execution log.
+The invoking session directly coordinates Codex and Claude workers and reviewers. It owns
+the user's objective, current constraints, task assignment, integration, and final
+acceptance. Do not insert a separate work-orchestrator session or a manager-replacement
+workflow. A child reading this skill keeps its assigned role and returns scoped results.
 
-## Roles and authority
+## Assign bounded work
 
-- **Final decision-maker:** Own the user's objective, constraints, acceptance criteria,
-  consequential decisions, and final response. Launch and replace the work orchestrator;
-  relay new user instructions promptly. Let it resolve routine implementation details
-  within scope. Inspect targeted evidence when needed to decide or accept completion.
-- **Work orchestrator:** Break down the task, coordinate Codex and Claude, manage edit
-  ownership, collect evidence, integrate results, and route reviewer findings to workers.
-  Maintain the handoff record and request replacement before context pressure impairs
-  coordination. Do not create your own successor or another final decision-maker.
-- **Workers and reviewers:** Perform bounded assignments and return results to the work
-  orchestrator. Preserve the user's planning-only, read-only, authorization, and workspace
-  boundaries throughout delegation and replacement.
+Use Agent Bridge when available locally, following machine-local instructions; otherwise
+use supported native delegation. Preserve planning-only, read-only, authorization, and
+workspace boundaries in every assignment. Relay changed user instructions promptly and
+stop or revise affected assignments before accepting results produced under old instructions.
+A queued instruction is not proof that a busy worker stopped. Use supported interruption
+controls and verify its state; report an unconfirmed halt when those controls are unavailable.
 
-Only the original invoking session takes the final decision-maker role. A child reading
-this skill must retain the role assigned in its launch prompt; do not recursively add
-management layers. Internal decisions never substitute for required user approval.
+Split work by dependencies and edit ownership. Batch small changes of the same kind.
+Run independent assignments concurrently when their edits and shared resources do not
+conflict; isolate or sequence overlapping work. Preserve unrelated changes. Choose useful
+assignments for Codex and Claude rather than duplicating the same implementation.
 
-Keep **one active work orchestrator**. During replacement, allow at most **two live work
-orchestrator sessions**, including launching, retiring, or uncertain sessions: the
-predecessor and one read-only successor. This limit excludes the final decision-maker,
-workers, and independent reviewers. Only the active owner may dispatch or redirect work.
-The decision-maker may stop affected assignments to enforce user steering or recover a
-failed manager; this does not make it a second routine dispatcher.
+Give each worker the objective, allowed edit scope, necessary interfaces and dependencies,
+acceptance criteria, relevant verification, and expected result. Supply only the context
+needed for that assignment, using artifact references for lengthy material.
 
-## Start and continue
+Use `gpt-5.6-sol` for Codex workers and inherit the invoking session's reasoning effort.
+With Agent Bridge, pass `--model gpt-5.6-sol` and the known `--effort <inherited-effort>`
+explicitly. Disclose actual defaults when effort is unknown. If a required model or
+setting is unavailable, report the affected requirement and continue unaffected work;
+substitute only within the user's allowed choices and identify the substitution.
 
-Use Agent Bridge when available locally, following applicable local instructions; use
-supported native delegation otherwise. Before launching, read
-[orchestrator-handoff.md](references/orchestrator-handoff.md) for the small task record,
-session ownership, and replacement procedure. Do not build a new scheduler or context
-monitor for this skill.
+## Collect results
 
-The final decision-maker gives the work orchestrator its explicit role, task and current
-instruction revision, constraints, acceptance criteria, record location, and result
-channel. Use the invoking session's model and reasoning effort for work orchestrators
-when available; pass known values explicitly and record the actual launch settings.
-Do not apply the Codex worker model below to this management role. If parent settings
-are unavailable, disclose the configured launch defaults instead of claiming inheritance.
-For workers too, disclose actual defaults when inherited effort is unknown. If a required
-worker/reviewer model or setting is unavailable, report the affected requirement to the
-decision-maker and continue unaffected work. Use an alternative only within the user's
-allowed choices, record any substitution, and do not claim the original requirement met.
+Keep task-owned session IDs, assignments, request IDs, and consumed result IDs retrievable
+through native state or an existing task record. Include any descendants in that ownership
+record. A dispatch receipt is not completion. Inspect the actual result before follow-ups
+or acceptance; after a timeout or interruption, reconcile the same request before retrying.
 
-The work orchestrator:
+Ask workers to return a concise status (`DONE`, `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, or
+`BLOCKED`), changed candidate or artifact, verification evidence, unresolved concerns, and
+evidence locations. Resolve correctness concerns before acceptance. Supply missing context,
+split an oversized task, or change the approach when blocked; do not repeat an unchanged
+failed assignment. Keep full transcripts, diffs, and test logs outside routine summaries.
 
-1. Delegates the requested planning or implementation to Codex and Claude. Use
-   `gpt-5.6-sol` for Codex worker sessions and inherit the original invoking session's
-   reasoning effort. With Agent Bridge, pass `--model gpt-5.6-sol` and the known
-   `--effort <inherited-effort>` explicitly. Carry these settings across replacements;
-   distinguish unavailable settings from verified inheritance.
-2. Keeps concurrent edits separate or sequences overlapping work, preserving unrelated
-   changes. Have Codex DevBlue (`gpt-daybreak-blue-latest`) and Claude independently
-   verify the same identified candidate, in sessions separate from the workers.
-3. Routes supported findings to workers and updates affected verification after fixes.
-   A clean review does not dismiss another reviewer's supported defect. Reuse evidence
-   for unchanged work; preserve what has and has not actually been verified.
-4. Updates the handoff at meaningful boundaries, then returns a compact milestone,
-   decision request, blocker, replacement request, or completion result. With a
-   turn-based bridge, finish the turn so the parent can retrieve that result and resume
-   the same session. Avoid one unbounded child turn that prevents steering or handoff.
+## Review and revise
 
-Report upward only: status and instruction revision, material changes, evidence
-references, unresolved risk or decision, and the next action. Keep transcripts, verbose
-test output, full diffs, and routine worker chatter in task artifacts or native results.
-Do not routinely load them into the final decision-maker. It keeps a compact current
-control record and relies on native context compression for its own conversation.
+Integrate the work and identify the candidate: a commit plus relevant uncommitted changes,
+or the exact planning artifact. Have Codex DevBlue (`gpt-daybreak-blue-latest`) and Claude
+independently verify that same candidate in sessions separate from the workers and the
+invoking session. The invoking session dispatches these reviews; worker self-review is
+useful but does not replace them.
 
-## Replace and finish
+Give both reviewers the requirements, current constraints, candidate, scoped changes, and
+verification evidence. Each checks requirement coverage and implementation or plan quality,
+reporting supported findings with evidence and naming what could not be verified. Reviews
+are read-only; inspect surrounding code or run focused checks when a concrete concern
+requires it. Reuse valid evidence instead of routinely rerunning unchanged checks.
 
-Replace on a user or final decision-maker instruction, or when the work orchestrator
-reports context pressure: an exposed context warning, impending compaction with work at
-risk, repeated loss of constraints, or difficulty producing a reliable current summary.
-Elapsed time alone is not a trigger. Do not invent token counts or require a fixed
-percentage when the runtime exposes no reliable measurement. Native compaction remains
-useful, but does not cancel an explicit replacement request.
+Route supported findings back to the original worker when practical. Re-review the findings
+and the fix's effects, refreshing affected evidence for the final candidate. Resolve reviewer
+disagreements from evidence: one clean review does not dismiss another's supported defect.
+If fixes stop making progress, revisit the cause, context, or task split. A retry count alone
+never makes an unresolved defect acceptable. Report material decisions and verification gaps.
 
-Follow the handoff reference: quiesce the predecessor, prepare one fresh successor,
-verify its readback, retire the predecessor, then activate the successor. Carry only
-current instructions, the compact handoff, and evidence references; resuming or copying
-the predecessor's full conversation defeats the replacement's purpose.
+Accept completion against the user's criteria and both independent reviews. Additional
+intermediate review is justified by a concrete integration risk, not every small task.
 
-The final decision-maker accepts completion against the user's criteria and both
-independent reviews, resolving material disagreements from evidence. Before the final
-response, inspect the last needed results and close task-owned sessions, including
-transferred descendants. Report any unverified requirements or incomplete cleanup;
-never close unrelated sessions or treat dispatch/acknowledgment as completion.
+## Context, Wiki, and completion
+
+Use native session state and context compression first. For an actual cross-session handoff
+or recovery need, keep one compact current record: objective and current instructions,
+completed and remaining work, candidate and workspace, pending session/request/result IDs,
+edit ownership, unresolved findings, and evidence references. Follow local storage policy
+for its canonical location; keep large evidence separately. Recover against current workspace
+and session evidence before resuming, preserving newer edits and avoiding duplicate actions.
+
+The invoking session also owns durable Wiki recording under the global and local instructions.
+When a local Wiki is configured, read its `AGENTS.md` and follow that policy for qualifying
+decisions, corrections, outcomes, lessons, and verification limits. Compact task records do
+not replace these Wiki updates. Before the final response, verify the required updates were
+saved and report their location. If access or authorization prevents recording, disclose the
+gap and continue unaffected authorized work. Keep machine-specific paths in local instructions.
+
+After inspecting the last needed results and completing follow-ups, close task-owned sessions,
+including descendants, through supported controls. Preserve unrelated sessions and existing
+records. Report incomplete cleanup or unverified requirements rather than claiming completion.

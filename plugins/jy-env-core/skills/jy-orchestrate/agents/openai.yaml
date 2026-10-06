@@ -1,6 +1,6 @@
 interface:
   display_name: "다중 에이전트 작업 지휘"
-  short_description: "최종결정자와 교체 가능한 작업 오케스트레이터로 장기 작업·독립 검증 조율"
-  default_prompt: "$jy-orchestrate로 현재 세션은 최종결정자를 맡고 작업 오케스트레이터를 두어 계획·구현과 Codex DevBlue·Claude 독립 검증을 진행해줘. 컨텍스트 부담이나 교체 지시가 있으면 인수인계하며 오케스트레이터는 동시에 최대 2개만 유지해줘."
+  short_description: "현재 세션이 Codex·Claude 작업과 독립 검증을 직접 조율"
+  default_prompt: "$jy-orchestrate로 현재 세션이 Codex·Claude의 계획·구현과 DevBlue·Claude 독립 검증을 직접 조율하고, 필요한 Wiki 기록과 작업 세션 정리까지 마쳐줘."
 policy:
   allow_implicit_invocation: false

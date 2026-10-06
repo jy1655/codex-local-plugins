@@ -24,14 +24,15 @@ Codex CLI로 설치합니다.
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate` (명시 호출 전용) |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — 실기기 메모리 그래프 분석 |
 
-`$jy-orchestrate`를 호출하면 현재 세션은 최종결정자를 맡고 작업 오케스트레이터 1개가
-Codex·Claude의 계획·구현과 Codex DevBlue·별도 Claude 세션의 독립 검증을 조율합니다.
-컨텍스트 부담이나 교체 지시가 있으면 새 오케스트레이터가 요약된 상태를 인수인계받습니다.
-교체 중에만 최대 2개가 공존하며 실제 작업 지휘권은 하나만 유지합니다. 상세 결과는 작업
-기록에 두고 최종결정자에게는 진행 요약과 결정 요청을 전달합니다. 로컬에서 Agent Bridge를
-사용할 수 있으면 우선 사용하며, `allow_implicit_invocation: false`로 자동 선택을 끕니다.
-교체는 사용 가능한 세션 제어 도구를 따르는 스킬 절차이며 자동 토큰 감시나 런타임 잠금을
-추가하는 방식은 아닙니다.
+`$jy-orchestrate`를 호출하면 현재 세션이 Codex·Claude의 계획·구현과 같은 결과물에 대한
+Codex DevBlue·별도 Claude 세션의 독립 검증을 직접 조율합니다. 작업자에게 범위와 완료
+조건을 전달하고 간결한 결과를 받으며, 근거 있는 지적은 작업자에게 돌려 수정과 영향 범위
+재검토를 진행합니다. 별도 관리 세션이나 지휘자 교체 개수 제한은 없습니다. 독립적인 작업은
+실행 환경이 지원하는 범위에서 병렬로 진행하고, 겹치는 편집은 격리하거나 순서대로 처리합니다.
+로컬에서 Agent Bridge를 사용할 수 있으면 우선 사용하며, `allow_implicit_invocation: false`로
+자동 선택을 끕니다. 컨텍스트는 기본 압축 기능을 우선 사용하고 실제 인계·복구에만 작은
+기록을 둡니다. 현재 세션은 전역·로컬 정책에 따른 Wiki 기록과 저장 확인, 결과 회수와 후속
+작업을 마친 세션의 종료까지 책임집니다. 기기별 Wiki 경로는 스킬에 넣지 않습니다.
 
 나머지 23개 절차 스킬과 `jy-env-planning`, `jy-env-delivery`, `jy-env-audit`는
 [archive/](archive/README.md)에 보존합니다. Manifest와 marketplace에서 제외되어
@@ -120,6 +121,21 @@ Windows PowerShell:
 
 두 명령 모두 `codex` CLI가 필요하며, repo를 한 번 clone하고 안정적인 snapshot과
 core-lite를 설치합니다.
+
+## 기존 기기 업데이트
+
+해당 기기의 이 저장소 clone에서 게시된 변경을 받고 설치본에 적용합니다.
+
+```bash
+git pull --ff-only
+python3 -m codex_env_sync.cli apply --repo-root .
+codex plugin list --marketplace personal-codex --json
+```
+
+해당 기기에 설정된 Python 3.11 이상을 사용합니다. Windows에서는 필요에 따라
+`python3` 대신 `python`을 씁니다. `apply`가 `jy-orchestrate`를 포함한 기본 core를
+갱신하므로 설치 버전이 `plugins/jy-env-core/.codex-plugin/plugin.json`과 일치하는지
+확인한 뒤 새 Codex 세션을 시작합니다. 기기별 `LOCAL.md`는 계속 별도로 관리합니다.
 
 ## Local development
 
