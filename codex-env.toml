@@ -8,6 +8,12 @@ install_mode = "symlink"
 installation_policy = "INSTALLED_BY_DEFAULT"
 
 [[plugins]]
+name = "jy-env-design"
+source = "plugins/jy-env-design"
+install_mode = "symlink"
+installation_policy = "INSTALLED_BY_DEFAULT"
+
+[[plugins]]
 name = "jy-env-ios"
 source = "plugins/jy-env-ios"
 install_mode = "symlink"

@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "terminology-conflict",
+      "title": "Interview while resolving terminology",
+      "prompt": "Use grill-with-docs for cancellation. CONTEXT.md says cancellation applies to an entire Order, but I want customers to cancel one OrderLine. The current code only cancels whole orders.",
+      "expected_without_skill": "May silently replace the definition or interview without checking code.",
+      "expected_with_skill": "Load both grilling and domain-modeling; surface the terminology/code contradiction, ask frontier decisions with recommendations, and update CONTEXT.md when the user resolves the term; keep implementation details out of the glossary."
+    },
+    {
+      "id": "adr-selectivity",
+      "title": "Record a durable decision selectively",
+      "prompt": "We have agreed during grill-with-docs that partner isolation requires separate billing storage despite higher operational cost. It is expensive to reverse and would surprise a future maintainer. We also renamed a temporary report heading.",
+      "expected_without_skill": "May record every detail as an ADR or omit the durable tradeoff.",
+      "expected_with_skill": "Offer a concise ADR for the storage decision under all three criteria; skip the temporary heading, preserve inline glossary updates, and continue the interview for remaining branches."
+    }
+  ]
+}

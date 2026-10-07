@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "decision-frontier",
+      "title": "Ask independent decisions in one round",
+      "prompt": "Use grill-me to sharpen my workshop plan. We must decide the audience and online versus in-person delivery. Room size matters only if we choose in-person.",
+      "expected_without_skill": "May ask every question in one list or serialize independent questions unnecessarily.",
+      "expected_with_skill": "Load grilling; ask audience and delivery together with numbered recommendations, defer room size until its prerequisite is settled, and wait for the user answers."
+    },
+    {
+      "id": "explicit-understanding",
+      "title": "Keep the interview before action",
+      "prompt": "Use grill-me on my migration plan. I have answered the current round, but two design decisions remain unresolved. Please keep questioning until we share the full plan.",
+      "expected_without_skill": "May summarize the current answers as a complete plan and start implementation.",
+      "expected_with_skill": "Continue recomputing the decision frontier, surface unresolved branches, and retain the original user-confirmed shared-understanding boundary before action."
+    }
+  ]
+}

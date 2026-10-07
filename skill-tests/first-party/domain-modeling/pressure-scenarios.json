@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "lazy-glossary",
+      "title": "Create the glossary only after resolving a term",
+      "prompt": "We are discussing a new project with no CONTEXT.md. We have now agreed that a Dispatch is one accepted delivery assignment; do not put queue technology into its definition.",
+      "expected_without_skill": "May scaffold many empty documents or mix implementation with domain language.",
+      "expected_with_skill": "Create CONTEXT.md lazily for the resolved term using CONTEXT-FORMAT.md; keep it limited to domain terminology and do not create an ADR directory without a qualifying decision."
+    },
+    {
+      "id": "bounded-context",
+      "title": "Use the existing context map",
+      "prompt": "CONTEXT-MAP.md points to Ordering and Billing contexts. We are refining what Invoice means in Billing, and Ordering uses a different concept.",
+      "expected_without_skill": "May overwrite a root glossary or conflate the contexts.",
+      "expected_with_skill": "Follow the existing map, update the Billing CONTEXT.md when the definition is settled, test concrete scenarios against code and existing language, and preserve the distinct Ordering model."
+    }
+  ]
+}

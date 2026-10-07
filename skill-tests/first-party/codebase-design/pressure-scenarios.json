@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "contract-depth",
+      "title": "Assess the real caller contract",
+      "prompt": "A facade has one method, but callers must configure five flags, order three setup calls, and handle six undocumented failures. Is this a deep module?",
+      "expected_without_skill": "May judge depth from the method count or lines of implementation.",
+      "expected_with_skill": "Assess the whole interface including invariants, ordering, configuration and errors; apply depth-as-leverage and the deletion test, and discuss locality rather than a line-count ratio."
+    },
+    {
+      "id": "alternative-interfaces",
+      "title": "Compare truly different designs",
+      "prompt": "For this selected deepening candidate, explore several interfaces. It calls an owned remote service and has an in-memory test adapter.",
+      "expected_without_skill": "May provide cosmetic variants of one design or introduce speculative abstraction.",
+      "expected_with_skill": "Use the full design-it-twice process with 3+ parallel independent designs, classify dependencies via DEEPENING.md, include contract, usage, hidden behavior, adapters and tradeoffs, then compare depth/locality/seam placement and recommend."
+    }
+  ]
+}

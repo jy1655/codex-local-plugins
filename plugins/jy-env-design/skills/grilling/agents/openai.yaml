@@ -1,0 +1,4 @@
+interface:
+  display_name: "결정 트리 인터뷰"
+  short_description: "선행 결정이 정해진 질문들을 묶어 추천안과 함께 심층 인터뷰"
+  default_prompt: "$grilling으로 이 아이디어의 결정 트리를 따라 질문하고 추천안을 제시해줘."

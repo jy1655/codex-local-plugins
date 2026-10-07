@@ -113,6 +113,7 @@ class RepoBundleTests(unittest.TestCase):
             {path.name for path in plugin_roots()},
             {
                 "jy-env-core",
+                "jy-env-design",
                 "jy-env-ios",
             },
         )
@@ -139,7 +140,7 @@ class RepoBundleTests(unittest.TestCase):
                 names.append(skill_path.parent.name)
                 self.assertTrue((skill_path.parent / "agents" / "openai.yaml").is_file())
 
-        self.assertEqual(len(names), 3)
+        self.assertEqual(len(names), 9)
         self.assertEqual(len(names), len(set(names)))
 
     def test_writing_skills_keeps_its_reference_assets(self) -> None:

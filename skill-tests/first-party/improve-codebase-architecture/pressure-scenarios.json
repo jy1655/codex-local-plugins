@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "hotspot-report",
+      "title": "Find architecture opportunities before choosing work",
+      "prompt": "The repository has a frequently changed order pipeline, a quiet legacy module, and an ADR that deliberately keeps billing separate. Use improve-codebase-architecture to show me the candidates first. Do not implement anything yet.",
+      "expected_without_skill": "May list generic refactors or start designing an interface before the user selects a candidate.",
+      "expected_with_skill": "Investigate recent hotspots with delegated exploration, respect the ADR, produce and open the full HTML candidate report with before/after visuals and recommendation strengths, then ask which candidate to explore; do not implement."
+    },
+    {
+      "id": "selected-candidate",
+      "title": "Continue from the selected candidate",
+      "prompt": "I choose the Order intake candidate from your architecture report. Explore alternative interfaces. Our CONTEXT.md calls this an Order, and the repo has HTTP and in-memory payment adapters.",
+      "expected_without_skill": "May present a single interface or redesign without the domain vocabulary.",
+      "expected_with_skill": "Use codebase-design and its complete design-it-twice reference for distinct parallel designs, compare depth/locality/seam placement, and use grilling for unresolved decisions; record resolved terminology and offer ADRs only under the original criteria."
+    }
+  ]
+}

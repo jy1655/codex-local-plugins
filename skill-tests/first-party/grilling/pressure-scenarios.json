@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "facts-and-decisions",
+      "title": "Research facts without blocking unrelated decisions",
+      "prompt": "Grill this rollout plan. You can inspect supported deployment modes in the repository. I must choose the user cohort and downtime budget; data-migration strategy depends on the modes you find.",
+      "expected_without_skill": "May ask the user to look up repo facts or block every question while investigating.",
+      "expected_with_skill": "Delegate fact-finding, ask the independent cohort and downtime frontier with recommendations now, and wait to ask downstream migration questions until their prerequisites are known."
+    },
+    {
+      "id": "frontier-recompute",
+      "title": "Recompute after a user choice",
+      "prompt": "We chose single-region service in the first grilling round. Multi-region replication is now out of scope, but failover and backup objectives remain undecided.",
+      "expected_without_skill": "May continue asking multi-region questions or silently assume recovery targets.",
+      "expected_with_skill": "Recompute the design tree from the answer, retire irrelevant branches, ask the newly available failover and backup decisions with recommendations, and wait."
+    }
+  ]
+}

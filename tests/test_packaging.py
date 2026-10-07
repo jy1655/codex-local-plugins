@@ -15,6 +15,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 EXPECTED_PACKS = {
     "jy-env-core": {"jy-change-guardrails", "jy-orchestrate"},
+    "jy-env-design": {
+        "improve-codebase-architecture", "grill-me", "grill-with-docs",
+        "grilling", "codebase-design", "domain-modeling",
+    },
     "jy-env-ios": {"ios-memgraph-leaks"},
 }
 
@@ -85,7 +89,7 @@ class PackagingTests(unittest.TestCase):
         all_skills = [skill for skills in actual.values() for skill in skills]
         self.assertEqual(len(all_skills), len(set(all_skills)))
 
-    def test_marketplace_defaults_only_core_lite(self) -> None:
+    def test_marketplace_defaults_core_and_selected_design_pack(self) -> None:
         marketplace = json.loads(
             (REPO_ROOT / ".agents" / "plugins" / "marketplace.json").read_text(encoding="utf-8")
         )
@@ -98,6 +102,7 @@ class PackagingTests(unittest.TestCase):
             policies,
             {
                 "jy-env-core": "INSTALLED_BY_DEFAULT",
+                "jy-env-design": "INSTALLED_BY_DEFAULT",
                 "jy-env-ios": "AVAILABLE",
             },
         )

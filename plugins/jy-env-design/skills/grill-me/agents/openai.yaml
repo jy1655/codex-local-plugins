@@ -1,0 +1,6 @@
+interface:
+  display_name: "계획 심층 인터뷰"
+  short_description: "질문과 추천안을 라운드별로 제시해 계획의 모든 결정 분기를 검토"
+  default_prompt: "$grill-me로 내 계획을 깊이 질문하고, 각 질문에 추천안을 붙여서 함께 구체화해줘."
+policy:
+  allow_implicit_invocation: false

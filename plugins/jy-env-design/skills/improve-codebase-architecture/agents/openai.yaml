@@ -1,0 +1,6 @@
+interface:
+  display_name: "코드베이스 아키텍처 개선"
+  short_description: "코드 구조 개선 후보를 HTML로 비교하고 선택한 설계를 심층 검토"
+  default_prompt: "$improve-codebase-architecture로 개선 후보를 HTML 보고서로 보여주고, 내가 고른 후보의 설계를 깊이 검토해줘."
+policy:
+  allow_implicit_invocation: false

@@ -6,10 +6,20 @@ its latency and maintenance cost. Scenario prose alone is not evidence.
 
 ## Current deployment baseline
 
-The 2026-09-08 user-approved configuration keeps one core guardrail and nine optional iOS
-skills, with 23 workflow skills preserved outside deployment under `archive/`. This
-reversible installation choice is not an automated utility verdict. Retention of language,
-authorization, privacy, and workspace preferences does not depend on workflow installation.
+The active configuration contains the core guardrail and explicit orchestration skill,
+the user-selected architecture/interview pack, and optional physical-device iOS memory
+analysis. Historical workflow skills remain under `archive/`.
+
+On 2026-10-07 the user chose `jy-env-design` after using the upstream workflows in Claude
+Code, explicitly prioritizing full functional preservation over core-lite simplification.
+This adoption does not require a new utility verdict. Explicit-only entry points must not
+be rejected for intentionally low implicit activation; this evaluator's `KEEP` contract
+is designed for automatic discovery. Use the design scenarios as behavioral regression
+inputs and assess explicitly invoked outcomes separately. No comparative Codex utility
+claim follows from adoption, packaging tests, or a behavioral smoke run.
+
+Retention of language, authorization, privacy, and workspace preferences does not depend
+on workflow installation.
 
 `eval-policy.json` targets `gpt-6-astra` / `max` / default service tier; the separate judge
 keeps its existing configuration. Historical GPT-5.6 results are not Astra evidence.

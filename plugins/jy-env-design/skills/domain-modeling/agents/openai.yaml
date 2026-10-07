@@ -1,0 +1,4 @@
+interface:
+  display_name: "도메인 용어와 결정 기록"
+  short_description: "프로젝트 용어를 코드와 대조하고 CONTEXT.md와 ADR을 갱신"
+  default_prompt: "$domain-modeling으로 도메인 용어를 명확히 하고 확정된 정의와 필요한 ADR을 기록해줘."

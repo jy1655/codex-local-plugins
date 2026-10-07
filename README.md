@@ -16,13 +16,15 @@ user-maintained `LOCAL.md`.
 ## Pack model
 
 The GPT-6 Astra baseline keeps `max` reasoning with one default core-lite guardrail,
-an explicitly invoked orchestration skill, and an optional iOS memory-analysis pack.
-`apply` stages only the two active bundles under `~/plugins`, then installs
+an explicitly invoked orchestration skill, the selected architecture/interview pack,
+and an optional iOS memory-analysis pack. `apply` stages the three active bundles under
+`~/plugins`, then installs
 `INSTALLED_BY_DEFAULT` entries through the Codex CLI.
 
 | Pack | Policy | Skills |
 |---|---|---|
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate` (explicit only) |
+| `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs` (explicit only); `grilling`, `codebase-design`, `domain-modeling` |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — physical-device memory graph analysis |
 
 Invoke `$jy-orchestrate` for the current session to directly coordinate Codex and Claude
@@ -58,9 +60,30 @@ codex plugin add jy-env-ios@personal-codex
 
 Run the remove commands only for installed entries. Update changed active plugins through
 `plugin-creator`'s cachebuster flow before `apply`; re-add iOS after staging because it is
-optional. `apply` refreshes the default core pack. It does not uninstall Codex plugins.
+optional. `apply` refreshes the default core and design packs. It does not uninstall Codex plugins.
 Start a fresh Codex session after changing installed packs. No second
 `~/.agents/skills/<pack>` discovery link is created.
+
+## Architecture improvement and grilling
+
+On 2026-10-07, the user chose these workflows after using Matt Pocock's originals in
+Claude Code and explicitly requested preservation without simplification. This choice
+supersedes the core-lite adoption filter for this pack. Other upstream workflows remain
+outside scope until the user tries and selects them.
+
+The separate `jy-env-design` pack preserves version 1.2.3 at `c55ee46073ed923f86ce59a5eb3b6d895095d1b7`:
+
+- `$improve-codebase-architecture`: exploration, visual HTML candidates, user selection,
+  then grilling and domain records; full HTML and parallel alternative-design references.
+- `$grill-me`: the complete decision-tree interview, question rounds with recommendations,
+  fact-finding delegation, and confirmation before acting.
+- `$grill-with-docs`: the same interview with inline `CONTEXT.md` and selective ADR recording.
+
+The three entry points are explicit-only. Their reusable `grilling`, `codebase-design`,
+and `domain-modeling` skills keep automatic discovery and can also be read through bundled
+relative links. Runtime adaptations cover Codex invocation, Korean UI, local delegation,
+and configured Wiki/report storage; they do not shorten the original workflows.
+See [port boundaries and attribution](plugins/jy-env-design/NOTICE.md).
 
 ## iOS memory analysis on physical devices
 
@@ -123,7 +146,7 @@ Windows PowerShell:
 ```
 
 Both commands require the `codex` CLI, clone once, install a stable snapshot, and activate
-core-lite.
+core-lite and the design pack.
 
 ## Update an existing machine
 
@@ -136,9 +159,8 @@ codex plugin list --marketplace personal-codex --json
 ```
 
 Use the machine's configured Python 3.11+ interpreter (`python` on Windows if needed).
-`apply` updates the default core plugin, including `jy-orchestrate`; confirm the installed
-version matches `plugins/jy-env-core/.codex-plugin/plugin.json`, then start a fresh Codex
-session. Machine-local `LOCAL.md` remains separately managed.
+`apply` updates the default core and design plugins; confirm each installed version
+matches its `plugins/<pack>/.codex-plugin/plugin.json`, then start a fresh Codex session. Machine-local `LOCAL.md` remains separately managed.
 
 ## Local development
 
@@ -166,10 +188,11 @@ workflow and start a new thread. Do not edit `~/.codex/plugins/cache` directly.
 ## Layout
 
 ```text
-codex-env.toml                    # Two active plugin sources and their installation policies
+codex-env.toml                    # Three active plugin sources and their installation policies
 codex_env_sync/                   # Inspect/apply/bootstrap engine
 archive/                         # Inactive originals, checksums, and restoration notes
 plugins/jy-env-core/              # Default core-lite bundle
+plugins/jy-env-design/            # Selected Matt Pocock architecture/interview port
 plugins/jy-env-ios/               # Optional physical-device memory-analysis pack
 instructions/AGENTS.md            # Compact global rules; no eager optional-skill routing
 .agents/plugins/marketplace.json  # Local personal marketplace catalog
@@ -181,7 +204,9 @@ tests/                            # Unit and integration tests
 Active first-party skill sources live under `plugins/jy-env-*/skills/`; inactive originals
 live under `archive/` and are excluded from deployment. Upstream or company-shared skills
 are local-only seed material; this repo stores only the customized first-party result and
-does not vendor third-party runtimes. Maintain retained skills here as first-party plugin
+does not vendor third-party runtimes. The user-selected `jy-env-design` port is a deliberate
+exception to seed-only rewriting: it preserves the selected original skills and references
+with a pinned provenance record and their MIT license. Maintain retained skills here as first-party plugin
 assets rather than live dependencies on upstream seeds. Do not install, discover, or follow
 instructions under `archive/` unless the user requests a reference or reactivation.
 
@@ -205,6 +230,10 @@ python3 -m unittest tests.test_skill_scenarios -v
 ```
 
 ## Skill utility gate
+
+The design pack is retained by the user's direct-use decision. Its explicit-only workflows
+are not blocked by implicit-activation gates or a new adoption benchmark. Scenario assets
+support behavioral regression checks; they do not establish comparative Codex utility.
 
 Do not keep a skill merely because its instructions sound reasonable. The utility evaluator
 compares the same task on the same model and effort as `baseline` (skill absent), `implicit`

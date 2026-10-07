@@ -15,13 +15,14 @@ cache를 직접 수정하지 않습니다.
 ## Pack model
 
 GPT-6 Astra 기준 구성은 `max` 추론과 기본 core-lite 가드레일 1개,
-명시 호출 전용 오케스트레이션 스킬, 선택형 iOS 메모리 분석 팩입니다.
-`apply`는 활성 bundle 2개만 `~/plugins`에 배치한 뒤 `INSTALLED_BY_DEFAULT` 항목을
+명시 호출 전용 오케스트레이션 스킬, 사용자가 선택한 아키텍처·인터뷰 팩,
+선택형 iOS 메모리 분석 팩입니다. `apply`는 활성 bundle 3개를 `~/plugins`에 배치한 뒤 `INSTALLED_BY_DEFAULT` 항목을
 Codex CLI로 설치합니다.
 
 | Pack | Policy | Skills |
 |---|---|---|
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate` (명시 호출 전용) |
+| `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs` (명시 호출 전용); `grilling`, `codebase-design`, `domain-modeling` |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — 실기기 메모리 그래프 분석 |
 
 `$jy-orchestrate`를 호출하면 현재 세션이 Codex·Claude의 계획·구현과 같은 결과물에 대한
@@ -53,10 +54,31 @@ codex plugin add jy-env-ios@personal-codex
 ```
 
 설치된 항목에 대해서만 remove를 실행합니다. 변경한 활성 plugin은 `apply` 전에
-`plugin-creator`의 cachebuster 흐름으로 갱신합니다. 기본 core는 `apply`가 갱신하고,
+`plugin-creator`의 cachebuster 흐름으로 갱신합니다. 기본 core와 design은 `apply`가 갱신하고,
 선택형 iOS는 배치 후 다시 add합니다. `apply` 자체는 Codex plugin을 설치 해제하지 않습니다.
 변경 후에는 새 Codex session을 시작합니다. 별도의 `~/.agents/skills/<pack>`
 discovery link는 만들지 않습니다.
+
+## 아키텍처 개선과 grill 인터뷰
+
+2026-10-07 사용자는 Claude Code에서 Matt Pocock 원본을 직접 사용한 뒤 이 기능들의
+도입을 결정했고, 간략화 없이 원본 기능을 최대한 보존하도록 요청했습니다. 이 팩의 채택은
+기존 core-lite 축소 원칙보다 우선합니다. 나머지 upstream 스킬은 사용자가 원본을
+사용해본 뒤 별도로 결정합니다.
+
+별도 `jy-env-design` 팩은 1.2.3의 `c55ee46073ed923f86ce59a5eb3b6d895095d1b7`을 기준으로 합니다.
+
+- `$improve-codebase-architecture`: 탐색, HTML 후보 보고서, 사용자 선택 후 grilling과
+  도메인 기록. HTML 템플릿과 병렬 대안 설계 참조도 모두 포함합니다.
+- `$grill-me`: 결정 트리 전체를 따라 추천안을 붙인 질문 라운드, 사실 조사 위임,
+  행동 전 사용자 확인을 원본대로 수행합니다.
+- `$grill-with-docs`: 같은 인터뷰와 함께 `CONTEXT.md`를 갱신하고 필요한 ADR을 기록합니다.
+
+직접 호출 스킬 3개는 명시 호출 전용입니다. 공통 기능인 `grilling`, `codebase-design`,
+`domain-modeling`은 원본처럼 자동 선택이 가능하며 번들 내부 상대 링크로도 읽습니다.
+Codex 호출 방식, 한국어 표시 정보, 로컬 위임 방식, Wiki·보고서 저장 위치만 이식하고
+원본 절차는 줄이지 않았습니다. [이식 범위와 원저작자 표시](plugins/jy-env-design/NOTICE.md)를
+참고하세요.
 
 ## 실기기 iOS 메모리 분석
 
@@ -120,7 +142,7 @@ Windows PowerShell:
 ```
 
 두 명령 모두 `codex` CLI가 필요하며, repo를 한 번 clone하고 안정적인 snapshot과
-core-lite를 설치합니다.
+core-lite와 design 팩을 설치합니다.
 
 ## 기존 기기 업데이트
 
@@ -133,8 +155,8 @@ codex plugin list --marketplace personal-codex --json
 ```
 
 해당 기기에 설정된 Python 3.11 이상을 사용합니다. Windows에서는 필요에 따라
-`python3` 대신 `python`을 씁니다. `apply`가 `jy-orchestrate`를 포함한 기본 core를
-갱신하므로 설치 버전이 `plugins/jy-env-core/.codex-plugin/plugin.json`과 일치하는지
+`python3` 대신 `python`을 씁니다. `apply`가 기본 core와 design을 갱신하므로
+각 설치 버전이 `plugins/<pack>/.codex-plugin/plugin.json`과 일치하는지
 확인한 뒤 새 Codex 세션을 시작합니다. 기기별 `LOCAL.md`는 계속 별도로 관리합니다.
 
 ## Local development
@@ -163,10 +185,11 @@ python3 -m codex_env_sync.cli apply --repo-root . --snapshot
 ## Layout
 
 ```text
-codex-env.toml                    # 활성 plugin source 2개와 installation policy
+codex-env.toml                    # 활성 plugin source 3개와 installation policy
 codex_env_sync/                   # inspect/apply/bootstrap engine
 archive/                         # Inactive originals, checksums, and restoration notes
 plugins/jy-env-core/              # 기본 core-lite bundle
+plugins/jy-env-design/            # 원본을 보존한 아키텍처·인터뷰 팩
 plugins/jy-env-ios/               # 선택형 실기기 메모리 분석 팩
 instructions/AGENTS.md            # 선택 skill을 eager routing하지 않는 전역 규칙
 .agents/plugins/marketplace.json  # local personal marketplace catalog
@@ -178,7 +201,9 @@ tests/                            # unit·integration test
 활성 first-party skill source는 `plugins/jy-env-*/skills/`에 두고, 비활성 원문은
 배포에서 제외된 `archive/`에 보관합니다. Upstream 또는 company-shared skill은
 로컬에서만 사용하는 seed material이며, 이 repo는 customization이 끝난 first-party
-결과만 저장하고 third-party runtime을 vendor하지 않습니다. 유지할 skill은 upstream
+결과만 저장하고 third-party runtime을 vendor하지 않습니다. 사용자가 선택한 `jy-env-design`은
+seed-only 재작성 원칙의 명시적 예외로, 선택한 원본 스킬과 참조를 고정 revision·출처 해시·
+MIT 라이선스와 함께 보존합니다. 유지할 skill은 upstream
 seed에 실시간으로 의존하지 않고 이 저장소의 first-party plugin asset으로 관리합니다.
 사용자가 참고나 재활성화를 요청하지 않으면 `archive/`의 지침을 설치·발견·적용하지 않습니다.
 
@@ -202,6 +227,10 @@ python3 -m unittest tests.test_skill_scenarios -v
 ```
 
 ## Skill 실용성 gate
+
+Design 팩은 사용자의 직접 사용 경험과 채택 결정으로 유지합니다. 명시 호출 전용
+워크플로에 implicit 활성률이나 추가 채택 벤치마크를 도입 조건으로 요구하지 않습니다.
+평가 시나리오는 동작 회귀 확인용이며 Codex에서의 비교 성능을 입증한 결과는 아닙니다.
 
 지침이 그럴듯하다는 이유만으로 skill을 유지하지 않습니다. 실용성 evaluator는 같은
 task를 같은 model·effort에서 `baseline`(skill 없음), `implicit`(발견 가능),
