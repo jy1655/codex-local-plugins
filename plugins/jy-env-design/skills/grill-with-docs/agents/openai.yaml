@@ -1,5 +1,5 @@
 interface:
-  display_name: "기록을 남기는 설계 인터뷰"
+  display_name: "grill-with-docs · 기록을 남기는 설계 인터뷰"
   short_description: "설계를 깊이 질문하면서 확정된 도메인 용어와 중요한 결정도 기록"
   default_prompt: "$grill-with-docs로 설계를 깊이 질문하면서 확정된 용어와 필요한 ADR을 기록해줘."
 policy:

@@ -1,4 +1,4 @@
 interface:
-  display_name: "변경 목적·범위 가드레일"
+  display_name: "jy-change-guardrails · 변경 목적·범위 가드레일"
   short_description: "핵심 목적을 지키며 작은 구현과 읽기 쉬운 짧은 코드를 선호"
   default_prompt: "$jy-change-guardrails 스킬로 핵심 목적에 맞는 작은 버전부터 구현하고 생략한 범위와 한계를 알려줘. 읽기 쉬운 짧은 코드를 선호하되 명시한 필수 요구와 필요한 안전 경계는 지켜줘."

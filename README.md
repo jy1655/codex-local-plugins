@@ -8,6 +8,8 @@ bundles, maintains a personal marketplace, and installs compact global instructi
 editing Codex's runtime cache directly.
 
 User-visible plugin and skill labels, descriptions, and suggested prompts are Korean.
+Skill labels include the exact invocation name first, for example
+`domain-modeling · 도메인 용어와 결정 기록`, so it remains visible in skill lists.
 Model-facing skill instructions and trigger descriptions stay English. Shared language,
 authorization, privacy, and workspace-preservation rules remain in global `AGENTS.md`
 regardless of workflow installation. Machine-specific instructions live in a separate,

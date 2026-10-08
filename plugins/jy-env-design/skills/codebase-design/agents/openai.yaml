@@ -1,4 +1,4 @@
 interface:
-  display_name: "깊은 모듈 설계"
+  display_name: "codebase-design · 깊은 모듈 설계"
   short_description: "작은 인터페이스에 기능을 모으는 모듈 설계와 대안 비교 기준"
   default_prompt: "$codebase-design으로 모듈의 interface와 seam을 검토하고 설계 대안을 비교해줘."
