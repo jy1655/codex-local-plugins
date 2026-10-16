@@ -1,0 +1,119 @@
+{
+  "budget": "large",
+  "speed": "standard",
+  "roles": {
+    "feature, refactoring": {
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh"
+    },
+    "bug-fix": {
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh"
+    },
+    "perf-issue": {
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh"
+    },
+    "hillclimb": {
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh"
+    },
+    "how explorer": {
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh"
+    },
+    "why investigators": {
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh"
+    },
+    "reflect tooling": {
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh"
+    },
+    "swarm workers": {
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh"
+    },
+    "judgment and prose": {
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "hardest tasks": {
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "how explainer": {
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "why synthesizer": {
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "reflect judgment, divergent, synthesizer": {
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "arena runners": [
+      {
+        "provider": "codex",
+        "model": "gpt-6-astra",
+        "effort": "xhigh"
+      },
+      {
+        "provider": "codex",
+        "model": "gpt-6.1-sol",
+        "effort": "xhigh"
+      }
+    ],
+    "arena cross-judge pool": [
+      {
+        "provider": "codex",
+        "model": "gpt-6-astra",
+        "effort": "xhigh"
+      },
+      {
+        "provider": "codex",
+        "model": "gpt-6.1-sol",
+        "effort": "xhigh"
+      }
+    ],
+    "architect runners": [
+      {
+        "provider": "codex",
+        "model": "gpt-6-astra",
+        "effort": "xhigh"
+      },
+      {
+        "provider": "codex",
+        "model": "gpt-6.1-sol",
+        "effort": "xhigh"
+      }
+    ],
+    "interrogate reviewers": [
+      {
+        "provider": "codex",
+        "model": "gpt-6-astra",
+        "effort": "xhigh"
+      },
+      {
+        "provider": "codex",
+        "model": "gpt-6.1-sol",
+        "effort": "xhigh"
+      }
+    ]
+  }
+}

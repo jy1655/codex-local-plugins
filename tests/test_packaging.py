@@ -14,7 +14,7 @@ from codex_env_sync.apply import apply_environment
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 EXPECTED_PACKS = {
-    "jy-env-core": {"jy-change-guardrails", "jy-orchestrate"},
+    "jy-env-core": {"jy-change-guardrails", "jy-orchestrate", "pstack"},
     "jy-env-design": {
         "improve-codebase-architecture", "grill-me", "grill-with-docs",
         "grilling", "codebase-design", "domain-modeling",

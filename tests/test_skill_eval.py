@@ -82,7 +82,7 @@ class SkillEvalDiscoveryTests(unittest.TestCase):
         self.assertEqual(plan.total_model_calls, 7)
         pack_names = {path.name for path in plan.pack_skill_dirs["jy-change-guardrails"]}
         self.assertIn("jy-change-guardrails", pack_names)
-        self.assertEqual(pack_names, {"jy-change-guardrails", "jy-orchestrate"})
+        self.assertEqual(pack_names, {"jy-change-guardrails", "jy-orchestrate", "pstack"})
 
         baseline_names = {
             path.name for path in skill_dirs_for_arm(plan, "jy-change-guardrails", "baseline")
@@ -91,7 +91,7 @@ class SkillEvalDiscoveryTests(unittest.TestCase):
             path.name for path in skill_dirs_for_arm(plan, "jy-change-guardrails", "implicit")
         }
         self.assertNotIn("jy-change-guardrails", baseline_names)
-        self.assertEqual(baseline_names, {"jy-orchestrate"})
+        self.assertEqual(baseline_names, {"jy-orchestrate", "pstack"})
         self.assertIn("jy-change-guardrails", implicit_names)
 
     def test_changed_paths_select_only_affected_skills_or_all_for_harness(self) -> None:
@@ -114,7 +114,7 @@ class SkillEvalDiscoveryTests(unittest.TestCase):
         )
 
         peers = expand_skill_names_to_pack_peers(REPO_ROOT, {"jy-change-guardrails"})
-        self.assertEqual(peers, {"jy-change-guardrails", "jy-orchestrate"})
+        self.assertEqual(peers, {"jy-change-guardrails", "jy-orchestrate", "pstack"})
         self.assertEqual(
             expand_skill_names_to_pack_peers(REPO_ROOT, {"ios-memgraph-leaks"}),
             {"ios-memgraph-leaks"},

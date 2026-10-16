@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack 작업 모드 · 시험용"
+  short_description: "조사·설계·구현·독립 검증을 연결하는 pstack 로컬 이식본"
+  default_prompt: "$pstack 현재 작업에 맞는 절차를 선택하고 구현과 검증까지 수행해줘."
+policy:
+  allow_implicit_invocation: false

@@ -16,14 +16,14 @@ cache를 직접 수정하지 않습니다.
 
 ## Pack model
 
-GPT-6 Astra 기준 구성은 `max` 추론과 기본 core-lite 가드레일 1개,
+GPT-6 Astra 기준 구성은 `max` 추론과 core-lite 가드레일 1개(현재 pstack 시험 중 자동 적용 임시 해제),
 명시 호출 전용 오케스트레이션 스킬, 사용자가 선택한 아키텍처·인터뷰 팩,
 선택형 iOS 메모리 분석 팩입니다. `apply`는 활성 bundle 3개를 `~/plugins`에 배치한 뒤 `INSTALLED_BY_DEFAULT` 항목을
 Codex CLI로 설치합니다.
 
 | Pack | Policy | Skills |
 |---|---|---|
-| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate` (명시 호출 전용) |
+| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack` (명시 호출 전용) |
 | `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs` (명시 호출 전용); `grilling`, `codebase-design`, `domain-modeling` |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — 실기기 메모리 그래프 분석 |
 
@@ -60,6 +60,19 @@ codex plugin add jy-env-ios@personal-codex
 선택형 iOS는 배치 후 다시 add합니다. `apply` 자체는 Codex plugin을 설치 해제하지 않습니다.
 변경 후에는 새 Codex session을 시작합니다. 별도의 `~/.agents/skills/<pack>`
 discovery link는 만들지 않습니다.
+
+## 시험용 pstack 모듈
+
+기존 `jy-env-core` 플러그인 내부의 `plugins/jy-env-core/skills/pstack/`에 모았습니다.
+새 세션에서 `$pstack <작업>` 또는 `$pstack interrogate <검토 대상>`으로 사용합니다.
+명시 호출 진입점 하나가 54개 워크플로를 필요할 때 읽습니다. 코드 작업은 Codex Sol,
+판단·글쓰기는 Astra를 기본으로 사용하며, `$pstack setup-pstack`으로 사용 가능한 모델을 역할별로 지정할 수 있습니다.
+Cursor 전용 실행 방식을 Codex에 맞췄고, 원본 MIT 고지와 고정된 출처를 보존했습니다.
+별도 플러그인·마켓플레이스·hook·전역 규칙은 추가하지 않습니다. 사용자 요청에 따른
+원본 이식 예외입니다. 가드레일 본문은 보존하되 자동 적용을 임시 해제했으며,
+pstack과 jy-orchestrate를 자동 결합하지 않습니다. Bun 도구는 제거했으며 PR 상태는 forge CLI로
+직접 확인하고 프로그램 상태는 작업 파일로 관리합니다. 남은 도구는 Node 또는 bash를 사용합니다.
+복구 방법과 제거할 연결 지점은 [모듈 안내](plugins/jy-env-core/skills/pstack/NOTICE.md)에 모았습니다.
 
 ## 아키텍처 개선과 grill 인터뷰
 

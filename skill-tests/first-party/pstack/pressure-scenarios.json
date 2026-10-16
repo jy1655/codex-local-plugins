@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "local-fix-without-cursor",
+      "title": "Local implementation uses available host tools and remains local",
+      "prompt": "$pstack Fix the failing invoice calculation in this local repository and verify it. Keep the result local. Only the current Codex model and terminal tools are available.",
+      "expected_without_skill": "Codex may solve the defect directly, without pstack routing or an explicit evidence distinction.",
+      "expected_with_skill": "Reads the Codex runtime adapter and bug-fix workflow, reproduces the failure, fixes it, verifies the same behavior, and reports actual evidence. Uses available capabilities, labels missing independent review, preserves unrelated work, and does not invoke Cursor Task, guess model slugs, edit installed caches, or publish a PR."
+    },
+    {
+      "id": "read-only-review-with-one-model",
+      "title": "Independent review does not invent model diversity or apply fixes",
+      "prompt": "$pstack interrogate Review this diff read-only. Only the parent model is available. Report supported findings and evidence gaps; do not change files or create issues.",
+      "expected_without_skill": "Codex can review the diff but may not use the pstack intent, reviewer, and lead-judgment separation.",
+      "expected_with_skill": "Reads the adapter and interrogate workflow, establishes intent, uses independent parent-model seats if delegation is available, and reports lack of cross-model diversity. If delegation is unavailable it performs feasible review and labels the gap. Synthesizes evidence-backed findings without editing files or creating external issues."
+    }
+  ]
+}
