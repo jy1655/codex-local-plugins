@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-swarm · 여러 작업자 병렬 실행"
+  short_description: "PSTACK · 여러 작업자 병렬 실행 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-swarm 현재 작업에 여러 작업자 병렬 실행 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

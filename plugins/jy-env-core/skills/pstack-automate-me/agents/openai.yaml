@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-automate-me · 개인 작업 방식 스킬화"
+  short_description: "PSTACK · 개인 작업 방식 스킬화 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-automate-me 현재 작업에 개인 작업 방식 스킬화 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

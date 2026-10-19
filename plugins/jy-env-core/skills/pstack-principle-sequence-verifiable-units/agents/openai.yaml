@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-principle-sequence-verifiable-units · 작업을 검증 단위로 나누기"
+  short_description: "PSTACK · 작업을 검증 단위로 나누기 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-principle-sequence-verifiable-units 현재 작업에 작업을 검증 단위로 나누기 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

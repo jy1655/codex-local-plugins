@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "direct-workflow-selection",
+      "title": "Direct principle-foundational-thinking selection uses its shared runtime contract",
+      "prompt": "$pstack-principle-foundational-thinking Use the current task context to choose data structures and preserve options before adding logic. Stay within that workflow and report the actual result.",
+      "expected_without_skill": "The agent may handle the request generically or select the full poteto-mode workflow without applying the named procedure.",
+      "expected_with_skill": "Reads the shared pstack entry point, Codex runtime adapter, and principle-foundational-thinking/WORKFLOW.md. Applies the selected procedure within the task scope, resolving its references from the workflow directory and reporting actual evidence."
+    },
+    {
+      "id": "restricted-host-and-scope",
+      "title": "principle-foundational-thinking preserves user scope when host capabilities are limited",
+      "prompt": "$pstack-principle-foundational-thinking Explain how you would choose data structures and preserve options before adding logic for the current task, using only the evidence already in this conversation. This turn is read-only; delegation and external services are unavailable.",
+      "expected_without_skill": "The agent may describe a generic approach, or assume that upstream tool names and independent reviewers are available.",
+      "expected_with_skill": "Uses the principle-foundational-thinking procedure and shared runtime adapter to give a scoped explanation. Does not edit files, contact external services, or claim unavailable delegation or execution. Marks missing evidence and preserves read-only scope even when the workflow normally performs changes."
+    }
+  ]
+}

@@ -5,6 +5,8 @@ for routing. Explain usage in the user's language:
 
 - `$pstack <task>` selects the matching poteto-mode playbook.
 - `$pstack <workflow> <task>` selects a named workflow, such as how or interrogate.
+- `$pstack-<workflow> <task>` selects the same workflow directly from the skill picker,
+  for example `$pstack-how`, `$pstack-interrogate`, or `$pstack-tdd`.
 - `$pstack setup-pstack` sets optional model roles; default execution inherits the parent.
 - `$pstack poteto-help` shows this help.
 

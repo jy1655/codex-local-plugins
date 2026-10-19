@@ -24,12 +24,16 @@ explicit invocation of poteto-mode; installation alone does not activate the mod
    Read poteto-mode's principles and delegation sections when that workflow calls for them.
 4. `$pstack setup-pstack` configures optional model roles;
    `$pstack poteto-help` reads [the workflow index](references/workflows.md).
+5. Each workflow also has a directly selectable `$pstack-<workflow>` skill in the
+   same plugin. For example, `$pstack-how` selects `how` and `$pstack-interrogate`
+   selects `interrogate`. These entries use this same runtime contract and workflow files.
 
-Bundled workflow names and slash examples refer to these local files, not to
-separately installed skills. Resolve relative links from the document being read.
+Bundled workflow names and slash examples resolve to these local workflow files.
+Resolve relative links from the document being read.
 In poteto-mode, `playbooks/`, `scripts/`, and `references/` are relative to
 `references/skills/poteto-mode/`. Use only the relevant references, not the whole bundle.
-Only this SKILL.md is registered with Codex; internal WORKFLOW.md files are resources.
+This entry point and 54 sibling `pstack-*` skills are registered with Codex.
+Internal WORKFLOW.md files remain the shared source for both invocation forms.
 
 Keep the mode for the current task and its follow-ups. Leave it when the user opts
 out or changes to an unrelated task. Do not edit global instructions to make it sticky.

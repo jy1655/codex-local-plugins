@@ -8,16 +8,20 @@ revision `f713f14203cd6420cec13cd7c55c32d598dbab68`, imported on 2026-10-16.
 their original paths and SHA-256 hashes. These hashes describe the input, not the modified port.
 
 The user requested a local trial inside the existing plugin, removable as an internal
-module. This is not a new plugin or marketplace. It adds one `$pstack` entry point to
-`jy-env-core`; existing guardrails and jy-orchestrate remain independent.
+module. This is not a new plugin or marketplace. It adds the `$pstack` entry point and
+54 directly selectable `$pstack-*` workflow entries to `jy-env-core`; existing guardrails
+and jy-orchestrate remain independent.
 
 ## Included and adapted
 
 - All 54 upstream skills, including 24 principles, 23 poteto-mode playbooks, both
   agent prompts, and their references are included. Internal
-  SKILL.md files become WORKFLOW.md resources, so they do not register independently.
+  SKILL.md files become shared WORKFLOW.md resources. On 2026-10-19, the user requested
+  individual skill visibility; 54 sibling `pstack-*` entry points now expose those
+  resources directly, with Korean UI metadata and without duplicating workflow bodies.
 - The entry point preserves poteto-mode's explicit invocation policy using
-  `agents/openai.yaml`. `$pstack <workflow> <task>` selects an individual workflow.
+  `agents/openai.yaml`, including the direct workflow entries. `$pstack <workflow> <task>`
+  and `$pstack-<workflow> <task>` select the same individual workflow.
 - Cursor Grok/Opus defaults become Codex Sol/Astra roles in references/default-models.json.
   Optional pstack-only models.json replaces an always-applied Cursor rule. The original
   starting budget and task-sensitive effort adjustments are retained using separate CLI
@@ -60,6 +64,9 @@ limited to actual host capabilities, not an emulation of Cursor's cloud schedule
 $pstack <task>
 $pstack how <question about this code>
 $pstack interrogate <diff or paths>
+$pstack-how <question about this code>
+$pstack-interrogate <diff or paths>
+$pstack-tdd <bug to reproduce and fix>
 $pstack setup-pstack
 $pstack poteto-help
 ```
@@ -69,11 +76,13 @@ configuration. Optional configuration lives only in `${CODEX_HOME:-$HOME/.codex}
 
 ## Remove the experiment
 
-1. Delete `plugins/jy-env-core/skills/pstack/`, `skill-tests/first-party/pstack/`, and
-   `tests/test_pstack.py` from the source repository.
-2. Remove `pstack` from `EXPECTED_PACKS["jy-env-core"]` in tests/test_packaging.py and
-   the three peer sets in tests/test_skill_eval.py, and return the skill count from
-   10 to 9 in tests/test_repo_bundle.py. Remove the pstack
+1. Delete `plugins/jy-env-core/skills/pstack/`, its sibling `pstack-*` skill directories,
+   the matching `skill-tests/first-party/pstack/` and `pstack-*` scenario directories,
+   and `tests/test_pstack.py` from the source repository.
+2. Remove `pstack` and `PSTACK_SKILLS` from `EXPECTED_PACKS["jy-env-core"]` in
+   tests/test_packaging.py, and remove `pstack` from `CORE_SKILLS` in
+   tests/test_skill_eval.py. Return the skill count from 64 to 9 in
+   tests/test_repo_bundle.py. Remove the pstack
    paragraph/table entry from both READMEs. Together with the guardrail metadata in step 3, these are the external integration points.
 3. Restore automatic guardrails by removing the trial comment and `policy` stanza from
    `plugins/jy-env-core/skills/jy-change-guardrails/agents/openai.yaml` (or set

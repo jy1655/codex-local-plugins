@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "direct-workflow-selection",
+      "title": "Direct principle-explain-the-number selection uses its shared runtime contract",
+      "prompt": "$pstack-principle-explain-the-number Use the current task context to explain measured results with variance, evidence, and a proven limiter. Stay within that workflow and report the actual result.",
+      "expected_without_skill": "The agent may handle the request generically or select the full poteto-mode workflow without applying the named procedure.",
+      "expected_with_skill": "Reads the shared pstack entry point, Codex runtime adapter, and principle-explain-the-number/WORKFLOW.md. Applies the selected procedure within the task scope, resolving its references from the workflow directory and reporting actual evidence."
+    },
+    {
+      "id": "restricted-host-and-scope",
+      "title": "principle-explain-the-number preserves user scope when host capabilities are limited",
+      "prompt": "$pstack-principle-explain-the-number Explain how you would explain measured results with variance, evidence, and a proven limiter for the current task, using only the evidence already in this conversation. This turn is read-only; delegation and external services are unavailable.",
+      "expected_without_skill": "The agent may describe a generic approach, or assume that upstream tool names and independent reviewers are available.",
+      "expected_with_skill": "Uses the principle-explain-the-number procedure and shared runtime adapter to give a scoped explanation. Does not edit files, contact external services, or claim unavailable delegation or execution. Marks missing evidence and preserves read-only scope even when the workflow normally performs changes."
+    }
+  ]
+}

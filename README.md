@@ -25,7 +25,7 @@ and an optional iOS memory-analysis pack. `apply` stages the three active bundle
 
 | Pack | Policy | Skills |
 |---|---|---|
-| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack` (all explicit-only during this trial) |
+| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack`, and 54 `pstack-*` workflow entries (all explicit-only during this trial) |
 | `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs` (explicit only); `grilling`, `codebase-design`, `domain-modeling` |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — physical-device memory graph analysis |
 
@@ -70,8 +70,12 @@ Start a fresh Codex session after changing installed packs. No second
 
 The local pstack trial lives inside the existing `jy-env-core` plugin at
 `plugins/jy-env-core/skills/pstack/`. Invoke `$pstack <task>` or
-`$pstack interrogate <diff>`. One explicit entry point loads the 54 bundled
-workflows on demand. Code roles default to Codex Sol and judgment roles to Astra; `$pstack setup-pstack`
+`$pstack interrogate <diff>`. All 54 bundled workflows also appear individually in the
+skill picker as `pstack-*`, with Korean labels and descriptions. Invoke, for example,
+`$pstack-how <question>`, `$pstack-interrogate <diff>`, or `$pstack-tdd <bug>`.
+These explicit-only entries share the existing workflow resources and runtime adapter;
+the original `$pstack <workflow>` form remains supported.
+Code roles default to Codex Sol and judgment roles to Astra; `$pstack setup-pstack`
 can configure available providers. The port adapts Cursor-specific runtime assumptions
 and keeps the original MIT notice and pinned provenance. It does not register another
 plugin, marketplace, hook, or global rule. This user-requested trial is another deliberate

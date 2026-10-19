@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-principle-experience-first · 사용자 경험 우선"
+  short_description: "PSTACK · 사용자 경험 우선 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-principle-experience-first 현재 작업에 사용자 경험 우선 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

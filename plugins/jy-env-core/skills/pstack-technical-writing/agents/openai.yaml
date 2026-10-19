@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-technical-writing · 명확한 기술 문서 작성"
+  short_description: "PSTACK · 명확한 기술 문서 작성 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-technical-writing 현재 작업에 명확한 기술 문서 작성 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

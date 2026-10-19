@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-show-me-your-work · 의사결정 근거 기록"
+  short_description: "PSTACK · 의사결정 근거 기록 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-show-me-your-work 현재 작업에 의사결정 근거 기록 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

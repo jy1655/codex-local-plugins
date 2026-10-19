@@ -1,7 +1,10 @@
 # Pstack workflow index
 
-Invoke `$pstack <name> <task>`. A plain task uses poteto-mode. These are internal
-resources, not 54 globally registered skills. Read the Codex runtime adapter first.
+Invoke `$pstack-<name> <task>` directly from the skill picker, or use the existing
+`$pstack <name> <task>` form. All 54 workflows below have a sibling skill entry with
+a Korean display label and description. Both forms use the same workflow resources
+and explicit-only invocation policy. A plain `$pstack <task>` uses poteto-mode.
+Read the Codex runtime adapter first.
 
 | Workflow | Reference |
 |---|---|

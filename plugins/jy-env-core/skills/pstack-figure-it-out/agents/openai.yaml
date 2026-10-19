@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-figure-it-out · 맞춤 작업 절차 설계"
+  short_description: "PSTACK · 맞춤 작업 절차 설계 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-figure-it-out 현재 작업에 맞춤 작업 절차 설계 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

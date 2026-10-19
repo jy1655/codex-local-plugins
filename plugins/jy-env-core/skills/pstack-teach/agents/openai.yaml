@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-teach · 동작과 설계 이유 가르치기"
+  short_description: "PSTACK · 동작과 설계 이유 가르치기 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-teach 현재 작업에 동작과 설계 이유 가르치기 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

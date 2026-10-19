@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-sharpen · 문제와 접근법 다듬기"
+  short_description: "PSTACK · 문제와 접근법 다듬기 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-sharpen 현재 작업에 문제와 접근법 다듬기 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

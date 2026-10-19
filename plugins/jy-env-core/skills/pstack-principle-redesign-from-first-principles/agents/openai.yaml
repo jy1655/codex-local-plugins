@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-principle-redesign-from-first-principles · 설계 재검토"
+  short_description: "PSTACK · 새 요구에 맞춘 설계 재검토 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-principle-redesign-from-first-principles 현재 작업에 새 요구에 맞춘 설계 재검토 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-make-bot-ui · 봇 조작 화면 만들기"
+  short_description: "PSTACK · 봇 조작 화면 만들기 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-make-bot-ui 현재 작업에 봇 조작 화면 만들기 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

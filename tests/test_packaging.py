@@ -13,8 +13,13 @@ from codex_env_sync.apply import apply_environment
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
+PSTACK_SKILLS = {
+    f"pstack-{path.parent.name}"
+    for path in (REPO_ROOT / "plugins/jy-env-core/skills/pstack/references/skills").glob("*/WORKFLOW.md")
+}
+
 EXPECTED_PACKS = {
-    "jy-env-core": {"jy-change-guardrails", "jy-orchestrate", "pstack"},
+    "jy-env-core": {"jy-change-guardrails", "jy-orchestrate", "pstack"} | PSTACK_SKILLS,
     "jy-env-design": {
         "improve-codebase-architecture", "grill-me", "grill-with-docs",
         "grilling", "codebase-design", "domain-modeling",
@@ -56,6 +61,13 @@ class PackagingTests(unittest.TestCase):
     def test_apply_migrates_old_sources_without_deploying_archive(self) -> None:
         for os_name in ["darwin", "windows"]:
             with self.subTest(os_name=os_name), tempfile.TemporaryDirectory() as tmp:
+                if os_name == "darwin":
+                    try:
+                        (Path(tmp) / "symlink-probe").symlink_to(REPO_ROOT, target_is_directory=True)
+                    except OSError as exc:
+                        if getattr(exc, "winerror", None) == 1314:
+                            self.skipTest("Windows host lacks symlink privileges for the macOS install mode")
+                        raise
                 old_repo = Path(tmp) / "old-repo"
                 home = Path(tmp) / "home"
                 shutil.copytree(REPO_ROOT / "archive" / "plugins", old_repo / "plugins")

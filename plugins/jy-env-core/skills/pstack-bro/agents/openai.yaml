@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-bro · 쉬운 말로 다시 설명"
+  short_description: "PSTACK · 쉬운 말로 다시 설명 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-bro 현재 작업에 쉬운 말로 다시 설명 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

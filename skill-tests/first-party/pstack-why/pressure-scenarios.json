@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "direct-workflow-selection",
+      "title": "Direct why selection uses its shared runtime contract",
+      "prompt": "$pstack-why Use the current task context to investigate the history and motivations behind a code design. Stay within that workflow and report the actual result.",
+      "expected_without_skill": "The agent may handle the request generically or select the full poteto-mode workflow without applying the named procedure.",
+      "expected_with_skill": "Reads the shared pstack entry point, Codex runtime adapter, and why/WORKFLOW.md. Applies the selected procedure within the task scope, resolving its references from the workflow directory and reporting actual evidence."
+    },
+    {
+      "id": "restricted-host-and-scope",
+      "title": "why preserves user scope when host capabilities are limited",
+      "prompt": "$pstack-why Explain how you would investigate the history and motivations behind a code design for the current task, using only the evidence already in this conversation. This turn is read-only; delegation and external services are unavailable.",
+      "expected_without_skill": "The agent may describe a generic approach, or assume that upstream tool names and independent reviewers are available.",
+      "expected_with_skill": "Uses the why procedure and shared runtime adapter to give a scoped explanation. Does not edit files, contact external services, or claim unavailable delegation or execution. Marks missing evidence and preserves read-only scope even when the workflow normally performs changes."
+    }
+  ]
+}

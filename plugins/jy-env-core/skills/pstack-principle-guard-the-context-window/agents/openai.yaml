@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-principle-guard-the-context-window · 문맥 용량 관리"
+  short_description: "PSTACK · 문맥 용량 관리 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-principle-guard-the-context-window 현재 작업에 문맥 용량 관리 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

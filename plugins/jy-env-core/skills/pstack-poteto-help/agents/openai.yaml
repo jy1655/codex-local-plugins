@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-poteto-help · 사용법과 워크플로 안내"
+  short_description: "PSTACK · 사용법과 워크플로 안내 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-poteto-help 현재 작업에 사용법과 워크플로 안내 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

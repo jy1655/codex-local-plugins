@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-principle-fix-root-causes · 근본 원인 수정"
+  short_description: "PSTACK · 근본 원인 수정 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-principle-fix-root-causes 현재 작업에 근본 원인 수정 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

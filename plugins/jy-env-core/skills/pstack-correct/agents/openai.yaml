@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-correct · 반복 실수 구조 개선"
+  short_description: "PSTACK · 반복 실수 구조 개선 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-correct 현재 작업에 반복 실수 구조 개선 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

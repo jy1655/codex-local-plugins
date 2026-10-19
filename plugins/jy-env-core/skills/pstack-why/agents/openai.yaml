@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-why · 코드가 만들어진 이유 조사"
+  short_description: "PSTACK · 코드가 만들어진 이유 조사 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-why 현재 작업에 코드가 만들어진 이유 조사 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

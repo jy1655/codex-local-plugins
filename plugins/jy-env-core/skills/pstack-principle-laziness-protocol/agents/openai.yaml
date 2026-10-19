@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-principle-laziness-protocol · 중복 결정과 변경 줄이기"
+  short_description: "PSTACK · 중복 결정과 변경 줄이기 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-principle-laziness-protocol 현재 작업에 중복 결정과 변경 줄이기 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false

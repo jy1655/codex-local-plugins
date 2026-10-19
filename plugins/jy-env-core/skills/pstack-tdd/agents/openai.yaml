@@ -1,0 +1,6 @@
+interface:
+  display_name: "pstack-tdd · 재현 테스트로 버그 수정"
+  short_description: "PSTACK · 재현 테스트로 버그 수정 절차를 직접 선택하고 실행합니다"
+  default_prompt: "$pstack-tdd 현재 작업에 재현 테스트로 버그 수정 절차를 적용해줘."
+policy:
+  allow_implicit_invocation: false
