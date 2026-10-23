@@ -26,7 +26,7 @@ and an optional iOS memory-analysis pack. `apply` stages the three active bundle
 | Pack | Policy | Skills |
 |---|---|---|
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack`, and 54 `pstack-*` workflow entries (all explicit-only during this trial) |
-| `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs` (explicit only); `grilling`, `codebase-design`, `domain-modeling` |
+| `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs`, `retro` (explicit only); `grilling`, `codebase-design`, `domain-modeling` |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — physical-device memory graph analysis |
 
 Invoke `$jy-orchestrate` for the current session to directly coordinate Codex and Claude
@@ -85,14 +85,14 @@ The bundled Bun tools are removed: PR status uses the forge CLI directly, progra
 uses task-owned files, and the remaining helpers use Node or bash.
 See the module's [usage, limits, and removal map](plugins/jy-env-core/skills/pstack/NOTICE.md).
 
-## Architecture improvement and grilling
+## Architecture improvement, grilling, and retrospectives
 
 On 2026-10-07, the user chose these workflows after using Matt Pocock's originals in
 Claude Code and explicitly requested preservation without simplification. This choice
 supersedes the core-lite adoption filter for this pack. Other upstream workflows remain
 outside scope until the user tries and selects them.
 
-The separate `jy-env-design` pack preserves version 1.2.3 at `c55ee46073ed923f86ce59a5eb3b6d895095d1b7`:
+The architecture and interview skills in `jy-env-design` preserve version 1.2.3 at `c55ee46073ed923f86ce59a5eb3b6d895095d1b7`:
 
 - `$improve-codebase-architecture`: exploration, visual HTML candidates, user selection,
   then grilling and domain records; full HTML and parallel alternative-design references.
@@ -100,7 +100,14 @@ The separate `jy-env-design` pack preserves version 1.2.3 at `c55ee46073ed923f86
   fact-finding delegation, and confirmation before acting.
 - `$grill-with-docs`: the same interview with inline `CONTEXT.md` and selective ADR recording.
 
-The three entry points are explicit-only. Their reusable `grilling`, `codebase-design`,
+On 2026-10-23, the user also selected `$retro` with functional preservation. It reads the
+specified session's primary sources (the current session by default), then proposes agent
+environment improvements in severity order across the original seven categories. Its full
+`writing-for-agents` dependency is bundled as a reference, including skill mechanics.
+Retro and those references are pinned separately to version 1.3.1 at
+`5beb35b040e3de97e54fa9e386d7e42d15c295c2`; the existing six skills retain their revision.
+
+The four entry points are explicit-only. Their reusable `grilling`, `codebase-design`,
 and `domain-modeling` skills keep automatic discovery and can also be read through bundled
 relative links. Runtime adaptations cover Codex invocation, Korean UI, local delegation,
 and configured Wiki/report storage; they do not shorten the original workflows.

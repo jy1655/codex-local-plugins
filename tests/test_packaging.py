@@ -21,7 +21,7 @@ PSTACK_SKILLS = {
 EXPECTED_PACKS = {
     "jy-env-core": {"jy-change-guardrails", "jy-orchestrate", "pstack"} | PSTACK_SKILLS,
     "jy-env-design": {
-        "improve-codebase-architecture", "grill-me", "grill-with-docs",
+        "improve-codebase-architecture", "grill-me", "grill-with-docs", "retro",
         "grilling", "codebase-design", "domain-modeling",
     },
     "jy-env-ios": {"ios-memgraph-leaks"},

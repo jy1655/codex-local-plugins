@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "existing-check-is-unwired",
+      "title": "An existing check is never run",
+      "prompt": "$retro Review this session and repository read-only. The agent spent ten minutes finding src/parser.py and introduced an invalid import. pyproject.toml already defines a lint command that rejects that import, but there is no pre-commit hook or CI job invoking it. The reviewer missed it. Suggest environment improvements; do not implement them.",
+      "expected_without_skill": "May propose another lint tool or add a prose rule for the reviewer without checking why the existing check did not run.",
+      "expected_with_skill": "Reads the writing reference and available primary sources, inspects the actual lint and CI configuration, identifies the unwired deterministic check as the mechanical-error finding, considers a navigation pointer for the search friction, and presents evidence-backed candidates in severity order without applying them."
+    },
+    {
+      "id": "specified-session-and-judgment-rule",
+      "title": "Use the specified session and separate judgment from mechanical checks",
+      "prompt": "$retro Review only logs/previous-session.jsonl, not today's session. In that prior session a reviewer missed inconsistent terminology across two modules; the agent also repeatedly fetched a large tool inventory. AGENTS.md is 900 lines and repeats several defaults. Inspect the available evidence and suggest improvements read-only.",
+      "expected_without_skill": "May summarize today's work, add more instructions to AGENTS.md, or demand a deterministic naming check without examining whether the terminology choice requires judgment.",
+      "expected_with_skill": "Uses the named session's primary sources and the writing reference, distinguishes a judgment-based reviewer standard from enforceable mechanical rules, examines tool economy and no-op steering text, and orders concrete candidates by severity. Missing source evidence is identified instead of invented, and changes remain proposals."
+    }
+  ]
+}

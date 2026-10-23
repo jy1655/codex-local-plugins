@@ -24,7 +24,7 @@ Codex CLI로 설치합니다.
 | Pack | Policy | Skills |
 |---|---|---|
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack`, `pstack-*` 하위 스킬 54개 (명시 호출 전용) |
-| `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs` (명시 호출 전용); `grilling`, `codebase-design`, `domain-modeling` |
+| `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs`, `retro` (명시 호출 전용); `grilling`, `codebase-design`, `domain-modeling` |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — 실기기 메모리 그래프 분석 |
 
 `$jy-orchestrate`를 호출하면 현재 세션이 Codex·Claude의 계획·구현과 같은 결과물에 대한
@@ -77,14 +77,14 @@ pstack과 jy-orchestrate를 자동 결합하지 않습니다. Bun 도구는 제�
 직접 확인하고 프로그램 상태는 작업 파일로 관리합니다. 남은 도구는 Node 또는 bash를 사용합니다.
 복구 방법과 제거할 연결 지점은 [모듈 안내](plugins/jy-env-core/skills/pstack/NOTICE.md)에 모았습니다.
 
-## 아키텍처 개선과 grill 인터뷰
+## 아키텍처 개선, grill 인터뷰와 회고
 
 2026-10-07 사용자는 Claude Code에서 Matt Pocock 원본을 직접 사용한 뒤 이 기능들의
 도입을 결정했고, 간략화 없이 원본 기능을 최대한 보존하도록 요청했습니다. 이 팩의 채택은
 기존 core-lite 축소 원칙보다 우선합니다. 나머지 upstream 스킬은 사용자가 원본을
 사용해본 뒤 별도로 결정합니다.
 
-별도 `jy-env-design` 팩은 1.2.3의 `c55ee46073ed923f86ce59a5eb3b6d895095d1b7`을 기준으로 합니다.
+`jy-env-design` 팩의 아키텍처·인터뷰 스킬은 1.2.3의 `c55ee46073ed923f86ce59a5eb3b6d895095d1b7`을 기준으로 합니다.
 
 - `$improve-codebase-architecture`: 탐색, HTML 후보 보고서, 사용자 선택 후 grilling과
   도메인 기록. HTML 템플릿과 병렬 대안 설계 참조도 모두 포함합니다.
@@ -92,7 +92,13 @@ pstack과 jy-orchestrate를 자동 결합하지 않습니다. Bun 도구는 제�
   행동 전 사용자 확인을 원본대로 수행합니다.
 - `$grill-with-docs`: 같은 인터뷰와 함께 `CONTEXT.md`를 갱신하고 필요한 ADR을 기록합니다.
 
-직접 호출 스킬 3개는 명시 호출 전용입니다. 공통 기능인 `grilling`, `codebase-design`,
+2026-10-23에는 사용자가 `$retro`도 원래 동작을 보존해 추가하도록 선택했습니다.
+지정한 세션(미지정 시 현재 세션)의 1차 자료를 읽고, 원본의 7개 범주에 따라 에이전트
+환경 개선 후보를 심각도순으로 제안합니다. 선행 의존성인 `writing-for-agents`와
+스킬 작성 세부 자료도 참조 파일로 모두 포함합니다. 회고와 해당 참조는 별도로
+1.3.1의 `5beb35b040e3de97e54fa9e386d7e42d15c295c2`에 고정하며 기존 6개 스킬의 기준은 유지합니다.
+
+직접 호출 스킬 4개는 명시 호출 전용입니다. 공통 기능인 `grilling`, `codebase-design`,
 `domain-modeling`은 원본처럼 자동 선택이 가능하며 번들 내부 상대 링크로도 읽습니다.
 Codex 호출 방식, 한국어 표시 정보, 로컬 위임 방식, Wiki·보고서 저장 위치만 이식하고
 원본 절차는 줄이지 않았습니다. [이식 범위와 원저작자 표시](plugins/jy-env-design/NOTICE.md)를
