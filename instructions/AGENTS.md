@@ -15,6 +15,9 @@
 - When changing this managed Codex environment, edit the source repository and use its
   sync tool or `codex plugin` to update installed artifacts.
 - Do not edit `~/.codex/plugins/cache` directly (or `plugins/cache` under a custom Codex home).
+- Install or update the Agent Bridge plugin (`agent-bridge@agent-bridge`) only from a verified
+  tabcli release archive ("Release archives" in tabcli's `docs/integrations.md`), never by adding
+  a tabcli source checkout as the marketplace; a checkout catalog carries unreleased skill text.
 
 ## Native Capability and Gate Policy
 
