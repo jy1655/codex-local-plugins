@@ -25,9 +25,15 @@ and an optional iOS memory-analysis pack. `apply` stages the three active bundle
 
 | Pack | Policy | Skills |
 |---|---|---|
-| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack`, and 54 `pstack-*` workflow entries (all explicit-only during this trial) |
+| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack`, and 54 `pstack-*` workflow entries (explicit-only during this trial); `skill-authoring-review` (skill authoring only) |
 | `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs`, `retro` (explicit only); `grilling`, `codebase-design`, `domain-modeling` |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — physical-device memory graph analysis |
+
+`skill-authoring-review` assists skill creation and modification with SkillSpector
+static checks and source-based triage. It does not activate for ordinary skill use
+or general code review. The scanner is a separately installed optional dependency;
+missing or failed scans remain explicit, and actual behavior needs its own verification.
+See the [helper skill](plugins/jy-env-core/skills/skill-authoring-review/SKILL.md).
 
 Invoke `$jy-orchestrate` for the current session to directly coordinate Codex and Claude
 planning or implementation, followed by independent Codex DevBlue and Claude verification

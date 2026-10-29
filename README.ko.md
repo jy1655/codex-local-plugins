@@ -45,9 +45,14 @@ Codex CLI로 설치합니다.
 
 | Pack | Policy | Skills |
 |---|---|---|
-| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack`, `pstack-*` 하위 스킬 54개 (명시 호출 전용) |
+| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack`, `pstack-*` 하위 스킬 54개 (명시 호출 전용); `skill-authoring-review` (스킬 제작 시에만 적용) |
 | `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs`, `retro` (명시 호출 전용); `grilling`, `codebase-design`, `domain-modeling` |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — 실기기 메모리 그래프 분석 |
+
+`skill-authoring-review`는 스킬 생성·작성·수정 시에만 SkillSpector 정적 검사와
+소스 대조를 보조합니다. 일반 스킬 실행이나 코드 리뷰에는 적용하지 않습니다.
+검사기는 별도 설치하는 선택 의존성이며, 미설치·검사 실패를 명시하고 실제 동작은
+별도로 검증합니다. [보조 스킬](plugins/jy-env-core/skills/skill-authoring-review/SKILL.md)을 참고하세요.
 
 `$jy-orchestrate`를 호출하면 현재 세션이 Codex·Claude의 계획·구현과 같은 결과물에 대한
 Codex DevBlue·별도 Claude 세션의 독립 검증을 직접 조율합니다. 작업자에게 범위와 완료
