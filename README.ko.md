@@ -105,6 +105,20 @@ codex plugin add jy-env-ios@personal-codex
 변경 후에는 새 Codex session을 시작합니다. 별도의 `~/.agents/skills/<pack>`
 discovery link는 만들지 않습니다.
 
+## 압축 전 Wiki handoff
+
+core 플러그인은 동기식 `PreCompact` 훅을 포함합니다. 압축 전 공개 대화를 별도의
+읽기 전용 Codex 호출로 요약하고, 기존 `wiki` MCP로 저장한 내용과 SHA-256을
+재조회해 확인합니다. 현재 세션의 모델 이름을 사용하며 기록마다 추가 모델 사용량과
+대기 시간이 발생합니다. 처리 가능한 실패는 `continue: false`로 압축을 중단하지만,
+호스트 강제 종료·시간초과나 미신뢰 훅의 건너뛰기까지 막는다는 보장은 아닙니다.
+`clear`는 호출하지 않습니다.
+
+각 기기에 Python·Codex·`gitleaks`·Wiki 인증과 플러그인 설치가 필요하며,
+새 Codex 세션의 `/hooks`에서 훅을 확인하고 신뢰해야 합니다. `git pull`만으로
+활성화되지는 않습니다. [설치·저장 위치·실패 처리·제한](plugins/jy-env-core/hooks/README.md)을
+참고하세요.
+
 ## 시험용 pstack 모듈
 
 기존 `jy-env-core` 플러그인 내부의 `plugins/jy-env-core/skills/pstack/`에 모았습니다.

@@ -1,0 +1,19 @@
+{
+  "description": "압축 전에 handoff를 요약하고 Wiki 저장을 확인합니다.",
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "^(auto|manual)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/precompact_wiki.py\"",
+            "commandWindows": "py -3 -c \"import os,runpy,sys; p=os.path.join(os.environ['PLUGIN_ROOT'],'hooks'); sys.path.insert(0,p); runpy.run_path(os.path.join(p,'precompact_wiki.py'),run_name='__main__')\"",
+            "timeout": 420,
+            "statusMessage": "압축 전 Wiki handoff 작성·저장 확인 중"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -91,6 +91,19 @@ optional. `apply` refreshes the default core and design packs. It does not unins
 Start a fresh Codex session after changing installed packs. No second
 `~/.agents/skills/<pack>` discovery link is created.
 
+## Pre-compaction Wiki handoff
+
+The core plugin includes a synchronous `PreCompact` hook that summarizes the visible
+conversation with a separate, read-only Codex call, saves a handoff through the existing
+`wiki` MCP connection, and verifies the saved bytes and SHA-256 before returning.
+It uses the active model name and consumes an additional model call per checkpoint.
+Handled failures return `continue: false`; host termination/timeouts and skipped,
+untrusted hooks are not a guarantee of blocking compaction. It never calls `clear`.
+
+Each machine needs Python, Codex, `gitleaks`, Wiki authentication, plugin installation,
+and review/trust of the hook in `/hooks`. A Git pull alone does not activate it.
+See [setup, storage, failure handling, and limits](plugins/jy-env-core/hooks/README.md).
+
 ## Experimental pstack module
 
 The local pstack trial lives inside the existing `jy-env-core` plugin at

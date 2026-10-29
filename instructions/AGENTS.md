@@ -24,6 +24,14 @@
 
 ## Native Capability and Gate Policy
 
+- When delegation is appropriate and permitted, prefer the current provider's built-in
+  subagents. Codex-to-Codex delegation through Agent Bridge (`tabcli`) requires the user's
+  explicit request to use Agent Bridge or tabcli for that delegation. A request for subagents,
+  parallel work, or an orchestration skill alone does not select Bridge, even if a skill
+  prefers it. If native delegation is unavailable, continue locally or report the limitation;
+  do not silently substitute Bridge.
+- Cross-provider delegation may use Agent Bridge within the authorized task scope.
+  Machine-local Bridge launch options apply only after that route has been selected.
 - Use the simplest approach that preserves safety, permissions, and data protection. Keep
   standing context and procedures minimal; add rules only for demonstrated needs.
 - Use native session state and context compression first. Add orchestration or persistent
