@@ -41,6 +41,26 @@
   and required approvals through the execution environment. Changing these boundaries
   requires supporting evidence and the owner's explicit approval.
 
+## Verification Artifacts
+
+- Create internal verification directories through `python3 ~/.codex/tools/task-workspace.py
+  create --purpose verification --name <task>` (use the installed Codex home and available
+  Python interpreter). Pass the returned path to shell, browser and download tools. The
+  default is an OS temporary directory; `output/` is for deliverables. Use `--path <path>
+  --user-selected-path` only when the user explicitly selected that destination.
+- Before cleanup, run the helper's `inventory`, classify each file, and preserve eligible
+  evidence in the configured Wiki under its policy. `classify --disposition wiki` requires
+  a separately fetched Wiki `--readback` whose byte size and SHA-256 match, plus `--wiki-path`.
+  Use `discard` only for task-owned reproducible or unnecessary files, and `keep` only for
+  a user-requested or policy-required retained original, with its reason. Do not copy
+  credentials, prohibited content or binary originals excluded by Wiki policy.
+- Completion includes verified evidence storage and disposition of remaining task files,
+  not just a summary or passing tests. Remove only classified task-owned disposable or
+  already-preserved copies, then run `finish`; it lists unclassified, changed and pending
+  files and never deletes them. Save the necessary receipt in the Wiki, verify it, and
+  remove the temporary helper metadata and empty directory. Unavailable Wiki storage or
+  unresolved retention leaves cleanup incomplete: retain the files and report the gap.
+
 ## Response Language
 
 - User-facing responses should default to the user's language unless the user explicitly asks otherwise.

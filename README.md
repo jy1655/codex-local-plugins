@@ -125,6 +125,46 @@ evidence. It does not install simulator tooling or register an MCP server. Gener
 builds, debugging, and UI work use the app repository's existing tools and instructions.
 See the [skill](plugins/jy-env-ios/skills/ios-memgraph-leaks/SKILL.md) for the workflow.
 
+## Verification workspaces
+
+The managed helper is installed at `~/.codex/tools/task-workspace.py` through the same
+manifest/apply path as instruction artifacts. It uses only the Python standard library.
+Global instructions route internal verification directory creation through it; pass its
+returned path to shell, browser screenshot, download and other artifact writers.
+
+```bash
+python3 ~/.codex/tools/task-workspace.py create --purpose verification --name release-check
+python3 ~/.codex/tools/task-workspace.py inventory <returned-directory>
+python3 ~/.codex/tools/task-workspace.py classify <returned-directory> --file result.json \
+  --disposition wiki --reason 'Required runtime evidence' \
+  --wiki-path raw/2026-10-29_result.json --readback <separately-fetched-wiki-file>
+python3 ~/.codex/tools/task-workspace.py classify <returned-directory> --file download.zip \
+  --disposition discard --reason 'Reproducible release download'
+# Remove the classified copies after verifying preservation and task ownership.
+python3 ~/.codex/tools/task-workspace.py finish <returned-directory>
+```
+
+Verification defaults to a unique OS temporary directory. A path containing an `output`
+component (including resolved symlink aliases) or under `--delivery-root` is refused
+before creation. `--path <destination> --user-selected-path` records the user's explicit
+destination choice; do not infer it from a previous task. `--purpose deliverable --path`
+creates a delivery directory without internal helper metadata. Existing paths are never
+reused or overwritten.
+
+Inventory records file paths, sizes and SHA-256. Wiki classification requires a separate
+readback with identical bytes, including CRLF. Fetch it through the configured Wiki
+channel; the helper does not authenticate the readback's origin. `keep` is only for an
+explicit user choice or a policy-required original, with a reason. For extracted or
+redacted evidence, preserve and verify the eligible derived file and account separately
+for the original under Wiki policy. No classification authorizes a prohibited upload.
+
+`finish` fails on unclassified files, changed files, pending removal and missing retained
+originals. Inventory before cleanup: a file removed before any observation cannot be
+reconstructed. The tool never deletes task files or scans unrelated directories; it is
+not an OS sandbox around arbitrary `mkdir` or browser writes. Preserve required receipts
+in the Wiki and verify them before removing the marker and empty temporary directories.
+If Wiki storage is unavailable, keep needed files and report incomplete cleanup.
+
 ## Archived research guidance
 
 The Context7 route in `jy-library-research` is archived with the other workflow skills.

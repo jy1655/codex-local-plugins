@@ -25,6 +25,12 @@ source = "instructions/AGENTS.md"
 target = ".codex/AGENTS.md"
 install_mode = "symlink"
 
+[[instructions]]
+name = "task-workspace"
+source = "scripts/task-workspace.py"
+target = ".codex/tools/task-workspace.py"
+install_mode = "symlink"
+
 [platform_overrides.windows]
 plugin_install_mode = "copy"
 instruction_install_mode = "copy"
