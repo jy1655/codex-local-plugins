@@ -25,7 +25,7 @@ and an optional iOS memory-analysis pack. `apply` stages the three active bundle
 
 | Pack | Policy | Skills |
 |---|---|---|
-| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack`, and 54 `pstack-*` workflow entries (explicit-only during this trial); `skill-authoring-review` (skill authoring only) |
+| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack`, and 54 `pstack-*` workflow entries (explicit-only during this trial); `security-audit` (explicit only); `skill-authoring-review` (skill authoring only) |
 | `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs`, `retro` (explicit only); `grilling`, `codebase-design`, `domain-modeling` |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — physical-device memory graph analysis |
 
@@ -34,6 +34,25 @@ static checks and source-based triage. It does not activate for ordinary skill u
 or general code review. The scanner is a separately installed optional dependency;
 missing or failed scans remain explicit, and actual behavior needs its own verification.
 See the [helper skill](plugins/jy-env-core/skills/skill-authoring-review/SKILL.md).
+
+Invoke `$security-audit` to audit the current repository, or name a target and
+`quick`, `standard` (default), or `deep` profile. This Cloudflare-based port keeps
+the six audit phases, coverage ledger, independent verification, and JSON validators.
+It runs bounded local checks with existing host permissions even without an OS
+sandbox or network block. Public research and task-scoped dependency retrieval may
+use the network; deployment probes and consequential external actions need their
+own authorization. Final reports and eligible evidence go to configured Wiki `raw/`,
+with a managed temporary workspace, verified readback, and cleanup. It does not
+activate for unnamed security questions or ordinary reviews. See the
+[skill](plugins/jy-env-core/skills/security-audit/SKILL.md) and
+[adaptation boundaries](plugins/jy-env-core/skills/security-audit/NOTICE.md).
+
+The target may be a user-designated SSH server: name the host alias and remote
+repository path. Scoped reads of configuration, selected logs, and runtime state,
+plus bounded tests on that host, do not require a local clone or sandbox. Existing
+SSH authentication stays with the client, and Wiki publication stays with the
+coordinating parent. Live attack traffic and operational changes still follow the
+user's defined scope; SSH connectivity alone does not authorize them.
 
 Invoke `$jy-orchestrate` for the current session to directly coordinate Codex and Claude
 planning or implementation, followed by independent Codex DevBlue and Claude verification
@@ -280,7 +299,10 @@ live under `archive/` and are excluded from deployment. Upstream or company-shar
 are local-only seed material; this repo stores only the customized first-party result and
 does not vendor third-party runtimes. The user-selected `jy-env-design` port is a deliberate
 exception to seed-only rewriting: it preserves the selected original skills and references
-with a pinned provenance record and their MIT license. Maintain retained skills here as first-party plugin
+with a pinned provenance record and their MIT license. The user-selected
+`security-audit` port also retains Cloudflare's audit references and validators,
+with explicit invocation, Wiki output, and host-execution adaptations documented
+in its `NOTICE.md`. Maintain retained skills here as first-party plugin
 assets rather than live dependencies on upstream seeds. Do not install, discover, or follow
 instructions under `archive/` unless the user requests a reference or reactivation.
 

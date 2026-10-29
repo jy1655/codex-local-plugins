@@ -1,7 +1,7 @@
 {
   "name": "jy-env-core",
-  "version": "0.1.0+codex.20261029031223",
-  "description": "\ubcc0\uacbd \uac00\ub4dc\ub808\uc77c, \ub2e4\uc911 \uc5d0\uc774\uc804\ud2b8 \uc791\uc5c5 \uc9c0\ud718, PSTACK\uacfc \uc2a4\ud0ac \uc81c\uc791 \ubcf4\uc548 \uc810\uac80",
+  "version": "0.1.0+codex.20261029050710",
+  "description": "변경 가드레일, 다중 에이전트 작업 지휘, PSTACK, 스킬 제작 점검과 명시 호출 보안 감사",
   "author": {
     "name": "JaeYoung Hwang",
     "url": "https://github.com/jy1655"
@@ -16,9 +16,9 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "\uac1c\uc778 \uc791\uc5c5 \ub3c4\uad6c",
-    "shortDescription": "\ubcc0\uacbd \uac00\ub4dc\ub808\uc77c, \ub2e4\uc911 \uc5d0\uc774\uc804\ud2b8 \uc791\uc5c5 \uc9c0\ud718, PSTACK\uacfc \uc2a4\ud0ac \uc81c\uc791 \ubcf4\uc548 \uc810\uac80",
-    "longDescription": "\uc694\uccad \ubc94\uc704\uc640 \ud544\uc694\ud55c \uac80\uc99d\uc744 \uad00\ub9ac\ud558\ub294 \uae30\ubcf8 \uac00\ub4dc\ub808\uc77c\uacfc, \uba85\uc2dc \ud638\ucd9c \uc2dc \ud604\uc7ac \uc138\uc158\uc774 Codex\u00b7Claude \uc791\uc5c5 \ubc0f DevBlue\u00b7Claude \ub3c5\ub9bd \uac80\uc99d\uc744 \uc9c1\uc811 \uc870\uc728\ud558\uace0 \ub85c\uceec \uc815\ucc45\uc5d0 \ub530\ub978 Wiki \uae30\ub85d\uacfc \uc138\uc158 \uc815\ub9ac\ub97c \uc218\ud589\ud558\ub294 \uc2a4\ud0ac\uc744 \uc81c\uacf5\ud569\ub2c8\ub2e4. PSTACK \uc2dc\ud5d8\uc6a9 \uc791\uc5c5 \ubaa8\ub4dc\uc640 54\uac1c \ud558\uc704 \uc6cc\ud06c\ud50c\ub85c\ub97c \uac01\uac01 \uba85\uc2dc \ud638\ucd9c \uac00\ub2a5\ud55c \uc2a4\ud0ac\ub85c \uc81c\uacf5\ud569\ub2c8\ub2e4. \uc2a4\ud0ac \uc0dd\uc131\u00b7\uc791\uc131\u00b7\uc218\uc815 \uc2dc\uc5d0\ub9cc SkillSpector \uc815\uc801 \uac80\uc0ac\uc640 \uc18c\uc2a4 \ub300\uc870\ub97c \ubcf4\uc870\ud569\ub2c8\ub2e4.",
+    "displayName": "개인 작업 도구",
+    "shortDescription": "작업 지휘, 스킬 제작 점검과 명시 호출 보안 감사",
+    "longDescription": "요청 범위와 필요한 검증을 관리하는 기본 가드레일과, 명시 호출 시 현재 세션이 Codex·Claude 작업 및 DevBlue·Claude 독립 검증을 직접 조율하고 로컬 정책에 따른 Wiki 기록과 세션 정리를 수행하는 스킬을 제공합니다. PSTACK 시험용 작업 모드와 54개 하위 워크플로를 각각 명시 호출 가능한 스킬로 제공합니다. 스킬 생성·작성·수정 시에만 SkillSpector 정적 검사와 소스 대조를 보조합니다. 명시 호출 security-audit는 Cloudflare 기반 독립 보안 감사를 일반 호스트에서도 수행하고 결과와 적격 증거를 Wiki raw에 보존합니다.",
     "developerName": "JaeYoung Hwang",
     "category": "Productivity",
     "capabilities": [
@@ -28,7 +28,7 @@
     ],
     "websiteURL": "https://github.com/jy1655/codex-local-plugins",
     "defaultPrompt": [
-      "\uc694\uccad\uc744 \ucda9\uc871\ud558\ub294 \ucd5c\uc18c \ubcc0\uacbd\uc744 \uad6c\ud604\ud558\uace0 \ud544\uc694\ud55c \uac80\uc99d\uc744 \uc218\ud589\ud574\uc918."
+      "요청을 충족하는 최소 변경을 구현하고 필요한 검증을 수행해줘."
     ],
     "brandColor": "#2563EB"
   }

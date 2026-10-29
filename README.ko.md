@@ -45,7 +45,7 @@ Codex CLI로 설치합니다.
 
 | Pack | Policy | Skills |
 |---|---|---|
-| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack`, `pstack-*` 하위 스킬 54개 (명시 호출 전용); `skill-authoring-review` (스킬 제작 시에만 적용) |
+| `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack`, `pstack-*` 하위 스킬 54개 (명시 호출 전용); `security-audit` (명시 호출 전용); `skill-authoring-review` (스킬 제작 시에만 적용) |
 | `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs`, `retro` (명시 호출 전용); `grilling`, `codebase-design`, `domain-modeling` |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — 실기기 메모리 그래프 분석 |
 
@@ -53,6 +53,23 @@ Codex CLI로 설치합니다.
 소스 대조를 보조합니다. 일반 스킬 실행이나 코드 리뷰에는 적용하지 않습니다.
 검사기는 별도 설치하는 선택 의존성이며, 미설치·검사 실패를 명시하고 실제 동작은
 별도로 검증합니다. [보조 스킬](plugins/jy-env-core/skills/skill-authoring-review/SKILL.md)을 참고하세요.
+
+`$security-audit`로 현재 저장소를 감사하거나 대상 경로와 `quick`, `standard`(기본),
+`deep` 범위를 지정할 수 있습니다. Cloudflare 원본의 6단계 감사, 검토 범위 장부,
+독립 검증과 JSON 검사기를 유지합니다. OS 샌드박스나 네트워크 차단 없이도 기존
+호스트 권한으로 제한된 로컬 검증을 수행하고, 공개 자료 조사와 작업 범위의 의존성
+다운로드에 네트워크를 사용할 수 있습니다. 배포된 서비스에 대한 공격 검증이나
+중대한 외부 변경은 별도 권한 범위를 따릅니다. 최종 보고서와 적격 증거는 설정된
+Wiki `raw/`에 저장하며 관리되는 임시 작업공간, 저장 후 무결성 확인과 정리를 사용합니다.
+스킬을 이름으로 요청하지 않은 보안 질문이나 일반 리뷰에는 자동 적용하지 않습니다.
+[스킬](plugins/jy-env-core/skills/security-audit/SKILL.md)과
+[원본·변경 범위](plugins/jy-env-core/skills/security-audit/NOTICE.md)를 참고하세요.
+
+SSH 서버 별칭과 원격 저장소 경로를 지정해 원격 환경도 감사할 수 있습니다.
+요청 범위의 설정·선별된 로그·실행 상태 조회와 제한된 테스트는 로컬 clone이나
+샌드박스 없이 해당 서버에서 수행합니다. 기존 SSH 인증은 접속 클라이언트가,
+Wiki 저장은 부모 에이전트가 담당합니다. 실제 서비스에 공격 트래픽을 보내거나
+운영 상태를 변경하는 작업은 사용자가 지정한 권한 범위를 따릅니다.
 
 `$jy-orchestrate`를 호출하면 현재 세션이 Codex·Claude의 계획·구현과 같은 결과물에 대한
 Codex DevBlue·별도 Claude 세션의 독립 검증을 직접 조율합니다. 작업자에게 범위와 완료

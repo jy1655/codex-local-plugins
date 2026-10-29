@@ -1,0 +1,7 @@
+interface:
+  display_name: "security-audit · 코드베이스 보안 감사"
+  short_description: "명시 호출로 독립 검증을 수행하고 감사 결과를 Wiki raw에 보존"
+  default_prompt: "$security-audit 현재 저장소를 보안 감사하고 결과와 검증 근거를 Wiki raw에 저장해줘."
+
+policy:
+  allow_implicit_invocation: false

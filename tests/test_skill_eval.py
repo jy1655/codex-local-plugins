@@ -43,7 +43,7 @@ from codex_env_sync.skill_eval import (
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-CORE_SKILLS = {"jy-change-guardrails", "jy-orchestrate", "pstack", "skill-authoring-review"} | {
+CORE_SKILLS = {"jy-change-guardrails", "jy-orchestrate", "pstack", "skill-authoring-review", "security-audit"} | {
     f"pstack-{path.parent.name}"
     for path in (REPO_ROOT / "plugins/jy-env-core/skills/pstack/references/skills").glob("*/WORKFLOW.md")
 }
