@@ -375,3 +375,19 @@ tier; the separate judge model keeps its existing role. GPT-5.6 results do not e
 Astra utility. This migration does not run a full model benchmark. See
 [skill-tests/UTILITY-EVAL.md](skill-tests/UTILITY-EVAL.md) for evidence limits and
 [archive/README.md](archive/README.md) for restoring one candidate.
+
+## Shell environment isolation
+
+To exclude an inherited Claude effort override from Codex commands, run this focused
+sync script with Python 3.11 or newer:
+
+```bash
+python3 scripts/sync-shell-environment.py
+python3 scripts/sync-shell-environment.py --check
+```
+
+It merges `CLAUDE_CODE_EFFORT_LEVEL` into `shell_environment_policy.exclude` in
+`$CODEX_HOME/config.toml` (default `~/.codex/config.toml`), preserving other settings.
+It refuses an explicit `set` override or a config using keyed `filters`; those need
+review instead of mixing policy formats. `--config <path>` supports isolated checks.
+The script does not restart running sessions or daemons. New config loads use the policy.

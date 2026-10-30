@@ -343,3 +343,17 @@ python3 -m codex_env_sync.skill_eval report --repo-root .
 유지합니다. 5.6 결과를 Astra의 실효성 근거로 사용하지 않으며 이번 전환에서 전체 모델
 평가를 실행하지 않습니다. 증거 경계는 [skill-tests/UTILITY-EVAL.md](skill-tests/UTILITY-EVAL.md),
 개별 복원 방법은 [archive/README.md](archive/README.md)를 참고합니다.
+
+## 셸 환경 분리
+
+상속된 Claude effort 설정이 Codex 명령으로 전달되지 않게 하려면 Python 3.11 이상으로 실행합니다.
+
+```bash
+python3 scripts/sync-shell-environment.py
+python3 scripts/sync-shell-environment.py --check
+```
+
+`$CODEX_HOME/config.toml`(기본 `~/.codex/config.toml`)의 `shell_environment_policy.exclude`에
+`CLAUDE_CODE_EFFORT_LEVEL`만 병합하며 다른 설정은 보존합니다. 명시적인 `set` 덮어쓰기나
+키별 `filters` 설정이 있으면 형식을 섞지 않고 중단합니다. `--config <경로>`로 격리 검사할 수 있습니다.
+실행 중인 세션·데몬을 재시작하지 않으며, 이후 설정을 새로 읽는 실행부터 적용됩니다.
