@@ -1,0 +1,18 @@
+{
+  "name": "jy-wiki-cues",
+  "version": "0.1.2",
+  "description": "현재 작업과 관련된 Wiki 교훈을 짧게 전달하는 선택 설치 훅",
+  "author": {"name": "JaeYoung Hwang", "url": "https://github.com/jy1655"},
+  "repository": "https://github.com/jy1655/codex-local-plugins",
+  "homepage": "https://github.com/jy1655/codex-local-plugins",
+  "license": "MIT",
+  "hooks": "./hooks/hooks.json",
+  "interface": {
+    "developerName": "JaeYoung Hwang",
+    "websiteURL": "https://github.com/jy1655/codex-local-plugins",
+    "displayName": "Wiki 교훈 전달",
+    "shortDescription": "작업 소유 세션과 검증 자료 교훈을 작업 시점에 전달",
+    "longDescription": "로컬 Wiki에서 출처 해시를 확인한 교훈만 UserPromptSubmit에 전달합니다. 추가 모델·네트워크 호출과 자동 차단은 없으며, 현재 사용자 지시가 우선합니다. 기기별 Wiki 경로 설정과 훅 신뢰가 필요합니다.",
+    "category": "Productivity"
+  }
+}

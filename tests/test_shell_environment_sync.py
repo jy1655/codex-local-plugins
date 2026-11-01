@@ -1,5 +1,8 @@
 import importlib.util
 from pathlib import Path
+import subprocess
+import sys
+import tempfile
 import tomllib
 import unittest
 
@@ -50,6 +53,26 @@ class ShellEnvironmentSyncTests(unittest.TestCase):
     def test_rejects_invalid_toml(self):
         with self.assertRaises(ValueError):
             sync.update('[shell_environment_policy]\nexclude = [')
+
+    def test_cli_replaces_existing_file_and_preserves_settings(self):
+        with tempfile.TemporaryDirectory() as root:
+            target = Path(root) / "config.toml"
+            target.write_text('model = "unchanged"\n[shell_environment_policy]\nexclude = ["OLD_*"]\n',
+                              encoding="utf-8")
+            command = [sys.executable, "-X", "utf8", "-B", str(Path(sync.__file__)), "--config", str(target)]
+            applied = subprocess.run(command, capture_output=True, text=True, encoding="utf-8")
+            self.assertEqual(applied.returncode, 0, applied.stderr)
+            first = target.read_bytes()
+            self.assertEqual(tomllib.loads(first.decode("utf-8")), {
+                "model": "unchanged",
+                "shell_environment_policy": {"exclude": ["OLD_*", sync.VARIABLE]},
+            })
+            checked = subprocess.run(command + ["--check"], capture_output=True, text=True, encoding="utf-8")
+            self.assertEqual(checked.returncode, 0, checked.stderr)
+            repeated = subprocess.run(command, capture_output=True, text=True, encoding="utf-8")
+            self.assertEqual(repeated.returncode, 0, repeated.stderr)
+            self.assertEqual(target.read_bytes(), first)
+            self.assertEqual(list(Path(root).iterdir()), [target])
 
 
 if __name__ == "__main__":

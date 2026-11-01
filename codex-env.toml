@@ -19,6 +19,12 @@ source = "plugins/jy-env-ios"
 install_mode = "symlink"
 installation_policy = "AVAILABLE"
 
+[[plugins]]
+name = "jy-wiki-cues"
+source = "plugins/jy-wiki-cues"
+install_mode = "symlink"
+installation_policy = "AVAILABLE"
+
 [[instructions]]
 name = "global-agents"
 source = "instructions/AGENTS.md"

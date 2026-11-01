@@ -12,7 +12,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 def plugin_roots() -> list[Path]:
     return sorted(
         path.parent.parent
-        for path in REPO_ROOT.glob("plugins/jy-env-*/.codex-plugin/plugin.json")
+        for path in REPO_ROOT.glob("plugins/*/.codex-plugin/plugin.json")
     )
 
 
@@ -31,7 +31,7 @@ class RepoBundleTests(unittest.TestCase):
             manifest = json.loads((root / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))
             for field in ["displayName", "shortDescription", "longDescription"]:
                 self.assertRegex(manifest["interface"][field], r"[가-힣]")
-            for prompt in manifest["interface"]["defaultPrompt"]:
+            for prompt in manifest["interface"].get("defaultPrompt", []):
                 self.assertRegex(prompt, r"[가-힣]")
         for path in skill_paths():
             text = (path.parent / "agents" / "openai.yaml").read_text(encoding="utf-8")
@@ -115,6 +115,7 @@ class RepoBundleTests(unittest.TestCase):
                 "jy-env-core",
                 "jy-env-design",
                 "jy-env-ios",
+                "jy-wiki-cues",
             },
         )
 

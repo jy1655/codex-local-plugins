@@ -1,0 +1,41 @@
+{
+  "description": "작업 관련 Wiki 교훈 전달·세션 범위 갱신",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I -X utf8 \"${PLUGIN_ROOT}/hooks/wiki_cues.py\" --host codex",
+            "commandWindows": "py -3 -I -X utf8 -c \"import os,runpy,sys; sys.argv=['wiki_cues.py','--host','codex']; runpy.run_path(os.path.join(os.environ['PLUGIN_ROOT'],'hooks','wiki_cues.py'),run_name='__main__')\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I -X utf8 \"${PLUGIN_ROOT}/hooks/wiki_cues.py\" --host codex",
+            "commandWindows": "py -3 -I -X utf8 -c \"import os,runpy,sys; sys.argv=['wiki_cues.py','--host','codex']; runpy.run_path(os.path.join(os.environ['PLUGIN_ROOT'],'hooks','wiki_cues.py'),run_name='__main__')\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I -X utf8 \"${PLUGIN_ROOT}/hooks/wiki_cues.py\" --host codex",
+            "commandWindows": "py -3 -I -X utf8 -c \"import os,runpy,sys; sys.argv=['wiki_cues.py','--host','codex']; runpy.run_path(os.path.join(os.environ['PLUGIN_ROOT'],'hooks','wiki_cues.py'),run_name='__main__')\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ]
+  }
+}

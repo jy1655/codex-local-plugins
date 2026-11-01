@@ -36,11 +36,26 @@ shell·브라우저·다운로드 도구에 전달합니다. `output/`과 그곳
 출처를 인증하지 않으며 임의의 `mkdir`를 가로채지도 않습니다. 실제 사용 예와 검증
 범위는 [영문 사용법](README.md#verification-workspaces)에 있습니다.
 
+## 필요한 도구
+
+실행할 작업에 따라 필요한 도구가 다릅니다. `apply`는 관리 대상 플러그인·지침을 설치하며,
+아래 실행 파일을 설치하거나 인증·훅 신뢰를 부여하지는 않습니다.
+
+| 작업 | 필요한 도구·접근 | 없을 때 |
+|---|---|---|
+| Bootstrap / 환경 동기화 | Python 3.11 이상, Git, Codex CLI. `bootstrap.sh`는 Bash, `bootstrap.ps1`은 PowerShell. 동기화 도구는 Python 표준 라이브러리만 사용합니다. Windows에서는 해당 기기의 `python` 또는 `python3`를 씁니다. | 누락된 필수 도구를 준비한 뒤 적용합니다. |
+| `jy-orchestrate` | 지정 작업자·리뷰어 모델 사용 권한, Codex 작업의 기본 서브에이전트, 지원되는 Claude 호출 경로. 교차 제공자 Agent Bridge는 `tabcli`와 대상 CLI가 필요합니다. | 불가능한 배정·독립 리뷰를 보고합니다. 스킬 호출만으로 Codex끼리 Bridge 위임을 선택하지 않습니다. |
+| `security-audit` JSON 검증 / JavaScript 테스트 | Node.js와 POSIX no-follow/nonblocking 파일 열기 기능. CI는 Ubuntu의 Node 22입니다. native Windows는 검증기 입력을 거부하므로 Linux/macOS·WSL 또는 허용된 SSH 호스트에서 실행합니다. | 검증기를 실행할 수 없으면 감사를 미완료로 보고합니다. 스키마를 수동으로 읽은 것은 통과가 아닙니다. |
+| 압축 전 Wiki 훅 | Python, 로그인된 Codex, `gitleaks`, 쓰기 권한이 있는 인증된 `wiki` MCP, 훅 신뢰. Windows launcher는 `py`를 사용합니다. [훅 설치·버전 요건](plugins/jy-env-core/hooks/README.md)을 참고하세요. | 설정 누락·checkpoint 실패를 보고합니다. 설치만으로 실제 훅 실행을 입증하지 않습니다. |
+| `skill-authoring-review` | 정적 검사에 사용하는 별도 선택 의존성 SkillSpector CLI. [설치 안내](plugins/jy-env-core/skills/skill-authoring-review/references/setup.md)를 참고하세요. | 소스 검토는 진행하고 스캔은 `NOT-RUN` 또는 `FAILED`로 표시합니다. |
+| `pstack` 워크플로 | 선택한 작업이 사용하는 Node/Bash 보조 도구와 제공자·forge CLI. [실행 지침](plugins/jy-env-core/skills/pstack/SKILL.md)을 참고하세요. | 선택한 작업에 필요한 의존성만 확인하고 사용할 수 없는 기능을 보고합니다. |
+| `ios-memgraph-leaks` | macOS, Xcode, 실제 iOS 기기와 선택한 메모리 분석 도구. [스킬](plugins/jy-env-ios/skills/ios-memgraph-leaks/SKILL.md)을 참고하세요. | 기기·도구 근거가 없음을 보고합니다. 시뮬레이터 결과로 실기기 동작을 단정하지 않습니다. |
+
 ## Pack model
 
 GPT-6 Astra 기준 구성은 `max` 추론과 core-lite 가드레일 1개(현재 pstack 시험 중 자동 적용 임시 해제),
 명시 호출 전용 오케스트레이션 스킬, 사용자가 선택한 아키텍처·인터뷰 팩,
-선택형 iOS 메모리 분석 팩입니다. `apply`는 활성 bundle 3개를 `~/plugins`에 배치한 뒤 `INSTALLED_BY_DEFAULT` 항목을
+선택형 iOS 메모리 분석·Wiki 교훈 전달 팩입니다. `apply`는 활성 bundle을 `~/plugins`에 배치한 뒤 `INSTALLED_BY_DEFAULT` 항목을
 Codex CLI로 설치합니다.
 
 | Pack | Policy | Skills |
@@ -48,6 +63,7 @@ Codex CLI로 설치합니다.
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack`, `pstack-*` 하위 스킬 54개 (명시 호출 전용); `security-audit` (명시 호출 전용); `skill-authoring-review` (스킬 제작 시에만 적용) |
 | `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs`, `retro` (명시 호출 전용); `grilling`, `codebase-design`, `domain-modeling` |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — 실기기 메모리 그래프 분석 |
+| `jy-wiki-cues` | `AVAILABLE` | 훅 전용 Wiki 교훈 전달, Claude와 같은 코어 패키징 |
 
 `skill-authoring-review`는 스킬 생성·작성·수정 시에만 SkillSpector 정적 검사와
 소스 대조를 보조합니다. 일반 스킬 실행이나 코드 리뷰에는 적용하지 않습니다.
@@ -272,7 +288,7 @@ python3 -m codex_env_sync.cli apply --repo-root . --snapshot
 ## Layout
 
 ```text
-codex-env.toml                    # 활성 plugin source 3개와 installation policy
+codex-env.toml                    # 활성 plugin source와 installation policy
 codex_env_sync/                   # inspect/apply/bootstrap engine
 archive/                         # Inactive originals, checksums, and restoration notes
 plugins/jy-env-core/              # 기본 core-lite bundle
@@ -399,3 +415,13 @@ python3 scripts/sync-shell-environment.py --check
 `CLAUDE_CODE_EFFORT_LEVEL`만 병합하며 다른 설정은 보존합니다. 명시적인 `set` 덮어쓰기나
 키별 `filters` 설정이 있으면 형식을 섞지 않고 중단합니다. `--config <경로>`로 격리 검사할 수 있습니다.
 실행 중인 세션·데몬을 재시작하지 않으며, 이후 설정을 새로 읽는 실행부터 적용됩니다.
+
+## 선택 설치: Wiki 교훈 전달
+
+`jy-wiki-cues`는 작업 소유 세션 정리와 검증 자료 관리 교훈을 출처 확인 후
+`UserPromptSubmit`에 전달합니다. `apply` 후 `codex plugin add jy-wiki-cues@personal-codex`로
+명시 설치하고, 로컬 Wiki 경로 설정과 `/hooks`의 정확한 훅 신뢰 검토를 수행합니다.
+공용 Python 코어를 Claude 플러그인에도 패키징하며 upstream TokenEconomizer나
+새 전역 지침을 설치하지 않습니다. [설정·한계](plugins/jy-wiki-cues/README.md)를 참고하세요.
+관련 검사는 `python -X utf8 -m unittest tests.test_wiki_cues -v`입니다.
+이 테스트만으로 실제 호스트 전달이나 재발 감소를 입증하지 않습니다.

@@ -15,11 +15,26 @@ authorization, privacy, and workspace-preservation rules remain in global `AGENT
 regardless of workflow installation. Machine-specific instructions live in a separate,
 user-maintained `LOCAL.md`.
 
+## Required tools
+
+Requirements depend on the workflow. `apply` installs the managed plugins and instructions;
+it does not install these executables or grant authentication and hook trust.
+
+| Workflow | Required tools or access | When unavailable |
+|---|---|---|
+| Bootstrap / environment sync | Python 3.11+, Git, Codex CLI; Bash for `bootstrap.sh` or PowerShell for `bootstrap.ps1`. Sync uses the Python standard library. On Windows, use the configured `python` or `python3`. | Install the missing prerequisite before applying. |
+| `jy-orchestrate` | Available required worker/reviewer models, native Codex subagents for Codex work, and a supported Claude route. Cross-provider Agent Bridge needs `tabcli` and the target CLI. | Report unavailable assignments/reviews; skill invocation alone does not authorize Codex-to-Codex Bridge. |
+| `security-audit` JSON validators / JavaScript tests | Node.js and POSIX no-follow/nonblocking open flags; CI uses Node 22 on Ubuntu. Native Windows refuses validator input. Use Linux/macOS, WSL, or an authorized SSH host. | Report the audit as incomplete when validators cannot run; a manual schema read is not a pass. |
+| Pre-compaction Wiki hook | Python, authenticated Codex, `gitleaks`, authenticated `wiki` MCP with write access, and hook trust; Windows launcher uses `py`. See [hook setup and version requirements](plugins/jy-env-core/hooks/README.md). | Report the missing setup or failed checkpoint; installation alone does not establish live hook execution. |
+| `skill-authoring-review` | Optional, separately installed SkillSpector CLI for static scanning; see its [setup](plugins/jy-env-core/skills/skill-authoring-review/references/setup.md). | Continue source review and label the scan `NOT-RUN` or `FAILED`. |
+| `pstack` workflows | The selected workflow's Node/Bash helpers and provider/forge CLI, where used. See the [runtime adapter](plugins/jy-env-core/skills/pstack/SKILL.md). | Check only the selected workflow's dependencies and report unavailable capabilities. |
+| `ios-memgraph-leaks` | macOS, Xcode, a physical iOS device and the selected memory-analysis tools. See the [skill](plugins/jy-env-ios/skills/ios-memgraph-leaks/SKILL.md). | Report missing device/tool evidence; simulator results do not establish physical-device behavior. |
+
 ## Pack model
 
 The GPT-6 Astra baseline keeps `max` reasoning with one core-lite guardrail (temporarily explicit-only during the pstack trial),
 an explicitly invoked orchestration skill, the selected architecture/interview pack,
-and an optional iOS memory-analysis pack. `apply` stages the three active bundles under
+and optional iOS memory-analysis and Wiki cue packs. `apply` stages the active bundles under
 `~/plugins`, then installs
 `INSTALLED_BY_DEFAULT` entries through the Codex CLI.
 
@@ -28,6 +43,7 @@ and an optional iOS memory-analysis pack. `apply` stages the three active bundle
 | `jy-env-core` — core-lite | `INSTALLED_BY_DEFAULT` | `jy-change-guardrails`, `jy-orchestrate`, `pstack`, and 54 `pstack-*` workflow entries (explicit-only during this trial); `security-audit` (explicit only); `skill-authoring-review` (skill authoring only) |
 | `jy-env-design` | `INSTALLED_BY_DEFAULT` | `improve-codebase-architecture`, `grill-me`, `grill-with-docs`, `retro` (explicit only); `grilling`, `codebase-design`, `domain-modeling` |
 | `jy-env-ios` | `AVAILABLE` | `ios-memgraph-leaks` — physical-device memory graph analysis |
+| `jy-wiki-cues` | `AVAILABLE` | Hook-only Wiki action cues; shared core packaged for Claude |
 
 `skill-authoring-review` assists skill creation and modification with SkillSpector
 static checks and source-based triage. It does not activate for ordinary skill use
@@ -437,3 +453,14 @@ It merges `CLAUDE_CODE_EFFORT_LEVEL` into `shell_environment_policy.exclude` in
 It refuses an explicit `set` override or a config using keyed `filters`; those need
 review instead of mixing policy formats. `--config <path>` supports isolated checks.
 The script does not restart running sessions or daemons. New config loads use the policy.
+
+## Optional Wiki action cues
+
+`jy-wiki-cues` delivers two source-checked Wiki reminders at `UserPromptSubmit`:
+task-owned session cleanup and verification evidence handling. It is available in the
+marketplace, installed explicitly with `codex plugin add jy-wiki-cues@personal-codex`
+after `apply`. Configure the local Wiki path and review the exact hooks in `/hooks`.
+The same Python core is packaged into the Claude plugin; no upstream TokenEconomizer
+dependency or new global instructions are installed. See [setup and limits](plugins/jy-wiki-cues/README.md).
+Run `python -X utf8 -m unittest tests.test_wiki_cues -v` for the focused contract tests.
+These tests do not establish live delivery or reduced recurrence.

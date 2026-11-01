@@ -39,6 +39,12 @@
         "authentication": "ON_INSTALL"
       },
       "category": "Developer Tools"
+    },
+    {
+      "name": "jy-wiki-cues",
+      "source": {"source": "local", "path": "./plugins/jy-wiki-cues"},
+      "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+      "category": "Productivity"
     }
   ]
 }

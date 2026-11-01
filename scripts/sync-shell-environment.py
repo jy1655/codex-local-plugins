@@ -74,16 +74,19 @@ def main() -> None:
         parser.exit(1, f"missing: {VARIABLE} exclusion\n")
     target.parent.mkdir(parents=True, exist_ok=True)
     mode = stat.S_IMODE(target.stat().st_mode) if target.exists() else 0o600
-    with tempfile.NamedTemporaryFile(dir=target.parent, delete=False) as stream:
-        temporary = Path(stream.name)
-        try:
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=target.parent, delete=False) as stream:
+            temporary = Path(stream.name)
             os.chmod(temporary, mode)
             stream.write(desired)
             stream.flush()
-            if (target.read_bytes() if target.exists() else b"") != original:
-                raise RuntimeError("Configuration changed during sync; retry after reviewing it")
-            temporary.replace(target)
-        finally:
+        # Windows cannot replace or unlink this file while its handle is open.
+        if (target.read_bytes() if target.exists() else b"") != original:
+            raise RuntimeError("Configuration changed during sync; retry after reviewing it")
+        temporary.replace(target)
+    finally:
+        if temporary is not None:
             temporary.unlink(missing_ok=True)
     print(f"updated: {VARIABLE} excluded in {target}")
 

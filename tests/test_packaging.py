@@ -25,6 +25,7 @@ EXPECTED_PACKS = {
         "grilling", "codebase-design", "domain-modeling",
     },
     "jy-env-ios": {"ios-memgraph-leaks"},
+    "jy-wiki-cues": set(),
 }
 
 
@@ -116,6 +117,7 @@ class PackagingTests(unittest.TestCase):
                 "jy-env-core": "INSTALLED_BY_DEFAULT",
                 "jy-env-design": "INSTALLED_BY_DEFAULT",
                 "jy-env-ios": "AVAILABLE",
+                "jy-wiki-cues": "AVAILABLE",
             },
         )
 
@@ -127,7 +129,10 @@ class PackagingTests(unittest.TestCase):
                     (plugin_root / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
                 )
                 self.assertEqual(manifest["name"], plugin_name)
-                self.assertEqual(manifest["skills"], "./skills/")
+                if EXPECTED_PACKS[plugin_name]:
+                    self.assertEqual(manifest["skills"], "./skills/")
+                else:
+                    self.assertEqual(manifest["hooks"], "./hooks/hooks.json")
                 self.assertNotIn("mcpServers", manifest)
                 self.assertFalse((plugin_root / ".mcp.json").exists())
 
