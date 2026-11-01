@@ -1,6 +1,6 @@
 {
   "name": "jy-env-core",
-  "version": "0.1.0+codex.20261029073822",
+  "version": "0.1.0+codex.20261101035000",
   "description": "변경 가드레일, 다중 에이전트 작업 지휘, PSTACK, 스킬 제작 점검과 명시 호출 보안 감사",
   "author": {
     "name": "JaeYoung Hwang",

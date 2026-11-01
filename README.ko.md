@@ -73,11 +73,16 @@ Wiki 저장은 부모 에이전트가 담당합니다. 실제 서비스에 공�
 
 `$jy-orchestrate`를 호출하면 현재 세션이 Codex·Claude의 계획·구현과 같은 결과물에 대한
 Codex DevBlue·별도 Claude 세션의 독립 검증을 직접 조율합니다. 작업자에게 범위와 완료
-조건을 전달하고 간결한 결과를 받으며, 근거 있는 지적은 작업자에게 돌려 수정과 영향 범위
-재검토를 진행합니다. 별도 관리 세션이나 지휘자 교체 개수 제한은 없습니다. 독립적인 작업은
+조건을 전달하고 간결한 결과를 받습니다. 리뷰 출력 형식이 허용하면 지적 개수부터 밝히고 위치를 붙인 각 지적에
+`important`·`nit`·`pre-existing` 중 하나를 표시합니다. `important`는 작업자에게 돌려 고치고,
+`nit`은 모아서 처리하며, `pre-existing`은 이번 결과물과 별개의 후속 작업으로 보고합니다.
+첫 전체 리뷰 뒤에는 수정 diff만 다시 리뷰하고, 3회차에도 `important`가 나오면 수정을 더
+보내기 전에 접근 방식을 다시 봅니다. 회차 수만으로 결함을 넘기지 않습니다. 별도 관리 세션이나 지휘자 교체 개수 제한은 없습니다. 독립적인 작업은
 실행 환경이 지원하는 범위에서 병렬로 진행하고, 겹치는 편집은 격리하거나 순서대로 처리합니다.
-로컬에서 Agent Bridge를 사용할 수 있으면 우선 사용하며, `allow_implicit_invocation: false`로
-자동 선택을 끕니다. 컨텍스트는 기본 압축 기능을 우선 사용하고 실제 인계·복구에만 작은
+Codex 작업은 기본 서브에이전트를 우선 사용합니다. Codex끼리 Agent Bridge로 위임하려면
+해당 경로에 대한 사용자 명시 요청이 필요하며, Claude 작업에는 허용 범위 안에서 Bridge를
+사용할 수 있습니다. `allow_implicit_invocation: false`로 자동 선택을 끕니다.
+컨텍스트는 기본 압축 기능을 우선 사용하고 실제 인계·복구에만 작은
 기록을 둡니다. 현재 세션은 전역·로컬 정책에 따른 Wiki 기록과 저장 확인, 결과 회수와 후속
 작업을 마친 세션의 종료까지 책임집니다. 기기별 Wiki 경로는 스킬에 넣지 않습니다.
 
@@ -291,14 +296,26 @@ seed에 실시간으로 의존하지 않고 이 저장소의 first-party plugin 
 
 ## Tests
 
-CI와 같은 Python 3.11로 push 전에 전체 suite를 실행합니다.
+Ubuntu·Windows CI와 같은 Python 3.11로 push 전에 테스트를 실행합니다.
 
 ```bash
 python3 -X warn_default_encoding -W error::EncodingWarning -m unittest discover -s tests -q
 git diff --check
 ```
 
-이 명령은 모든 OS에서 텍스트 인코딩 누락을 오류로 처리해 Windows에서만 드러나던
+별도 Ubuntu 작업에서 Node.js 22로 JavaScript 테스트를 실행하며 패키지 설치는 필요
+없습니다. 해당 검증기를 변경했다면 push 전에 Linux에서 다음 명령을 실행합니다.
+
+```bash
+node --test plugins/jy-env-core/skills/security-audit/validate-findings.test.cjs plugins/jy-env-core/skills/security-audit/validate-coverage-ledger.test.cjs plugins/jy-env-core/skills/pstack/references/skills/poteto-mode/scripts/check-plan.test.mjs
+```
+
+보안 검증기는 파일을 열 때 `O_NOFOLLOW`·`O_NONBLOCK` 보호 기능을 요구하며, native
+Windows처럼 지원하지 않는 환경에서는 CLI 입력을 거부합니다. 따라서 전체 CLI 테스트는
+Ubuntu에서 실행합니다. Windows 테스트 통과를 위해 이 보호 기능을 제거하지 않습니다.
+Windows 로컬 확인만으로는 Ubuntu 작업을 검증한 것이 아닙니다.
+
+Python 테스트 명령은 모든 OS에서 텍스트 인코딩 누락을 오류로 처리해 Windows에서만 드러나던
 기본 인코딩 의존을 로컬에서도 잡습니다. 파일 입출력의 명시적 UTF-8 지정과
 `.gitattributes`의 archive 원본 바이트 보존·plugin LF 규칙을 유지합니다.
 
@@ -307,6 +324,31 @@ Pressure-scenario asset 검증:
 ```bash
 python3 -m unittest tests.test_skill_scenarios -v
 ```
+
+## 코드 리뷰
+
+[REVIEW.md](REVIEW.md)에 이 저장소에서 중요한 실패 유형과 리뷰 근거 기준을 둡니다.
+루트 `AGENTS.md`가 로컬 리뷰에서 이 파일을 읽도록 연결하고, `CLAUDE.md`는 해당 저장소
+지침을 import합니다. 이 파일들은 전역 지침으로 설치되지 않습니다.
+
+독립 리뷰에는 검토할 후보와 `REVIEW.md`, diff, 관련 검증 결과를 명시적으로 전달합니다.
+Codex는 적용되는 `AGENTS.md`의 리뷰 지침을 읽고 기본 출력 형식과 우선순위를 유지합니다.
+지적 분류용 태그로 이를 대체하지 않습니다. 전역 소스 `instructions/AGENTS.md`에는
+수명주기·재시도·상태 경계·호환성·결과 완전성 검사를 둡니다. 회귀 테스트가 있는 수정은
+작업 트리를 되돌리지 않고 같은 테스트를 수정 전 구현과 수정 후보에서 비교합니다.
+OpenAI의 [저장소 리뷰 규칙](https://developers.openai.com/blog/custom-code-review-rules-for-codex)을 참고하세요.
+
+Claude 플러그인은 설계 참고 자료이며 Codex 지침과 바이트 단위로 일치시키는 원본이 아닙니다.
+리뷰 요구사항은 Codex 기본 기능에 맞춰 재구성합니다. `claude-local-plugins`의 선택적 리뷰
+평가기는 이미 `--reviewer codex`를 지원하므로 실행기와 과거 결함 자료를 여기 복제하지 않습니다.
+비교 평가에서는 후보를 Wiki 정답·후속 수정·다른 체크아웃과 격리하고 접근 기록을 확인합니다.
+기존 기본 프롬프트는 이번 규칙의 효과를 측정하지 않으며, 탐지율 향상을 검증했다고 주장하지 않습니다.
+
+Claude Code의 로컬 `/code-review`는 `CLAUDE.md`를 따르지만 `REVIEW.md`를 자동으로
+읽지는 않으므로 저장소 지침의 연결을 따릅니다. 관리형 GitHub Code Review 서비스는
+`REVIEW.md`를 직접 읽습니다. 공식 [로컬 리뷰 사용법](https://code.claude.com/docs/en/code-review-local)과
+[리뷰 설정](https://code.claude.com/docs/en/code-review-customize)을 참고하세요.
+이 저장소 설정으로 해당 서비스가 활성화되거나 merge 승인 요건이 바뀌지는 않습니다.
 
 ## Skill 실용성 gate
 

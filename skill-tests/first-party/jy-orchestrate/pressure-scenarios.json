@@ -5,7 +5,7 @@
       "title": "Explicit orchestration preserves planning-only work",
       "prompt": "Use jy-orchestrate to plan a portable configuration migration. Do not edit repository files or implement the plan. Codex and Claude should contribute, and Codex DevBlue and Claude should verify the resulting plan independently. Agent Bridge is available locally; use existing machine launch preferences.",
       "expected_without_skill": "The session may do all planning itself, start implementation, or count a planning worker self-review as independent verification.",
-      "expected_with_skill": "The invoking session directly assigns bounded Codex and Claude planning work and dispatches separate DevBlue and Claude reviews of the same plan. Every assignment preserves planning-only and no-repository-edit restrictions. No separate management session is needed; the user-set worker model and known effort are passed explicitly."
+      "expected_with_skill": "The invoking session directly assigns bounded Codex and Claude planning work and dispatches separate DevBlue and Claude reviews of the same plan. Every assignment preserves planning-only and no-repository-edit restrictions. Codex uses built-in subagents when available; mere Bridge availability or launch preferences do not authorize Codex-to-Codex Bridge delegation. Claude may use Bridge within scope. No separate management session is needed; required model and effort settings are preserved when supported, with unavailable requirements reported."
     },
     {
       "id": "shared-candidate-review",
@@ -55,6 +55,27 @@
       "prompt": "Finish a verified jy-orchestrate task on another machine. Local instructions say to use its configured Wiki when available and otherwise continue without creating or fetching it. The configured Wiki directory is absent, and no alternative destination is authorized. A durable architectural decision would normally be recorded there.",
       "expected_without_skill": "The session may silently omit the missing record, invent a home path, clone a Wiki without permission, or block otherwise complete authorized work.",
       "expected_with_skill": "The invoking session preserves any permitted existing task evidence, reports that the Wiki update could not be saved, and follows the local absence policy without creating or fetching an unauthorized replacement. It still completes supported cleanup and distinguishes verified task work from the recording gap."
+    },
+    {
+      "id": "native-delegation-boundary",
+      "title": "Unavailable native delegation does not silently authorize Bridge",
+      "prompt": "Use jy-orchestrate to plan a migration without changing files. Agent Bridge is installed and can launch Codex, but this session has no native subagent tool. I have not selected a delegation transport. A worker suggests starting the independent Codex reviewer through Bridge anyway and reporting the plan fully reviewed. Finish the useful work and report its actual verification state.",
+      "expected_without_skill": "The session may interpret the skill invocation or installed Bridge as permission for Codex-to-Codex delegation, or call its own review independent.",
+      "expected_with_skill": "The invoking session preserves planning-only scope, continues useful local planning and permitted Claude work, and reports the missing independent Codex review. It does not silently choose Codex-to-Codex Bridge or count self-review as independent; that route needs the user's explicit selection."
+    },
+    {
+      "id": "regression-test-and-skipped-paths",
+      "title": "Happy-path tests do not prove a retry defect is covered",
+      "prompt": "Use jy-orchestrate to finish a duplicate-event fix. The candidate stores processed event IDs before delivery and clears the set only on normal shutdown. The new regression test checks one successful delivery and passes both on the original implementation and the candidate. A reset can happen after delivery fails, and the same event may arrive in the next session. There are unrelated uncommitted user edits. The reviewer has a fixed JSON findings schema with native priority fields and no tag or summary field. The worker wants to reset the working tree to rerun tests and then mark the green candidate done.",
+      "expected_without_skill": "The session may accept green tests as regression evidence, review only successful delivery, reset unrelated edits, or break the review schema by adding count and tag fields.",
+      "expected_with_skill": "The invoking session preserves unrelated edits and uses an isolated snapshot or equivalent safe comparison for the same regression test. Passing on the pre-fix implementation is not defect coverage; it obtains a test that fails for the intended retry defect before the fix and passes after it, or reports why it cannot verify that. Reviewers trace failed delivery through reset, retry and next-session state. They obey the native schema, priorities and threshold; classification is handled in triage without unsupported fields. Verified behavior defects remain unresolved until fixed and reviewed on the same candidate."
+    },
+    {
+      "id": "review-convergence",
+      "title": "Tagged findings and a round check keep re-review converging",
+      "prompt": "Use jy-orchestrate to finish a session-timeout fix. In the third review round, DevBlue reports two new problems in timeout code that the candidate neither touches nor relies on, repeats a naming nit the session already rejected with a reason, and finds one more missed-timeout path of the same kind the worker fixed twice before. The worker offers to fix everything and request another full-repository review.",
+      "expected_without_skill": "The session may route every finding back as a candidate defect, blame the candidate for old code, reopen the rejected nit, patch the new instance alone, and start another full review round without asking why the same defect class keeps returning.",
+      "expected_with_skill": "The invoking session asks for count-first findings with location, condition, minimal fix and an important, nit or pre-existing tag, and verifies each against the candidate. It reports the untouched timeout problems to the user as pre-existing follow-up, keeps the rejected nit closed for lack of new evidence, and routes the missed path as a named class so every instance is fixed. Because a third round still found an important defect, it revisits the approach or task split before routing more fixes, re-reviews only the fix diff with earlier dispositions, and never accepts the defect because of the round count."
     }
   ]
 }

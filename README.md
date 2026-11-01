@@ -56,11 +56,17 @@ user's defined scope; SSH connectivity alone does not authorize them.
 
 Invoke `$jy-orchestrate` for the current session to directly coordinate Codex and Claude
 planning or implementation, followed by independent Codex DevBlue and Claude verification
-of the same candidate. Workers receive bounded assignments and return concise results;
-supported findings go back to workers for fixes and review of the affected changes.
+of the same candidate. Workers receive bounded assignments and return concise results.
+Where the review format permits, reviewers open with the finding count and tag each located
+finding `important`, `nit`, or `pre-existing`. Important findings go back to workers, nits are batched, and pre-existing
+defects are reported as separate follow-up. After the first full review only the fix diff
+is re-reviewed, and a third round that still finds important defects prompts a review of
+the approach before more fixes; the round count never accepts a defect.
 There is no separate manager session or manager-replacement count. Independent work can
 run concurrently within the runtime's capabilities, while overlapping edits are isolated
-or sequenced. It prefers Agent Bridge locally and has `allow_implicit_invocation: false`.
+or sequenced. Codex work prefers built-in subagents; Codex-to-Codex Agent Bridge delegation
+requires an explicit request for that route. Claude work may use Bridge within the authorized
+scope. The skill has `allow_implicit_invocation: false`.
 Native context compression is the default; a compact record serves actual handoff or
 recovery needs. The invoking session remains responsible for durable Wiki updates under
 global/local policy, verifies they were saved, and closes task-owned sessions after results
@@ -321,14 +327,26 @@ instructions under `archive/` unless the user requests a reference or reactivati
 
 ## Tests
 
-Use Python 3.11 to match CI and run the full suite before pushing:
+Use Python 3.11 to match the Ubuntu and Windows CI jobs, and run the suite before pushing:
 
 ```bash
 python3 -X warn_default_encoding -W error::EncodingWarning -m unittest discover -s tests -q
 git diff --check
 ```
 
-The test command treats omitted text encodings as errors on every OS, catching locale
+The separate Ubuntu job runs the JavaScript suite with Node.js 22 and no package
+installation. Run this command on Linux before pushing changes to these validators:
+
+```bash
+node --test plugins/jy-env-core/skills/security-audit/validate-findings.test.cjs plugins/jy-env-core/skills/security-audit/validate-coverage-ledger.test.cjs plugins/jy-env-core/skills/pstack/references/skills/poteto-mode/scripts/check-plan.test.mjs
+```
+
+The security validators require `O_NOFOLLOW` and `O_NONBLOCK` file-open protection and
+reject CLI input when those flags are unavailable, including on native Windows. Their
+full CLI test suite therefore runs on Ubuntu; do not remove that protection to pass it
+on Windows. A Windows-only local check leaves the Ubuntu job unverified.
+
+The Python test command treats omitted text encodings as errors on every OS, catching locale
 dependencies locally before they fail on Windows. Keep explicit UTF-8 file I/O and the
 `.gitattributes` archive byte-preservation and plugin LF rules intact.
 
@@ -337,6 +355,34 @@ Validate pressure-scenario assets:
 ```bash
 python3 -m unittest tests.test_skill_scenarios -v
 ```
+
+## Code review
+
+[REVIEW.md](REVIEW.md) defines repository-specific failure modes and the evidence expected
+from a review. The root `AGENTS.md` directs local reviews to it; `CLAUDE.md` imports that
+repository instruction. These files are not installed as global instructions.
+
+For an independent review, identify the candidate and explicitly provide `REVIEW.md`, the
+diff, and relevant verification results. Codex uses applicable `AGENTS.md` review guidance
+and keeps its native output schema and priorities; the triage labels do not replace them.
+The global source `instructions/AGENTS.md` adds focused lifecycle, retry, state-boundary,
+compatibility, and completeness checks. For a fix with a regression test, compare that test
+against the pre-fix implementation and candidate without resetting the working tree.
+See OpenAI's [repository review rules](https://developers.openai.com/blog/custom-code-review-rules-for-codex).
+
+The Claude plugin is a design reference, not a byte-for-byte upstream for Codex instructions.
+Review requirements are adapted to Codex's native capabilities. The optional reviewer evaluator
+in `claude-local-plugins` already supports `--reviewer codex`; its runner and historical defect
+fixtures are not duplicated here. Keep benchmark candidates isolated from Wiki answers, later
+fixes, and other checkouts, and audit access before comparing results. Its unchanged baseline
+prompt does not measure these new rules; no comparative detection gain is claimed.
+
+Claude Code's local `/code-review` follows
+`CLAUDE.md` but does not automatically load `REVIEW.md`, so follow the repository pointer.
+The managed GitHub Code Review service reads `REVIEW.md` directly. See the official
+[local review](https://code.claude.com/docs/en/code-review-local) and
+[review customization](https://code.claude.com/docs/en/code-review-customize) docs.
+This repository does not enable that service or change merge approval requirements.
 
 ## Skill utility gate
 

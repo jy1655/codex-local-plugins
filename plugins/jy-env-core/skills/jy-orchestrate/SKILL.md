@@ -12,8 +12,14 @@ workflow. A child reading this skill keeps its assigned role and returns scoped 
 
 ## Assign bounded work
 
-Use Agent Bridge when available locally, following machine-local instructions; otherwise
-use supported native delegation. Preserve planning-only, read-only, authorization, and
+Prefer Codex's built-in subagents for Codex work. Use Agent Bridge for Codex-to-Codex
+delegation only when the user explicitly requests that route; invoking this skill alone
+does not select it. If native delegation is unavailable, continue locally where possible
+and report any unmet independent-review requirement rather than silently switching routes.
+Cross-provider work with Claude may use Agent Bridge within the authorized task scope;
+apply machine-local launch options only after selecting that route.
+
+Preserve planning-only, read-only, authorization, and
 workspace boundaries in every assignment. Relay changed user instructions promptly and
 stop or revise affected assignments before accepting results produced under old instructions.
 A queued instruction is not proof that a busy worker stopped. Use supported interruption
@@ -55,17 +61,49 @@ independently verify that same candidate in sessions separate from the workers a
 invoking session. The invoking session dispatches these reviews; worker self-review is
 useful but does not replace them.
 
-Give both reviewers the requirements, current constraints, candidate, scoped changes, and
-verification evidence. Each checks requirement coverage and implementation or plan quality,
-reporting supported findings with evidence and naming what could not be verified. Reviews
-are read-only; inspect surrounding code or run focused checks when a concrete concern
+Give both reviewers the requirements, current constraints, candidate, scoped changes,
+applicable global and repository review guidance, and verification evidence. Each checks
+requirement coverage and implementation or plan quality.
+Reviews are read-only; inspect surrounding code or run focused checks when a concrete concern
 requires it. Reuse valid evidence instead of routinely rerunning unchanged checks.
 
-Route supported findings back to the original worker when practical. Re-review the findings
-and the fix's effects, refreshing affected evidence for the final candidate. Resolve reviewer
+For code changes, ask reviewers to trace relevant release/reset/failure, retry, state-boundary,
+mode, compatibility, and incomplete-result paths beyond the proposed scenario. Before reviewing
+a fix with a regression test, obtain its result on both the pre-fix implementation and candidate,
+or the reason comparison could not run. Use isolated snapshots or an equivalent safe comparison;
+preserve unrelated working-tree changes. A failure must demonstrate the intended defect, not a
+setup error; a test passing before the fix does not establish regression coverage.
+
+Ask each reviewer to open with the finding count, saying plainly when nothing needs fixing,
+and to give every finding its location (file and line, or plan section), triggering
+condition, minimal fix, and one tag when the review surface permits this format. Preserve
+required schemas, priorities, and reporting thresholds; otherwise classify findings during
+triage without requiring extra fields or optional-polish findings:
+
+- `important`: a defect or unmet requirement in what the candidate changes or relies on.
+- `nit`: style or polish that leaves behavior and requirements intact.
+- `pre-existing`: a defect the candidate neither introduces, touches, nor relies on.
+
+Reviewers name the bug class when one cause has several instances, and name what they could
+not verify.
+
+Verify each finding against the candidate, then close it as fixed, rejected with a reason,
+or deferred. Route `important` findings back to the original worker when practical, asking
+for every instance of a named class. Fold `nit` findings into the next routed fix or list
+them in the final report. Report `pre-existing` findings to the user as follow-up work
+outside this candidate. After the first full review, re-review the fix diff and its effects,
+giving reviewers the earlier findings and their dispositions so a closed finding returns
+only with new evidence. Refresh affected evidence for the final candidate. Resolve reviewer
 disagreements from evidence: one clean review does not dismiss another's supported defect.
-If fixes stop making progress, revisit the cause, context, or task split. A retry count alone
-never makes an unresolved defect acceptable. Report material decisions and verification gaps.
+
+A review round is one pass by both reviewers over one candidate; the first full review is
+round one. When fixes stop making progress, or round three still reports `important`
+findings, revisit the approach, cause, context, or task split before routing more fixes.
+Continue the same approach when the evidence shows `important` findings being resolved
+rather than recurring in the same class; newly exposed boundary cases can hold the count
+flat or raise it, so state the reason for continuing. Ask the user when the approach itself
+is in doubt. The round count triggers that check; it never makes an unresolved defect
+acceptable. Report material decisions and verification gaps.
 
 Accept completion against the user's criteria and both independent reviews. Additional
 intermediate review is justified by a concrete integration risk, not every small task.

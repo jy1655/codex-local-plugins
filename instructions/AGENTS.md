@@ -49,6 +49,23 @@
   and required approvals through the execution environment. Changing these boundaries
   requires supporting evidence and the owner's explicit approval.
 
+## Code Review
+
+- During a code review, trace relevant paths beyond the change's happy-path scenario:
+  acquisition through release/reset/failure; repeated calls and retries after failure or
+  success; cached state across time/session boundaries; and invariants across modes.
+  Check older inputs when compatibility requires their behavior to be preserved, and
+  early exits or pagination limits when the caller requires a complete result.
+- For a fix with a regression test, verify that the same test fails for the intended
+  reason on the pre-fix implementation and passes on the candidate. Use an isolated
+  snapshot or equivalent safe comparison; never reset unrelated working-tree changes.
+  Record both results, or why the comparison could not run. A test that also passes
+  before the fix is not evidence that it covers the defect.
+- Ground findings in a reachable condition and observable impact. Follow the review
+  surface's required schema, priorities, and reporting threshold; do not add unsupported
+  fields or force optional polish into defect findings. Re-review changed behavior and
+  its effects, reusing valid evidence; reopen closed findings only with new evidence.
+
 ## Verification Artifacts
 
 - Create internal verification directories through `python3 ~/.codex/tools/task-workspace.py
