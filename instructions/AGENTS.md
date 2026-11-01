@@ -102,3 +102,7 @@
 
 - Use only skills actually available in the current session. Do not assume an optional
   pack is installed.
+- When the user corrects a result that came from following a skill, propose a fix to that
+  skill instead of only correcting the result: name the skill line that led there, what the
+  user wanted, whether the skill already says it or lacks it, and the smallest edit. Edit
+  the skill only after the user agrees.
