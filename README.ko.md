@@ -216,6 +216,10 @@ copy snapshot을 설치합니다. Stage 후에는 `codex plugin add`로 기본 p
 설치하거나 갱신하며, 선택 pack은 명시적으로 설치해야 합니다. Dirty checkout은
 별도의 live skill discovery surface로 노출하지 않습니다.
 
+공통 지침은 스킬·워크플로를 포함해 Agent Bridge로 Claude 하위 세션을 시작하거나
+다시 열 때 `--model opus`를 명시하도록 합니다. 사용자가 해당 세션에 Fable을 명시적으로
+요청한 경우에만 `--model fable`을 쓰며, CLI 기본 모델을 그대로 상속하지 않습니다.
+
 ### 컴퓨터별 로컬 지침
 
 각 컴퓨터의 경로·로컬 도구·작업 공간 규칙은 설치된 전역 `AGENTS.md` 옆의 `LOCAL.md`에
@@ -261,6 +265,8 @@ codex plugin list --marketplace personal-codex --json
 `python3` 대신 `python`을 씁니다. `apply`가 기본 core와 design을 갱신하므로
 각 설치 버전이 `plugins/<pack>/.codex-plugin/plugin.json`과 일치하는지
 확인한 뒤 새 Codex 세션을 시작합니다. 기기별 `LOCAL.md`는 계속 별도로 관리합니다.
+위의 Claude 하위 세션 모델 규칙도 함께 적용됩니다. Codex의 Agent Bridge 호출을 위해
+기기별 `LOCAL.md`에 모델 규칙을 추가할 필요는 없습니다.
 
 ## Local development
 

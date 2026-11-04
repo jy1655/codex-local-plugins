@@ -245,6 +245,10 @@ mode. Bootstrap and `--snapshot` always copy a stable snapshot. After staging, t
 install or refresh default plugins with `codex plugin add`; optional packs remain explicit
 installs. A dirty checkout is not a second live skill-discovery surface.
 
+Shared instructions require `--model opus` when starting or reopening a Claude child
+session through Agent Bridge, including skill/workflow calls. Use `--model fable` only
+when the user explicitly requests Fable for that session; do not inherit the CLI default.
+
 ### Machine-local instructions
 
 Keep machine-specific paths, local tools, and workspace rules in `LOCAL.md` alongside the
@@ -289,6 +293,8 @@ codex plugin list --marketplace personal-codex --json
 Use the machine's configured Python 3.11+ interpreter (`python` on Windows if needed).
 `apply` updates the default core and design plugins; confirm each installed version
 matches its `plugins/<pack>/.codex-plugin/plugin.json`, then start a fresh Codex session. Machine-local `LOCAL.md` remains separately managed.
+This also installs the shared Claude child-session model rule above; no per-machine
+`LOCAL.md` model override is needed for Codex's Agent Bridge calls.
 
 ## Local development
 

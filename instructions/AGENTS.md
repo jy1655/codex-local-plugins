@@ -32,6 +32,11 @@
   do not silently substitute Bridge.
 - Cross-provider delegation may use Agent Bridge within the authorized task scope.
   Machine-local Bridge launch options apply only after that route has been selected.
+- For Claude child sessions through Agent Bridge, explicitly pass `--model opus` on every
+  `tabcli ask claude` and every `tabcli reopen` of a Claude session, including calls made by
+  a skill or workflow. Use `--model fable` only when the user explicitly requests Fable for
+  that session. Do not omit `--model` or infer a Fable upgrade from task complexity,
+  workflow defaults, or the main conversation's model.
 - Use the simplest approach that preserves safety, permissions, and data protection. Keep
   standing context and procedures minimal; add rules only for demonstrated needs.
 - Use native session state and context compression first. Add orchestration or persistent
