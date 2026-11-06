@@ -89,7 +89,7 @@ unrelated paused, stopped, failed, or outside-mandate tickets do not block it. E
 and name their unresolved scope in the final report; an excluded dependency is not satisfied.
 Technical integration gets its own inferred ticket: its scope is the union of the integrated
 scopes, its mandate retains their original authorizing words, and its worker owns integration
-defects. Separate Codex DevBlue and Claude reviewers inspect the same frozen
+defects. Separate Codex and Claude reviewers inspect the same frozen
 candidate, including relevant uncommitted and untracked changes. While other tickets run, review
 uses its own worktree, or a commit only where commits are authorized, that their edits cannot
 reach; reviewer checks receive the same resource isolation as tickets. Findings use `important`, `nit`, and `pre-existing` where the

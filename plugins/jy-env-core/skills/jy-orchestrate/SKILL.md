@@ -1,6 +1,6 @@
 ---
 name: jy-orchestrate
-description: Use when the user explicitly requests jy-orchestrate to route Codex and Claude planning or implementation tickets, with independent Codex DevBlue and Claude verification of the same candidate.
+description: Use when the user explicitly requests jy-orchestrate to route Codex and Claude planning or implementation tickets, with independent Codex and Claude verification of the same candidate.
 ---
 
 # JY Orchestrate
@@ -56,9 +56,9 @@ workers; never silently switch to Bridge or take over technical work yourself. C
 use Bridge within the authorized scope. Read the available Bridge skill when selecting it and
 apply the governing global model policy and machine-local launch options.
 
-Use `gpt-5.6-sol` for Codex workers, inheriting the invoking session's reasoning effort. Use
+Use `gpt-6.1-sol` for Codex workers, inheriting the invoking session's reasoning effort. Use
 only model/effort controls supported by the actual native tool. On an explicitly selected
-Codex Bridge route pass `--model gpt-5.6-sol --effort <inherited-effort>` when effort is known;
+Codex Bridge route pass `--model gpt-6.1-sol --effort <inherited-effort>` when effort is known;
 disclose actual defaults otherwise. Report unavailable required settings; substitute only
 within the user's allowed choices, naming the substitution. Never assume a model named here
 exists in the current host.
@@ -143,7 +143,7 @@ open its own inferred ticket: its scope is the union of the integrated tickets' 
 its mandate retains their original authorizing words. Assign it to a worker; that integration
 ticket must also be ready before review.
 Identify the stable candidate: named base plus exact committed/uncommitted/untracked change set,
-or exact plan artifact. Freeze it while Codex DevBlue (`gpt-daybreak-blue-latest`) and Claude
+or exact plan artifact. Freeze it while a Codex reviewer (`gpt-6-astra`) and Claude
 review independently in sessions separate from workers and router, using the permitted routes.
 While other tickets run, review the candidate where their edits and resource use cannot reach
 it (its own worktree, or a commit only where commits are authorized), giving reviewer checks
