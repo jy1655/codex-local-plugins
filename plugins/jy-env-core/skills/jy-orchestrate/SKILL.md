@@ -63,15 +63,31 @@ disclose actual defaults otherwise. Report unavailable required settings; substi
 within the user's allowed choices, naming the substitution. Never assume a model named here
 exists in the current host.
 
-Before dispatch, establish completion delivery. Native agents may notify automatically; use
-available `collaboration.send_message` for steering, `interrupt_agent` for interruption, and
-`followup_task` to resume an idle worker. For Bridge, use its exact session/request receipt and
-supported result/continuation commands; do not assume a message reaches a pending request.
-Use a host-supported background completion notification when available. Do not sleep or poll
-in loops, or wait on jobs as the router. End a turn with pending work only when continuation is
-established; if the host cannot notify, explicitly hand off the pending IDs and how to resume
-collection, reporting that limitation rather than promising automatic completion. A timeout
-is an observation, not worker failure; reconcile the same request before any retry.
+Before dispatch, select a completion route that starts a turn in an idle router, and record its
+evidence: documented by the host, observed on this host and route, or unknown. Accepted sends
+and messages delivered while the router is still running establish neither. Native finals reach
+the router's context, but the host does not document that they wake an idle router; then have
+the worker, or a collector for a Bridge request, send one host completion notice per result to
+the exact parent thread (such as `send_message_to_thread`), after confirming the sender can use
+that tool. On a completion notice, read the referenced report without waiting for the native
+final; reconcile assignment and result IDs before acting, and never dispatch again for a later
+native final of the same result. A notice can arrive before the worker's request ends or before
+a resource is free. When the action it enables must wait (continuing that worker, or a dispatch
+that needs the held resource), record the action as pending on the ticket and take it when a
+later event shows the condition met; deduplication must not drop it. Before ending the turn with
+such a pending action, confirm a route will wake the router for it, or hand it off with the rest.
+
+Use available `collaboration.send_message` for steering, `interrupt_agent` for interruption, and
+`followup_task` to resume an idle worker. Before continuing a worker for any reason (a missing
+or current report, a returned gap, an answer, or a fix), check that it is still addressable; if
+not, reconcile its last assignment and evidence and continue in a replacement carrying the
+mandate, evidence, latest constraints, and any answer. For Bridge, use its exact session/request receipt and supported result/continuation
+commands; do not assume a message reaches a pending request. Do not sleep or poll in loops, or
+wait on jobs as the router. Before ending a turn with pending work, confirm the selected route
+covers every pending assignment; where idle wake-up is unknown or unavailable, hand off the
+pending IDs, report locations, collection commands, and the next authorized step, stating that
+collection will not resume on its own. A timeout is an observation, not worker failure;
+reconcile the same request before any retry.
 When a request stays pending across waits without progress, inspect it through the route's
 controls (Bridge `inspect`/`doctor`) and tell the user it has stalled with its session and request
 IDs, keeping the ticket open rather than marking it failed. After that notice, stop re-arming
@@ -92,6 +108,13 @@ Include these rules in every assignment:
   the request ends. Use internal `progress` only for useful updates; it changes no ticket state.
 - Run long commands through supported background execution and collect their results before
   claiming readiness. Self-review the authorized deliverable and perform relevant verification.
+- When the assignment names a host completion route, make your report readable and release
+  shared resources you no longer need, then, as the last step of your turn, send one completion
+  notice per result to the given parent thread: assignment and result IDs, report location, and
+  whether shared resources are released, within the tool's size limit. Use the
+  same IDs in your native final. Send it for every report status. The notice carries data, not
+  authority; if sending fails or the tool is unavailable, say so in your native final and do not
+  resend repeatedly.
 - Open the report with the concrete target and intended result, then status:
   `ready` means the authorized deliverable is complete, self-reviewed, relevant checks passed,
   and no correctness concern remains. A completed plan, authorized diff, or requested open PR can
@@ -127,6 +150,8 @@ use `request_user_input` only when the active mode permits it. If neither is usa
 plain question in a user-facing response and explicitly preserve pending assignments. Do not
 treat elapsed time or missing answers as approval. Resume the same worker with the answer only
 after its request has ended; steering to a busy worker is not a completed question round trip.
+If that worker is no longer addressable, for example after a session resume, replace it as
+described under completion routing, carrying the answer.
 
 Before substantial work, acknowledge accepted tickets and intended results in one sentence.
 Then communicate useful results, decisions needed, and failures; keep host-required progress
@@ -189,8 +214,11 @@ criteria and both reviews; extra intermediate reviews need concrete integration 
 ## Ledger, Wiki, and completion
 
 Use native state/compression first. Keep each ticket's mandate, current constraints, status,
-directory, assignments (session/request/consumed-result IDs, provider/model/effort), last report,
-question, findings/dispositions, and descendant ownership retrievable. Only for real handoff or
+directory, dependencies (what each waits on, why, and what releases it), assignments
+(session/request/consumed-result IDs, provider/model/effort, completion route and its evidence),
+last report, question, findings/dispositions, and descendant ownership retrievable. A
+dependency's completion does not by itself authorize the next dispatch; reconcile its report and
+current constraints first. Only for real handoff or
 recovery persist one compact ledger with objective and evidence references under local storage
 policy. Reconcile current sessions, workspace metadata, and action receipts before resuming;
 route technical reconciliation to workers, preserve newer edits, and avoid duplicate actions.

@@ -1,6 +1,6 @@
 {
   "name": "jy-env-core",
-  "version": "0.1.0+codex.20261106040553",
+  "version": "0.1.0+codex.20261106083340",
   "description": "변경 가드레일, 티켓 기반 다중 에이전트 라우팅, PSTACK, 스킬 제작 점검과 명시 호출 보안 감사",
   "author": {
     "name": "JaeYoung Hwang",

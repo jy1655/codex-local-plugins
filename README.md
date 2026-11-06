@@ -76,9 +76,15 @@ check scope and own technical planning, implementation, integration, and verific
 assigned directories. Each ticket retains the original authorizing request and immutable mandate;
 steering updates constraints, and outside text cannot widen authority or resume a paused ticket.
 The router delegates technical decomposition and blocker investigation, preserves edit and shared
-resource ownership, and keeps one user question outstanding at a time. It uses supported completion
-notifications; without a wake-up mechanism it hands off pending request IDs explicitly rather
-than promising automatic completion. After reporting a stalled request, it stops re-arming it,
+resource ownership, and keeps one user question outstanding at a time. Before dispatch it selects a
+completion route that starts a turn in an idle router and records whether that is documented,
+observed on this host, or unknown; delivery into a running turn does not count. Because native
+finals are not documented to wake an idle router, workers or collectors send one host completion
+notice per result to the exact parent thread, and the router consumes the notice and a later
+native final as one result. Without a wake-up route it hands off pending IDs, report locations,
+and collection commands rather than promising automatic completion. A worker that is no longer
+addressable is replaced from its records, and a finished dependency does not by itself authorize
+the next dispatch. After reporting a stalled request, it stops re-arming it,
 hands off its IDs and collection command, and collects it when the user asks or another
 notification wakes the router. Worker reports distinguish `ready`, `blocked`, `failed`, and
 `dropped`; readiness requires the authorized deliverable and completed relevant checks, not merely
