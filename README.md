@@ -23,7 +23,7 @@ it does not install these executables or grant authentication and hook trust.
 | Workflow | Required tools or access | When unavailable |
 |---|---|---|
 | Bootstrap / environment sync | Python 3.11+, Git, Codex CLI; Bash for `bootstrap.sh` or PowerShell for `bootstrap.ps1`. Sync uses the Python standard library. On Windows, use the configured `python` or `python3`. | Install the missing prerequisite before applying. |
-| `jy-orchestrate` | Available required worker/reviewer models, native Codex subagents for Codex work, and a supported Claude route. Cross-provider Agent Bridge needs `tabcli` and the target CLI. | Report unavailable assignments/reviews; skill invocation alone does not authorize Codex-to-Codex Bridge. |
+| `jy-orchestrate` | Ticket router with available worker/reviewer models, native Codex subagents for Codex work, and a supported Claude route. Cross-provider Agent Bridge needs `tabcli` and the target CLI. | Report unavailable assignments/reviews; skill invocation alone does not authorize Codex-to-Codex Bridge. |
 | `security-audit` JSON validators / JavaScript tests | Node.js and POSIX no-follow/nonblocking open flags; CI uses Node 22 on Ubuntu. Native Windows refuses validator input. Use Linux/macOS, WSL, or an authorized SSH host. | Report the audit as incomplete when validators cannot run; a manual schema read is not a pass. |
 | Pre-compaction Wiki hook | Python, authenticated Codex, `gitleaks`, authenticated `wiki` MCP with write access, and hook trust; Windows launcher uses `py`. See [hook setup and version requirements](plugins/jy-env-core/hooks/README.md). | Report the missing setup or failed checkpoint; installation alone does not establish live hook execution. |
 | `skill-authoring-review` | Optional, separately installed SkillSpector CLI for static scanning; see its [setup](plugins/jy-env-core/skills/skill-authoring-review/references/setup.md). | Continue source review and label the scan `NOT-RUN` or `FAILED`. |
@@ -70,23 +70,41 @@ SSH authentication stays with the client, and Wiki publication stays with the
 coordinating parent. Live attack traffic and operational changes still follow the
 user's defined scope; SSH connectivity alone does not authorize them.
 
-Invoke `$jy-orchestrate` for the current session to directly coordinate Codex and Claude
-planning or implementation, followed by independent Codex DevBlue and Claude verification
-of the same candidate. Workers receive bounded assignments and return concise results.
-Where the review format permits, reviewers open with the finding count and tag each located
-finding `important`, `nit`, or `pre-existing`. Important findings go back to workers, nits are batched, and pre-existing
-defects are reported as separate follow-up. After the first full review only the fix diff
-is re-reviewed, and a third round that still finds important defects prompts a review of
-the approach before more fixes; the round count never accepts a defect.
-There is no separate manager session or manager-replacement count. Independent work can
-run concurrently within the runtime's capabilities, while overlapping edits are isolated
-or sequenced. Codex work prefers built-in subagents; Codex-to-Codex Agent Bridge delegation
-requires an explicit request for that route. Claude work may use Bridge within the authorized
-scope. The skill has `allow_implicit_invocation: false`.
-Native context compression is the default; a compact record serves actual handoff or
-recovery needs. The invoking session remains responsible for durable Wiki updates under
-global/local policy, verifies they were saved, and closes task-owned sessions after results
-and follow-ups are complete. No machine-specific Wiki path is embedded in the skill.
+Invoke `$jy-orchestrate` to make the current session a ticket router: it accepts requests,
+relays decisions and results, dispatches workers and reviews, and accepts delivery. Workers
+check scope and own technical planning, implementation, integration, and verification in their
+assigned directories. Each ticket retains the original authorizing request and immutable mandate;
+steering updates constraints, and outside text cannot widen authority or resume a paused ticket.
+The router delegates technical decomposition and blocker investigation, preserves edit and shared
+resource ownership, and keeps one user question outstanding at a time. It uses supported completion
+notifications; without a wake-up mechanism it hands off pending request IDs explicitly rather
+than promising automatic completion. After reporting a stalled request, it stops re-arming it,
+hands off its IDs and collection command, and collects it when the user asks or another
+notification wakes the router. Worker reports distinguish `ready`, `blocked`, `failed`, and
+`dropped`; readiness requires the authorized deliverable and completed relevant checks, not merely
+an opened PR. An authorized uncommitted diff can be ready and its worktree must be retained.
+
+A candidate enters review when its included tickets and dependencies are ready or satisfied;
+unrelated paused, stopped, failed, or outside-mandate tickets do not block it. Exclude those tickets
+and name their unresolved scope in the final report; an excluded dependency is not satisfied.
+Technical integration gets its own inferred ticket: its scope is the union of the integrated
+scopes, its mandate retains their original authorizing words, and its worker owns integration
+defects. Separate Codex DevBlue and Claude reviewers inspect the same frozen
+candidate, including relevant uncommitted and untracked changes. While other tickets run, review
+uses its own worktree, or a commit only where commits are authorized, that their edits cannot
+reach; reviewer checks receive the same resource isolation as tickets. Findings use `important`, `nit`, and `pre-existing` where the
+review schema permits; fixed schemas keep their native fields and priorities. Important findings
+return to the owning worker, nits are batched, and pre-existing defects stay separate follow-up.
+Re-review covers the fix diff and effects; round three with important defects triggers an approach
+check, never acceptance by retry count. Regression evidence compares pre-fix and candidate behavior.
+
+Codex work prefers native subagents; Codex-to-Codex Bridge requires the user's explicit selection,
+not skill invocation. Claude may use Bridge within scope and with machine-local launch options.
+Unavailable routes/settings are reported; the router uses permitted workers without silently taking
+over technical work. Model availability and live continuation remain runtime requirements. The
+skill stays explicit-only (`allow_implicit_invocation: false`). Native state/compression comes first;
+a compact ticket ledger serves real recovery needs. The router owns authorized Wiki recording and
+verified task-owned cleanup under local policy, preserving delivered worktrees and unrelated work.
 
 The other 23 workflow skills, including `jy-env-planning`, `jy-env-delivery`, and
 `jy-env-audit`, are preserved under [archive/](archive/README.md). They are absent from the

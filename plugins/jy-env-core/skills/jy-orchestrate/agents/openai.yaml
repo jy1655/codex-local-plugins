@@ -1,6 +1,6 @@
 interface:
-  display_name: "jy-orchestrate · 다중 에이전트 작업 지휘"
-  short_description: "현재 세션이 Codex·Claude 작업과 독립 검증을 직접 조율"
-  default_prompt: "$jy-orchestrate로 현재 세션이 Codex·Claude의 계획·구현과 DevBlue·Claude 독립 검증을 직접 조율하고, 필요한 Wiki 기록과 작업 세션 정리까지 마쳐줘."
+  display_name: "jy-orchestrate · 티켓 기반 다중 에이전트 라우팅"
+  short_description: "현재 세션이 티켓·질문·결과를 라우팅하고 워커가 구현·검증"
+  default_prompt: "$jy-orchestrate로 현재 세션은 티켓과 질문·결과를 라우팅하고, Codex·Claude 워커가 계획·구현·검증을 맡게 해줘. 같은 결과물의 DevBlue·Claude 독립 검토와 필요한 Wiki 기록·세션 정리까지 마쳐줘."
 policy:
   allow_implicit_invocation: false
