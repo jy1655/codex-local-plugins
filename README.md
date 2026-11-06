@@ -25,7 +25,6 @@ it does not install these executables or grant authentication and hook trust.
 | Bootstrap / environment sync | Python 3.11+, Git, Codex CLI; Bash for `bootstrap.sh` or PowerShell for `bootstrap.ps1`. Sync uses the Python standard library. On Windows, use the configured `python` or `python3`. | Install the missing prerequisite before applying. |
 | `jy-orchestrate` | Ticket router with available worker/reviewer models, native Codex subagents for Codex work, and a supported Claude route. Cross-provider Agent Bridge needs `tabcli` and the target CLI. | Report unavailable assignments/reviews; skill invocation alone does not authorize Codex-to-Codex Bridge. |
 | `security-audit` JSON validators / JavaScript tests | Node.js and POSIX no-follow/nonblocking open flags; CI uses Node 22 on Ubuntu. Native Windows refuses validator input. Use Linux/macOS, WSL, or an authorized SSH host. | Report the audit as incomplete when validators cannot run; a manual schema read is not a pass. |
-| Pre-compaction Wiki hook | Python, authenticated Codex, `gitleaks`, authenticated `wiki` MCP with write access, and hook trust; Windows launcher uses `py`. See [hook setup and version requirements](plugins/jy-env-core/hooks/README.md). | Report the missing setup or failed checkpoint; installation alone does not establish live hook execution. |
 | `skill-authoring-review` | Optional, separately installed SkillSpector CLI for static scanning; see its [setup](plugins/jy-env-core/skills/skill-authoring-review/references/setup.md). | Continue source review and label the scan `NOT-RUN` or `FAILED`. |
 | `pstack` workflows | The selected workflow's Node/Bash helpers and provider/forge CLI, where used. See the [runtime adapter](plugins/jy-env-core/skills/pstack/SKILL.md). | Check only the selected workflow's dependencies and report unavailable capabilities. |
 | `ios-memgraph-leaks` | macOS, Xcode, a physical iOS device and the selected memory-analysis tools. See the [skill](plugins/jy-env-ios/skills/ios-memgraph-leaks/SKILL.md). | Report missing device/tool evidence; simulator results do not establish physical-device behavior. |
@@ -136,19 +135,6 @@ Run the remove commands only for installed entries. Update changed active plugin
 optional. `apply` refreshes the default core and design packs. It does not uninstall Codex plugins.
 Start a fresh Codex session after changing installed packs. No second
 `~/.agents/skills/<pack>` discovery link is created.
-
-## Pre-compaction Wiki handoff
-
-The core plugin includes a synchronous `PreCompact` hook that summarizes the visible
-conversation with a separate, read-only Codex call, saves a handoff through the existing
-`wiki` MCP connection, and verifies the saved bytes and SHA-256 before returning.
-It uses the active model name and consumes an additional model call per checkpoint.
-Handled failures return `continue: false`; host termination/timeouts and skipped,
-untrusted hooks are not a guarantee of blocking compaction. It never calls `clear`.
-
-Each machine needs Python, Codex, `gitleaks`, Wiki authentication, plugin installation,
-and review/trust of the hook in `/hooks`. A Git pull alone does not activate it.
-See [setup, storage, failure handling, and limits](plugins/jy-env-core/hooks/README.md).
 
 ## Experimental pstack module
 

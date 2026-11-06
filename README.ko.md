@@ -46,7 +46,6 @@ shell·브라우저·다운로드 도구에 전달합니다. `output/`과 그곳
 | Bootstrap / 환경 동기화 | Python 3.11 이상, Git, Codex CLI. `bootstrap.sh`는 Bash, `bootstrap.ps1`은 PowerShell. 동기화 도구는 Python 표준 라이브러리만 사용합니다. Windows에서는 해당 기기의 `python` 또는 `python3`를 씁니다. | 누락된 필수 도구를 준비한 뒤 적용합니다. |
 | `jy-orchestrate` 티켓 라우터 | 지정 작업자·리뷰어 모델 사용 권한, Codex 작업의 기본 서브에이전트, 지원되는 Claude 호출 경로. 교차 제공자 Agent Bridge는 `tabcli`와 대상 CLI가 필요합니다. | 불가능한 배정·독립 리뷰를 보고합니다. 스킬 호출만으로 Codex끼리 Bridge 위임을 선택하지 않습니다. |
 | `security-audit` JSON 검증 / JavaScript 테스트 | Node.js와 POSIX no-follow/nonblocking 파일 열기 기능. CI는 Ubuntu의 Node 22입니다. native Windows는 검증기 입력을 거부하므로 Linux/macOS·WSL 또는 허용된 SSH 호스트에서 실행합니다. | 검증기를 실행할 수 없으면 감사를 미완료로 보고합니다. 스키마를 수동으로 읽은 것은 통과가 아닙니다. |
-| 압축 전 Wiki 훅 | Python, 로그인된 Codex, `gitleaks`, 쓰기 권한이 있는 인증된 `wiki` MCP, 훅 신뢰. Windows launcher는 `py`를 사용합니다. [훅 설치·버전 요건](plugins/jy-env-core/hooks/README.md)을 참고하세요. | 설정 누락·checkpoint 실패를 보고합니다. 설치만으로 실제 훅 실행을 입증하지 않습니다. |
 | `skill-authoring-review` | 정적 검사에 사용하는 별도 선택 의존성 SkillSpector CLI. [설치 안내](plugins/jy-env-core/skills/skill-authoring-review/references/setup.md)를 참고하세요. | 소스 검토는 진행하고 스캔은 `NOT-RUN` 또는 `FAILED`로 표시합니다. |
 | `pstack` 워크플로 | 선택한 작업이 사용하는 Node/Bash 보조 도구와 제공자·forge CLI. [실행 지침](plugins/jy-env-core/skills/pstack/SKILL.md)을 참고하세요. | 선택한 작업에 필요한 의존성만 확인하고 사용할 수 없는 기능을 보고합니다. |
 | `ios-memgraph-leaks` | macOS, Xcode, 실제 iOS 기기와 선택한 메모리 분석 도구. [스킬](plugins/jy-env-ios/skills/ios-memgraph-leaks/SKILL.md)을 참고하세요. | 기기·도구 근거가 없음을 보고합니다. 시뮬레이터 결과로 실기기 동작을 단정하지 않습니다. |
@@ -143,20 +142,6 @@ codex plugin add jy-env-ios@personal-codex
 선택형 iOS는 배치 후 다시 add합니다. `apply` 자체는 Codex plugin을 설치 해제하지 않습니다.
 변경 후에는 새 Codex session을 시작합니다. 별도의 `~/.agents/skills/<pack>`
 discovery link는 만들지 않습니다.
-
-## 압축 전 Wiki handoff
-
-core 플러그인은 동기식 `PreCompact` 훅을 포함합니다. 압축 전 공개 대화를 별도의
-읽기 전용 Codex 호출로 요약하고, 기존 `wiki` MCP로 저장한 내용과 SHA-256을
-재조회해 확인합니다. 현재 세션의 모델 이름을 사용하며 기록마다 추가 모델 사용량과
-대기 시간이 발생합니다. 처리 가능한 실패는 `continue: false`로 압축을 중단하지만,
-호스트 강제 종료·시간초과나 미신뢰 훅의 건너뛰기까지 막는다는 보장은 아닙니다.
-`clear`는 호출하지 않습니다.
-
-각 기기에 Python·Codex·`gitleaks`·Wiki 인증과 플러그인 설치가 필요하며,
-새 Codex 세션의 `/hooks`에서 훅을 확인하고 신뢰해야 합니다. `git pull`만으로
-활성화되지는 않습니다. [설치·저장 위치·실패 처리·제한](plugins/jy-env-core/hooks/README.md)을
-참고하세요.
 
 ## 시험용 pstack 모듈
 
